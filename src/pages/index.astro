@@ -1,11 +1,213 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "../layouts/Layout.astro";
+import CompetencesSection from "../components/SkillsCloud.astro";
+import SectionTitle from "../components/SectionTitle.astro";
+import SkillsCloud from "../components/SkillsCloud.astro";
+import SkewButton from "../components/SkewButton.astro";
+import { Image } from "astro:assets";
+import heroAstro from "../assets/hero-accueil.svg";
+import competencesBg from "../assets/competences-bg.svg";
+import spike from "../assets/spike.svg";
+import arrow from "../assets/arrow.svg";
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Titouan Winkel - Designer web">
+	<main>
+		<!-- Hero section directly in index instead of separate component -->
+		<section class="container mx-auto px-6 py-16">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+				<!-- Applied exact Figma dimensions (1193x426px) and shifted SVG left -->
+				<div class="text-white p-12 overflow-visible">
+					<Image
+						src={heroAstro || "/placeholder.svg"}
+						alt="Hero background"
+						height={400}
+						class="absolute top-35 -left-80 -z-10"
+					/>
+					<h2
+						class="text-4xl font-bold leading-tight relative z-10"
+						style="font-family: 'Russo One', sans-serif;"
+					>
+						Chaque projet est une nouvelle aventure.
+					</h2>
+				</div>
+
+				<div
+					class="flex items-center justify-center min-h-[300px] bg-gray-100 rounded-lg"
+				>
+					<p class="text-gray-500 text-xl">ordi svg</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- About section directly in index instead of separate component -->
+		<section class="container mx-auto px-6 py-16">
+			<!-- Using SectionTitle component instead of manual slash + text -->
+			<SectionTitle text="Qui suis-je ?" />
+
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+				<div
+					class="space-y-4 text-base leading-relaxed"
+					style="font-family: 'Space Grotesk', sans-serif;"
+				>
+					<p>
+						Je m'appelle Titouan <span
+							class="text-purple-600 font-semibold">Winkel</span
+						>, actuellement étudiant en deuxième année de <span
+							class="text-purple-600 font-semibold"
+							>BUT Métiers du Multimédia et de l'Internet</span
+						>. Passionné par la création visuelle et la
+						communication digitale, je me spécialise en design
+						graphique. J'aime concevoir des identités visuelles, des
+						supports de communication et des interfaces alliant
+						créativité et clarté.
+					</p>
+
+					<p>
+						Curieux et motivé, je cherche à enrichir mes compétences
+						à travers des projets concrets, collaboratifs et
+						innovants. Mon objectif est de mettre le design au
+						service <span class="text-purple-600 font-semibold"
+							>d'expériences visuelles cohérentes et impactantes</span
+						>.
+					</p>
+				</div>
+
+				<div
+					class="flex items-center justify-center min-h-[400px] bg-gray-100 rounded-lg"
+				>
+					<p class="text-gray-500 text-xl">dessin svg</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Competences section directly in index instead of separate component -->
+		<section class="py-16">
+			<div class="container mx-auto px-6">
+				<SectionTitle text="Compétences" />
+			</div>
+
+			<!-- Changed from flex with justify-between to flex-start with specific gaps -->
+			<div class="flex gap-8 items-start mt-8">
+				<!-- Categories list with SVG background - aligned to left edge -->
+				<div class="space-y-4">
+					<div class="relative w-fit">
+						<Image
+							src={competencesBg || "/placeholder.svg"}
+							alt=""
+							class="w-auto h-auto"
+						/>
+						<span
+							class="absolute inset-0 flex items-center px-8 text-white text-lg"
+							style="font-family: 'Russo One', sans-serif;"
+						>
+							Design
+						</span>
+					</div>
+					<div class="relative w-fit">
+						<Image
+							src={competencesBg || "/placeholder.svg"}
+							alt=""
+							class="w-auto h-auto"
+						/>
+						<span
+							class="absolute inset-0 flex items-center px-8 text-white text-lg"
+							style="font-family: 'Russo One', sans-serif;"
+						>
+							Développement web
+						</span>
+					</div>
+					<div class="relative w-fit">
+						<Image
+							src={competencesBg || "/placeholder.svg"}
+							alt=""
+							class="w-auto h-auto"
+						/>
+						<span
+							class="absolute inset-0 flex items-center px-8 text-white text-lg"
+							style="font-family: 'Russo One', sans-serif;"
+						>
+							Communication
+						</span>
+					</div>
+					<div class="relative w-fit">
+						<Image
+							src={competencesBg || "/placeholder.svg"}
+							alt=""
+							class="w-auto h-auto"
+						/>
+						<span
+							class="absolute inset-0 flex items-center px-8 text-white text-lg"
+							style="font-family: 'Russo One', sans-serif;"
+						>
+							Audiovisuel
+						</span>
+					</div>
+				</div>
+
+				<!-- Skills cloud with controlled width -->
+				<div class="w-[495px]">
+					<SkillsCloud />
+				</div>
+
+				<!-- Description with smaller gap, positioned directly after skills cloud -->
+				<div class="pt-8 pl-4">
+					<h3
+						class="text-xl mb-4"
+						style="font-family: 'Russo One', sans-serif;"
+					>
+						Description :
+					</h3>
+					<p
+						class="text-gray-600"
+						style="font-family: 'Space Grotesk', sans-serif;"
+					>
+						Cliquez sur une icone
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Contact section directly in index instead of separate component -->
+		<section class="container mx-auto px-6 py-16">
+			<SectionTitle text="Me contacter" />
+
+			<div class="flex justify-between items-start mt-8">
+				<!-- Left side: text and CTA -->
+				<div class="space-y-6">
+					<p
+						class="text-base"
+						style="font-family: 'Space Grotesk', sans-serif;"
+					>
+						Intéressé par mon travail, des questions, une offre
+						d'emploi...{" "}
+						<span class="text-purple-600 font-semibold"
+							>Contacter moi !</span
+						>
+					</p>
+
+					<!-- Pass arrow and text inside button slot -->
+					<SkewButton href="#formulaire">
+						<div class="flex items-center gap-3">
+							<Image
+								src={arrow || "/placeholder.svg"}
+								alt=""
+								class="w-6 h-6"
+							/>
+							<span>Accéder au formulaire</span>
+						</div>
+					</SkewButton>
+				</div>
+
+				<!-- Added negative margin to move spike up -->
+				<div class="-mt-16">
+					<Image
+						src={spike || "/placeholder.svg"}
+						alt=""
+						class="w-auto h-auto"
+					/>
+				</div>
+			</div>
+		</section>
+	</main>
 </Layout>

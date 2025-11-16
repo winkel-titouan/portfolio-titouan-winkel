@@ -1,0 +1,28 @@
+---
+import SkewButton from "./SkewButton.astro";
+---
+
+<header class="container mx-auto px-6 py-6">
+    <nav class="flex items-start justify-between">
+        <div class="flex items-baseline gap-3">
+            <!-- Applied exact Figma styles for Titouan: 50px, Russo One, black -->
+            <h1
+                class="text-black leading-normal"
+                style="font-family: 'Russo One', sans-serif; font-size: 50px; font-weight: 400; font-style: normal;"
+            >
+                Titouan Winkel
+            </h1>
+            <span
+                class="text-purple-600 font-medium text-lg"
+                style="font-family: 'Space Grotesk', sans-serif;"
+                >Designer web</span
+            >
+        </div>
+
+        <div class="flex items-center gap-17 mt-2">
+            <SkewButton href="/projects" text="Projets" />
+            <SkewButton href="/about" text="A propos" />
+            <SkewButton href="/contact" text="Contact" />
+        </div>
+    </nav>
+</header>

@@ -1,0 +1,91 @@
+---
+import linkedinLogo from "../assets/logos/linkedin.svg";
+import behanceLogo from "../assets/logos/behance.svg";
+---
+
+<footer class="bg-black text-white py-16 px-12">
+    <div class="max-w-7xl mx-auto">
+        <!-- Logo -->
+        <h2 class="text-5xl font-bold mb-16">Titouan Winkel</h2>
+
+        <div class="flex justify-between items-start">
+            <!-- Navigation -->
+            <div>
+                <h3 class="text-xl font-semibold mb-6">Navigation</h3>
+                <ul class="space-y-3">
+                    <li>
+                        <a
+                            href="#projets"
+                            class="text-white hover:text-purple-400 transition-colors"
+                            >Projets</a>
+                    </li>
+                    <li>
+                        <a
+                            href="#inspirations"
+                            class="text-white hover:text-purple-400 transition-colors"
+                            >Inspirations</a>
+                    </li>
+                    <li>
+                        <a
+                            href="#contact"
+                            class="text-white hover:text-purple-400 transition-colors"
+                            >Contact</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Légal -->
+            <div>
+                <h3 class="text-xl font-semibold mb-6">Légal</h3>
+                <ul class="space-y-3">
+                    <li>
+                        <a
+                            href="#mentions"
+                            class="text-white hover:text-purple-400 transition-colors"
+                            >Mentions légales</a>
+                    </li>
+                    <li>
+                        <a
+                            href="#confidentialite"
+                            class="text-white hover:text-purple-400 transition-colors"
+                            >Politique de confidentialité</a>
+                    </li>
+                    <li class="pt-4">
+                        © 2025 Titouan Winkel - Tous droits réservés
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Réseaux sociaux -->
+            <div>
+                <h3 class="text-xl font-semibold mb-6">Réseaux sociaux</h3>
+                <div class="flex gap-4">
+                    <a
+                        href="https://linkedin.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:opacity-80 transition-opacity"
+                    >
+                        <img
+                            src={linkedinLogo.src || "/placeholder.svg"}
+                            alt="LinkedIn"
+                            class="w-12 h-12"
+                        />
+                    </a>
+                    <a
+                        href="https://behance.net"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:opacity-80 transition-opacity"
+                    >
+                        <img
+                            src={behanceLogo.src || "/placeholder.svg"}
+                            alt="Behance"
+                            class="w-12 h-12"
+                        />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,31 @@
+---
+const { href, text } = Astro.props;
+
+import line1 from "../assets/boutons/line1.svg";
+import line2 from "../assets/boutons/line2.svg";
+---
+
+<a
+    href={href}
+    class="relative inline-block bg-white border-3 border-black font-bold text-black hover:bg-purple-50 transition-colors"
+    style="transform: skewX(-15deg); width: fit-content; height: 53px; display: flex; align-items: center; justify-content: center; padding: 0 25px;"
+>
+    <img
+        src={line1.src || "/placeholder.svg"}
+        alt=""
+        class="absolute"
+        style="width: 34.2px; top: -9px; left: -17px; transform: skewX(15deg);"
+    />
+
+    <img
+        src={line2.src || "/placeholder.svg"}
+        alt=""
+        class="absolute"
+        style="width: 34.2px; bottom: -12px; right: -17px; transform: skewX(15deg);"
+    />
+
+    <!-- Accept slot content or text prop, unskew the content wrapper -->
+    <span style="transform: skewX(15deg); display: inline-block;">
+        <slot>{text}</slot>
+    </span>
+</a>

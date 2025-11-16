@@ -1,0 +1,19 @@
+---
+import line1 from "../assets/boutons/line1.svg";
+
+interface Props {
+    text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<h2 class="text-4xl font-bold mb-8 flex items-start gap-0">
+    <img
+        src={line1.src || "/placeholder.svg"}
+        alt=""
+        class="-mt-1"
+        aria-hidden="true"
+    />
+    <span class="-ml-3">{text}</span>
+</h2>
