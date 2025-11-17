@@ -3,120 +3,92 @@ import linkedinLogo from "../assets/logos/linkedin.svg";
 import behanceLogo from "../assets/logos/behance.svg";
 ---
 
-<footer class="bg-black text-white py-16 px-12">
+<footer class="bg-black text-white py-8 px-12">
     <div class="max-w-7xl mx-auto">
-        <!-- Logo - Applied Russo One font -->
-        <h2
-            class="mb-16"
-            style="font-family: 'Russo One', sans-serif; font-size: 50px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
-        >
-            Titouan Winkel
-        </h2>
+        <div class="flex justify-between items-center mb-6">
+            <h2
+                style="font-family: 'Russo One', sans-serif; font-size: 32px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
+            >
+                Titouan Winkel
+            </h2>
 
-        <div class="flex justify-between items-start">
-            <!-- Navigation -->
-            <div>
-                <!-- Applied Russo One to section heading -->
-                <h3
-                    class="mb-6"
-                    style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; font-style: normal; line-height: normal; color: #FFF;"
-                >
-                    Navigation
-                </h3>
-                <!-- Applied Space Grotesk to links -->
-                <ul
-                    class="space-y-3"
-                    style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
-                >
-                    <li>
-                        <a
-                            href="#projets"
-                            class="text-white hover:text-purple-400 transition-colors"
-                            >Projets</a>
-                    </li>
-                    <li>
-                        <a
-                            href="#inspirations"
-                            class="text-white hover:text-purple-400 transition-colors"
-                            >Inspirations</a>
-                    </li>
-                    <li>
-                        <a
-                            href="#contact"
-                            class="text-white hover:text-purple-400 transition-colors"
-                            >Contact</a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Légal -->
-            <div>
-                <!-- Applied Russo One to section heading -->
-                <h3
-                    class="mb-6"
-                    style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; font-style: normal; line-height: normal; color: #FFF;"
-                >
-                    Légal
-                </h3>
-                <!-- Applied Space Grotesk to links and copyright -->
-                <ul
-                    class="space-y-3"
-                    style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
-                >
-                    <li>
-                        <a
-                            href="#mentions"
-                            class="text-white hover:text-purple-400 transition-colors"
-                            >Mentions légales</a>
-                    </li>
-                    <li>
-                        <a
-                            href="#confidentialite"
-                            class="text-white hover:text-purple-400 transition-colors"
-                            >Politique de confidentialité</a>
-                    </li>
-                    <li class="pt-4">
-                        © 2025 Titouan Winkel - Tous droits réservés
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Réseaux sociaux -->
-            <div>
-                <!-- Applied Russo One to section heading -->
-                <h3
-                    class="mb-6"
-                    style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; font-style: normal; line-height: normal; color: #FFF;"
-                >
-                    Réseaux sociaux
-                </h3>
-                <div class="flex gap-4">
-                    <a
-                        href="https://linkedin.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="hover:opacity-80 transition-opacity"
+            <div class="flex gap-16 items-start">
+                <!-- Navigation -->
+                <div>
+                    <h3
+                        class="mb-3"
+                        style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; font-style: normal; line-height: normal; color: #FFF;"
                     >
-                        <img
-                            src={linkedinLogo.src || "/placeholder.svg"}
-                            alt="LinkedIn"
-                            class="w-12 h-12"
-                        />
-                    </a>
-                    <a
-                        href="https://behance.net"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="hover:opacity-80 transition-opacity"
+                        Navigation
+                    </h3>
+                    <ul
+                        class="space-y-2"
+                        style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
                     >
-                        <img
-                            src={behanceLogo.src || "/placeholder.svg"}
-                            alt="Behance"
-                            class="w-12 h-12"
-                        />
-                    </a>
+                        <li>
+                            <a
+                                href="/"
+                                class="text-white hover:text-purple-400 transition-colors"
+                                >Projets</a>
+                        </li>
+                        <li>
+                            <a
+                                href="#inspirations"
+                                class="text-white hover:text-purple-400 transition-colors"
+                                >Inspirations</a>
+                        </li>
+                        <li>
+                            <a
+                                href="#contact"
+                                class="text-white hover:text-purple-400 transition-colors"
+                                >Contact</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Réseaux sociaux -->
+                <div>
+                    <h3
+                        class="mb-3"
+                        style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; font-style: normal; line-height: normal; color: #FFF;"
+                    >
+                        Réseaux sociaux
+                    </h3>
+                    <div class="flex gap-4">
+                        <a
+                            href="https://linkedin.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="hover:opacity-80 transition-opacity"
+                        >
+                            <img
+                                src={linkedinLogo.src || "/placeholder.svg"}
+                                alt="LinkedIn"
+                                class="w-10 h-10"
+                            />
+                        </a>
+                        <a
+                            href="https://behance.net"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="hover:opacity-80 transition-opacity"
+                        >
+                            <img
+                                src={behanceLogo.src || "/placeholder.svg"}
+                                alt="Behance"
+                                class="w-10 h-10"
+                            />
+                        </a>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <div
+            class="text-center pt-6 border-t border-gray-800"
+            style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
+        >
+            © 2025 Titouan Winkel - Tous droits réservés
         </div>
     </div>
 </footer>

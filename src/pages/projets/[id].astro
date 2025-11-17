@@ -1,0 +1,298 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import SkewButton from "../../components/SkewButton.astro";
+import { pb } from "../../utils/pb";
+import line1 from "../../assets/boutons/line1.svg";
+import line2 from "../../assets/boutons/line2.svg";
+import bubble from "../../assets/bubble.svg";
+
+export async function getStaticPaths() {
+    const projects = await pb.collection("projets").getFullList();
+
+    return projects.map((project) => ({
+        params: { id: project.id },
+        props: { project },
+    }));
+}
+
+const { project } = Astro.props;
+
+// Helper function to get image URL from PocketBase
+function getImageUrl(record: any, filename: string) {
+    return `https://portfolio.titouan-winkel.fr/api/files/${record.collectionId}/${record.id}/${filename}`;
+}
+
+// Get the first image from prod_finale array
+const firstImage = project.prod_finale?.[0] || "";
+const imageUrl = firstImage ? getImageUrl(project, firstImage) : "";
+
+// Get inspirations images
+const inspirationImages = project.inspirations || [];
+
+// Get production finale images
+const prodFinaleImages = project.prod_finale || [];
+
+// Get logo images
+const logoOldUrl = project.logo_old
+    ? getImageUrl(project, project.logo_old)
+    : "";
+const logoNewUrl = project.logo_new
+    ? getImageUrl(project, project.logo_new)
+    : "";
+---
+
+<Layout title={project.nom_projet}>
+
+    <!-- Hero Section with project title and colored background -->
+    <section
+        class="relative py-32 overflow-hidden"
+        style={`background-color: ${project.couleur};`}
+    >
+        <!-- Decorative bubbles -->
+        <img
+            src={bubble.src || "/placeholder.svg"}
+            alt=""
+            class="absolute top-10 left-10 w-48 h-48 opacity-50"
+        />
+        <img
+            src={bubble.src || "/placeholder.svg"}
+            alt=""
+            class="absolute top-20 right-10 w-64 h-64 opacity-50"
+        />
+
+        <div class="max-w-7xl mx-auto px-8 relative z-10">
+            <div class="flex items-center justify-center gap-8">
+                {
+                    imageUrl && (
+                        <img
+                            src={imageUrl || "/placeholder.svg"}
+                            alt={`${project.nom_projet} logo`}
+                            class="w-24 h-24 object-contain"
+                        />
+                    )
+                }
+                <h1
+                    class="text-black font-['Russo_One'] text-[80px] font-normal leading-normal"
+                >
+                    {project.nom_projet}
+                </h1>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-8">
+            <h2
+                class="text-black font-['Russo_One'] text-[30px] font-normal mb-6"
+            >
+                Compétences mobilisées
+            </h2>
+            <div class="flex gap-6">
+                {/* Skill icons will be added later */}
+            </div>
+        </div>
+    </section>
+
+    <!-- Introduction Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="relative mb-8">
+                <img
+                    src={line1.src || "/placeholder.svg"}
+                    alt=""
+                    class="absolute -left-4 -top-2 w-12 h-12"
+                />
+                <h2
+                    class="text-black font-['Russo_One'] text-[30px] font-normal"
+                >
+                    Introduction
+                </h2>
+                <img
+                    src={line2.src || "/placeholder.svg"}
+                    alt=""
+                    class="absolute -right-4 -bottom-2 w-12 h-12"
+                />
+            </div>
+
+            <div class="grid grid-cols-2 gap-12">
+                <div
+                    class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed text-justify"
+                >
+                    {project.introduction}
+                </div>
+                <div
+                    class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed text-justify"
+                >
+                    {/* Second column for longer text or additional content */}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inspirations Section -->
+    {
+        project.inspiration_texte && (
+            <section class="py-16 bg-white">
+                <div class="max-w-7xl mx-auto px-8">
+                    <div class="relative mb-8">
+                        <img
+                            src={line1.src || "/placeholder.svg"}
+                            alt=""
+                            class="absolute -left-4 -top-2 w-12 h-12"
+                        />
+                        <h2 class="text-black font-['Russo_One'] text-[30px] font-normal">
+                            Inspirations
+                        </h2>
+                        <img
+                            src={line2.src || "/placeholder.svg"}
+                            alt=""
+                            class="absolute -right-4 -bottom-2 w-12 h-12"
+                        />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-12">
+                        <div class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed text-justify">
+                            {project.inspiration_texte}
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            {inspirationImages
+                                .slice(0, 4)
+                                .map((image: string) => (
+                                    <img
+                                        src={
+                                            getImageUrl(project, image) ||
+                                            "/placeholder.svg"
+                                        }
+                                        alt="Inspiration"
+                                        class="w-full h-64 object-cover rounded-lg"
+                                    />
+                                ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        )
+    }
+
+    <!-- Logo Evolution Section -->
+    {
+        (project.logo_old || project.logo_new) && (
+            <section class="py-16 bg-white">
+                <div class="max-w-7xl mx-auto px-8">
+                    <div class="relative mb-8">
+                        <img
+                            src={line1.src || "/placeholder.svg"}
+                            alt=""
+                            class="absolute -left-4 -top-2 w-12 h-12"
+                        />
+                        <h2 class="text-black font-['Russo_One'] text-[30px] font-normal">
+                            Logo
+                        </h2>
+                        <img
+                            src={line2.src || "/placeholder.svg"}
+                            alt=""
+                            class="absolute -right-4 -bottom-2 w-12 h-12"
+                        />
+                    </div>
+
+                    <div class="flex items-center justify-center gap-16 mb-12">
+                        {/* Old Logo */}
+                        {project.logo_old && (
+                            <div class="flex flex-col items-center">
+                                <img
+                                    src={logoOldUrl || "/placeholder.svg"}
+                                    alt="Ancien logo"
+                                    class="w-48 h-48 object-contain mb-6"
+                                />
+                                <p class="text-black font-['Space_Grotesk'] text-[16px] font-normal text-center max-w-xs leading-relaxed">
+                                    {project.logo_old_txt}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Arrow */}
+                        {project.logo_old && project.logo_new && (
+                            <svg
+                                width="100"
+                                height="24"
+                                viewBox="0 0 100 24"
+                                fill="none"
+                                class="text-purple-400"
+                            >
+                                <path
+                                    d="M0 12H98M98 12L86 2M98 12L86 22"
+                                    stroke="currentColor"
+                                    stroke-width="3"
+                                />
+                            </svg>
+                        )}
+
+                        {/* New Logo */}
+                        {project.logo_new && (
+                            <div class="flex flex-col items-center">
+                                <img
+                                    src={logoNewUrl || "/placeholder.svg"}
+                                    alt="Nouveau logo"
+                                    class="w-48 h-48 object-contain mb-6"
+                                />
+                                <p class="text-black font-['Space_Grotesk'] text-[16px] font-normal text-center max-w-xs leading-relaxed">
+                                    {project.logo_new_txt}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+        )
+    }
+
+    <!-- Production Finale Section -->
+    {
+        prodFinaleImages.length > 0 && (
+            <section class="py-16 bg-white">
+                <div class="max-w-7xl mx-auto px-8">
+                    <div class="relative mb-8">
+                        <img
+                            src={line1.src || "/placeholder.svg"}
+                            alt=""
+                            class="absolute -left-4 -top-2 w-12 h-12"
+                        />
+                        <h2 class="text-black font-['Russo_One'] text-[30px] font-normal">
+                            Production Finale
+                        </h2>
+                        <img
+                            src={line2.src || "/placeholder.svg"}
+                            alt=""
+                            class="absolute -right-4 -bottom-2 w-12 h-12"
+                        />
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-8 mb-12">
+                        {prodFinaleImages.map((image: string) => (
+                            <img
+                                src={
+                                    getImageUrl(project, image) ||
+                                    "/placeholder.svg"
+                                }
+                                alt="Production finale"
+                                class="w-full object-contain"
+                            />
+                        ))}
+                    </div>
+
+                    {/* Visit Website Button */}
+                    <div class="flex justify-start">
+                        <SkewButton href={project.lien_site || "#"}>
+                            Accéder au site web
+                        </SkewButton>
+                    </div>
+                </div>
+            </section>
+        )
+    }
+
+</Layout>

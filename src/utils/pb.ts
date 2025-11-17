@@ -1,8 +1,6 @@
 import PocketBase from 'pocketbase';
 
-const pb = new PocketBase('https://portfolio.titouan-winkel.fr');
-
-export default pb;
+export const pb = new PocketBase('https://portfolio.titouan-winkel.fr');
 
 export interface Projet {
     id: string;
@@ -10,4 +8,12 @@ export interface Projet {
     description: string;
     couleur: string;
     prod_finale: string[];
+    introduction?: string;
+    inspiration_texte?: string;
+    inspirations?: string[];
+    logo_old?: string;
+    logo_new?: string;
+    logo_old_txt?: string;
+    logo_new_txt?: string;
+    lien_site?: string;
 }

@@ -1,0 +1,102 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SkewButton from '../../components/SkewButton.astro';
+import { pb, type Projet } from '../../utils/pb';
+import line1 from '../../assets/boutons/line1.svg';
+import line2 from '../../assets/boutons/line2.svg';
+import bubble from '../../assets/bubble.svg';
+import arrowDown from '../../assets/arrow-down.svg';
+import elementPageProjet from '../../assets/element_page_projet.svg';
+
+let projets: Projet[] = [];
+
+try {
+  console.log('[v0] Fetching projects from PocketBase...');
+  const records = await pb.collection('projets').getFullList<Projet>();
+  console.log('[v0] Projects fetched:', records.length, 'projects');
+  console.log('[v0] First project:', records[0]);
+  projets = records;
+} catch (error) {
+  console.error('[v0] Erreur lors de la récupération des projets:', error);
+}
+
+console.log('[v0] Projets array length:', projets.length);
+
+function getImageUrl(projet: Projet): string {
+  if (projet.prod_finale && projet.prod_finale.length > 0) {
+    return `https://portfolio.titouan-winkel.fr/api/files/projets/${projet.id}/${projet.prod_finale[0]}`;
+  }
+  return '/placeholder.svg?height=400&width=300';
+}
+---
+
+<Layout title="Mes Projets - Titouan Winkel">
+  <main class="min-h-screen pt-32 pb-20">
+    <!-- Centered title section with single bubble -->
+    <section class="relative max-w-7xl mx-auto px-8 mb-32">
+      <!-- Single bubble behind title -->
+      <div class="absolute top-14 left-118 -translate-y-1/2 -translate-x-1/2 z-0">
+        <img src={bubble.src || "/placeholder.svg"} alt="" class="w-48 h-48 opacity-60" />
+      </div>
+
+      <!-- Centered title with Figma styles and decorations -->
+      <div class="relative z-10 flex justify-center">
+        <div class="relative inline-block">
+          <img src={line1.src || "/placeholder.svg"} alt="" class="absolute -top-2 -left-8 w-12 h-12" />
+          <h1 class="text-black font-[Russo_One] text-[50px] font-normal leading-normal">
+            Mes projets
+          </h1>
+          <img src={line2.src || "/placeholder.svg"} alt="" class="absolute -bottom-2 -right-8 w-12 h-12" />
+        </div>
+      </div>
+
+      <!-- Using arrow-down.svg -->
+      <div class="flex justify-center mt-50">
+        <img src={arrowDown.src || "/placeholder.svg"} alt="Scroll down" class="w-6 h-10" />
+      </div>
+    </section>
+
+    <!-- Liste des projets -->
+    <section class="space-y-32">
+      {projets.map((projet, index) => (
+        <article class="relative flex items-center gap-8">
+          <!-- SVG positioned flush with page edge, always on left -->
+          <div class="absolute left-0 top-1/2 -translate-y-1/2">
+            <img 
+              src={elementPageProjet.src || "/placeholder.svg"} 
+              alt="" 
+              class="h-60"
+              style={`filter: hue-rotate(${index * 30}deg);`}
+            />
+          </div>
+
+          <!-- Content always has left margin -->
+          <div class="flex-1 space-y-6 z-10 relative ml-64">
+            <div class="flex items-center gap-4">
+              <h2 class="text-black font-[Russo_One] text-[40px] font-normal leading-normal">
+                {projet.nom_projet}
+              </h2>
+              <!-- Les icônes de compétences seront ajoutées plus tard -->
+            </div>
+
+            <p class="text-black font-[Space_Grotesk] text-[20px] font-normal leading-normal max-w-md">
+              {projet.description}
+            </p>
+
+            <!-- Added link to project detail page with projet.id -->
+            <SkewButton href={`/projets/${projet.id}`}>
+              Voir plus
+            </SkewButton>
+          </div>
+
+          <!-- Image is now straight -->
+          <img 
+            src={getImageUrl(projet) || "/placeholder.svg"} 
+            alt={projet.nom_projet}
+            class="w-60 h-auto flex-shrink-0 z-10 mr-30"
+          />
+        </article>
+      ))}
+    </section>
+  </main>
+</Layout>
