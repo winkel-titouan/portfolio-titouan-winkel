@@ -24,9 +24,10 @@ import arrow from "../assets/arrow.svg";
 						height={400}
 						class="absolute top-35 -left-80 -z-10"
 					/>
+					<!-- Applied exact Figma styles: Russo One, 30px, white -->
 					<h2
-						class="text-4xl font-bold leading-tight relative z-10"
-						style="font-family: 'Russo One', sans-serif;"
+						class="relative z-10"
+						style="font-family: 'Russo One', sans-serif; font-size: 30px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
 					>
 						Chaque projet est une nouvelle aventure.
 					</h2>
@@ -46,9 +47,10 @@ import arrow from "../assets/arrow.svg";
 			<SectionTitle text="Qui suis-je ?" />
 
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+				<!-- Applied exact Figma styles for body text: Space Grotesk, 20px, weight 400, black -->
 				<div
-					class="space-y-4 text-base leading-relaxed"
-					style="font-family: 'Space Grotesk', sans-serif;"
+					class="space-y-4"
+					style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
 				>
 					<p>
 						Je m'appelle Titouan <span
@@ -87,10 +89,10 @@ import arrow from "../assets/arrow.svg";
 				<SectionTitle text="Compétences" />
 			</div>
 
-			<!-- Changed from flex with justify-between to flex-start with specific gaps -->
-			<div class="flex gap-8 items-start mt-8">
-				<!-- Categories list with SVG background - aligned to left edge -->
-				<div class="space-y-4">
+			<!-- Changed to flex with fixed widths to prevent layout shifts -->
+			<div class="flex gap-10 items-start mt-5">
+				<!-- Added fixed width and flex-shrink-0 to prevent movement -->
+				<div class="space-y-4 flex-shrink-0 w-[420px]">
 					<div class="relative w-fit">
 						<Image
 							src={competencesBg || "/placeholder.svg"}
@@ -145,22 +147,23 @@ import arrow from "../assets/arrow.svg";
 					</div>
 				</div>
 
-				<!-- Skills cloud with controlled width -->
-				<div class="w-[495px]">
+				<!-- Added flex-shrink-0 to prevent logo cloud from moving -->
+				<div class="w-[450px] flex-shrink-0">
 					<SkillsCloud />
 				</div>
 
-				<!-- Description with smaller gap, positioned directly after skills cloud -->
-				<div class="pt-8 pl-4">
+				<!-- Reduced width from 400px to 350px -->
+				<div class="pt-8 pl-4 w-[350px] flex-shrink-0">
 					<h3
-						class="text-xl mb-4"
-						style="font-family: 'Russo One', sans-serif;"
+						class="mb-4"
+						style="font-family: 'Russo One', sans-serif; font-size: 30px; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
 					>
 						Description :
 					</h3>
 					<p
-						class="text-gray-600"
-						style="font-family: 'Space Grotesk', sans-serif;"
+						id="skill-description"
+						class="text-justify leading-relaxed"
+						style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; color: #000;"
 					>
 						Cliquez sur une icone
 					</p>
@@ -175,9 +178,9 @@ import arrow from "../assets/arrow.svg";
 			<div class="flex justify-between items-start mt-8">
 				<!-- Left side: text and CTA -->
 				<div class="space-y-6">
+					<!-- Applied Space Grotesk, 20px for body text -->
 					<p
-						class="text-base"
-						style="font-family: 'Space Grotesk', sans-serif;"
+						style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
 					>
 						Intéressé par mon travail, des questions, une offre
 						d'emploi...{" "}
@@ -211,3 +214,50 @@ import arrow from "../assets/arrow.svg";
 		</section>
 	</main>
 </Layout>
+
+<script>
+	// Skill descriptions object
+	const skillDescriptions: Record<string, string> = {
+		illustrator:
+			"Adobe Illustrator est un logiciel de création graphique vectorielle professionnel, idéal pour la conception de logos, illustrations et designs complexes.",
+		figma: "Figma est un outil de design d'interface collaboratif en ligne, parfait pour créer des maquettes web et mobile avec une approche en équipe.",
+		css: "CSS (Cascading Style Sheets) est le langage de style qui donne vie aux pages web en définissant leur apparence visuelle et leur mise en page.",
+		wordpress:
+			"WordPress est un système de gestion de contenu puissant qui permet de créer et gérer facilement des sites web dynamiques sans connaissances techniques approfondies.",
+		daisyui:
+			"DaisyUI est une bibliothèque de composants pour Tailwind CSS qui propose des éléments d'interface prêts à l'emploi avec un design moderne et cohérent.",
+		astro: "Astro est un framework web moderne qui permet de créer des sites ultra-rapides en générant du HTML statique et en chargeant le JavaScript uniquement quand nécessaire.",
+		html: "HTML (HyperText Markup Language) est le langage de balisage fondamental qui structure le contenu des pages web et définit leur architecture.",
+		javascript:
+			"JavaScript est le langage de programmation qui rend les pages web interactives et dynamiques, permettant de créer des expériences utilisateur riches.",
+		sql: "SQL (Structured Query Language) est le langage standard pour gérer et interroger les bases de données relationnelles de manière efficace.",
+		davinci:
+			"DaVinci Resolve est un logiciel de montage vidéo professionnel qui combine édition, étalonnage colorimétrique et effets visuels dans une seule application.",
+		capcut: "CapCut est une application de montage vidéo intuitive et accessible, parfaite pour créer du contenu créatif pour les réseaux sociaux rapidement.",
+		sketchbook:
+			"Sketchbook est une application de dessin numérique intuitive offrant des outils professionnels pour l'illustration et le croquis artistique.",
+		notion: "Notion est un espace de travail tout-en-un qui combine prise de notes, gestion de projets et bases de données pour organiser efficacement toutes vos informations.",
+		canva: "Canva est une plateforme de design graphique accessible qui permet de créer facilement des visuels professionnels pour les réseaux sociaux et la communication.",
+		pocketbase:
+			"Pocketbase est une base de données backend légère et open-source qui fournit une API REST automatique et une interface d'administration intégrée.",
+		tailwind:
+			"Tailwind CSS est un framework CSS utility-first qui permet de construire rapidement des interfaces modernes en composant des classes utilitaires.",
+	};
+
+	// Get description element
+	const descriptionElement = document.getElementById("skill-description");
+
+	// Add click event listeners to all skill buttons
+	document.querySelectorAll("[data-skill]").forEach((button) => {
+		button.addEventListener("click", (e) => {
+			const skillName = (e.currentTarget as HTMLElement).getAttribute(
+				"data-skill",
+			);
+			if (skillName && descriptionElement) {
+				descriptionElement.textContent =
+					skillDescriptions[skillName] ||
+					"Description non disponible";
+			}
+		});
+	});
+</script>

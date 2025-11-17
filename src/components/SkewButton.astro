@@ -5,27 +5,71 @@ import line1 from "../assets/boutons/line1.svg";
 import line2 from "../assets/boutons/line2.svg";
 ---
 
-<a
-    href={href}
-    class="relative inline-block bg-white border-3 border-black font-bold text-black hover:bg-purple-50 transition-colors"
-    style="transform: skewX(-15deg); width: fit-content; height: 53px; display: flex; align-items: center; justify-content: center; padding: 0 25px;"
->
+<div class="button-wrapper relative inline-block" style="width: fit-content;">
     <img
         src={line1.src || "/placeholder.svg"}
         alt=""
-        class="absolute"
-        style="width: 34.2px; top: -9px; left: -17px; transform: skewX(15deg);"
+        class="absolute z-30"
+        style="width: 34.2px; top: -9px; left: -10px; "
     />
 
     <img
         src={line2.src || "/placeholder.svg"}
         alt=""
-        class="absolute"
-        style="width: 34.2px; bottom: -12px; right: -17px; transform: skewX(15deg);"
+        class="absolute z-30"
+        style="width: 34.2px; bottom: -9px; right: -10px;"
     />
 
-    <!-- Accept slot content or text prop, unskew the content wrapper -->
-    <span style="transform: skewX(15deg); display: inline-block;">
-        <slot>{text}</slot>
-    </span>
-</a>
+    <a
+        href={href}
+        class="skew-button relative inline-block bg-white border-3 border-black font-bold text-black transition-colors"
+        style="transform: skewX(-15deg); width: fit-content; height: 53px; display: flex; align-items: center; justify-content: center; padding: 0 25px; font-family: 'Russo One', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; overflow: hidden;"
+    >
+        <!-- Add black background that fills from left to right on hover, z-index 1 to stay below text -->
+        <span class="fill-bg"></span>
+
+        <!-- Duplicate text for color transition effect -->
+        <span
+            class="button-text"
+            style="transform: skewX(15deg); display: inline-block; position: relative; z-index: 10;"
+        >
+            <span class="text-black transition-opacity duration-500">
+                <slot>{text}</slot>
+            </span>
+            <span
+                class="text-white absolute top-0 left-0 opacity-0 transition-opacity duration-500"
+            >
+                <slot>{text}</slot>
+            </span>
+        </span>
+    </a>
+</div>
+<style>
+    .skew-button {
+        position: relative;
+    }
+
+    .fill-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        transform: translateX(-100%);
+        transition: transform 0.5s ease-in-out;
+        z-index: 1;
+    }
+
+    .skew-button:hover .fill-bg {
+        transform: translateX(0);
+    }
+
+    .skew-button:hover .button-text > span:first-child {
+        opacity: 0;
+    }
+
+    .skew-button:hover .button-text > span:last-child {
+        opacity: 1;
+    }
+</style>

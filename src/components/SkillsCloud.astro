@@ -18,13 +18,14 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 ---
 
 <div class="space-y-6">
-    <!-- Using absolute positioning so each logo can be moved independently -->
+    <!-- Shifted all logos 80px to the left for better centering -->
     <div class="w-[495px] h-[372px] relative">
         <!-- Illustrator -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 150px; top: 30px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 70px; top: 30px;"
             title="Adobe Illustrator"
+            data-skill="illustrator"
         >
             <img
                 src={illustratorLogo.src || "/placeholder.svg"}
@@ -35,9 +36,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- Figma -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 250px; top: 0px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 170px; top: 0px;"
             title="Figma"
+            data-skill="figma"
         >
             <img
                 src={figmaLogo.src || "/placeholder.svg"}
@@ -48,9 +50,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- CSS -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 350px; top: 15px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 270px; top: 15px;"
             title="CSS"
+            data-skill="css"
         >
             <img
                 src={cssLogo.src || "/placeholder.svg"}
@@ -61,23 +64,25 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- WordPress -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 100px; top: 100px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 25px; top: 85px;"
             title="WordPress"
+            data-skill="wordpress"
         >
             <img
                 src={wordpressLogo.src || "/placeholder.svg"}
                 alt="WordPress"
-                style="width: 200px; height: 100px;"
+                style="width: 170px; height: 120px;"
                 class="object-contain"
             />
         </button>
 
         <!-- DaisyUI -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 230px; top: 180px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 150px; top: 180px;"
             title="DaisyUI"
+            data-skill="daisyui"
         >
             <img
                 src={daisyuiLogo.src || "/placeholder.svg"}
@@ -88,9 +93,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- Astro -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 250px; top: 100px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 170px; top: 100px;"
             title="Astro"
+            data-skill="astro"
         >
             <img
                 src={astrojsLogo.src || "/placeholder.svg"}
@@ -101,9 +107,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- HTML -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 320px; top: 90px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 240px; top: 90px;"
             title="HTML"
+            data-skill="html"
         >
             <img
                 src={htmlLogo.src || "/placeholder.svg"}
@@ -114,22 +121,24 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- JavaScript -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 325px; top: 85px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 280px; top: 85px;"
             title="JavaScript"
+            data-skill="javascript"
         >
             <img
                 src={jsLogo.src || "/placeholder.svg"}
                 alt="JavaScript"
-                class="w-50 h-16 object-contain"
+                class="w-36 h-16 object-contain"
             />
         </button>
 
         <!-- SQL -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 120px; top: 180px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 40px; top: 180px;"
             title="SQL"
+            data-skill="sql"
         >
             <img
                 src={sqlLogo.src || "/placeholder.svg"}
@@ -140,9 +149,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- DaVinci Resolve -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 310px; top: 160px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 230px; top: 160px;"
             title="DaVinci Resolve"
+            data-skill="davinci"
         >
             <img
                 src={davinciResolveLogo.src || "/placeholder.svg"}
@@ -153,9 +163,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- CapCut -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 390px; top: 160px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 310px; top: 160px;"
             title="CapCut"
+            data-skill="capcut"
         >
             <img
                 src={capcutLogo.src || "/placeholder.svg"}
@@ -166,9 +177,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- Sketchbook -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 320px; top: 230px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 240px; top: 230px;"
             title="Sketchbook"
+            data-skill="sketchbook"
         >
             <img
                 src={sketchbookLogo.src || "/placeholder.svg"}
@@ -179,22 +191,24 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- Notion -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 400px; top: 235px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 320px; top: 235px;"
             title="Notion"
+            data-skill="notion"
         >
             <img
                 src={notionLogo.src || "/placeholder.svg"}
                 alt="Notion"
-                class="w-15 h-20 object-contain"
+                class="w-20 h-20 object-contain"
             />
         </button>
 
         <!-- Canva -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 155px; top: 240px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 75px; top: 240px;"
             title="Canva"
+            data-skill="canva"
         >
             <img
                 src={canvaLogo.src || "/placeholder.svg"}
@@ -205,9 +219,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- Pocketbase -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 250px; top: 285px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 170px; top: 285px;"
             title="Pocketbase"
+            data-skill="pocketbase"
         >
             <img
                 src={pocketbaseLogo.src || "/placeholder.svg"}
@@ -218,9 +233,10 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
 
         <!-- Tailwind CSS -->
         <button
-            class="absolute cursor-pointer"
-            style="left: 340px; top: 305px;"
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 260px; top: 305px;"
             title="Tailwind CSS"
+            data-skill="tailwind"
         >
             <img
                 src={tailwindcssLogo.src || "/placeholder.svg"}
