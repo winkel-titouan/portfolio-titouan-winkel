@@ -8,6 +8,7 @@ export interface Projet {
     description: string;
     couleur: string;
     prod_finale: string[];
+    competences?: string[];
     introduction?: string;
     inspiration_texte?: string;
     inspirations?: string[];
@@ -16,4 +17,5 @@ export interface Projet {
     logo_old_txt?: string;
     logo_new_txt?: string;
     lien_site?: string;
+    lien_appli?: string;
 }

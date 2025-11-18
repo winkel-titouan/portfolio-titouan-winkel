@@ -6,6 +6,17 @@ import SkewButton from "../../components/SkewButton.astro";
 import SectionTitle from "../../components/SectionTitle.astro";
 import { pb } from "../../utils/pb";
 import bubble from "../../assets/bubble.svg";
+import line1 from "../../assets/boutons/line1.svg";
+import line2 from "../../assets/boutons/line2.svg";
+import javascriptLogo from "../../assets/logos/js.svg";
+import astroLogo from "../../assets/logos/astrojs.svg";
+import tailwindLogo from "../../assets/logos/tailwindcss.svg";
+import sqlLogo from "../../assets/logos/sql.svg";
+import pocketbaseLogo from "../../assets/logos/pocketbase.svg";
+import capcutLogo from "../../assets/logos/capcut.svg";
+import cssLogo from "../../assets/logos/css.svg";
+import htmlLogo from "../../assets/logos/html.svg";
+import figmaLogo from "../../assets/logos/figma.svg";
 
 export async function getStaticPaths() {
     const projects = await pb.collection("projets").getFullList();
@@ -17,6 +28,18 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
+
+const logoMap: Record<string, any> = {
+    javascript: javascriptLogo,
+    astro: astroLogo,
+    tailwind: tailwindLogo,
+    sql: sqlLogo,
+    pocketbase: pocketbaseLogo,
+    capcut: capcutLogo,
+    css: cssLogo,
+    html: htmlLogo,
+    figma: figmaLogo,
+};
 
 // Helper function to get image URL from PocketBase
 function getImageUrl(record: any, filename: string) {
@@ -75,7 +98,7 @@ const inspParagraphs = inspText
                         <img
                             src={heroImageUrl || "/placeholder.svg"}
                             alt={`${project.nom_projet} logo`}
-                            class="w-54 h-54 object-contain"
+                            class="w-24 h-54 object-contain"
                         />
                     )
                 }
@@ -88,16 +111,50 @@ const inspParagraphs = inspText
         </div>
     </section>
 
-    <!-- Skills Section -->
+    <!-- Skills Section with logos -->
     <section class="py-12 bg-white">
         <div class="max-w-7xl mx-auto px-8">
-            <h2
-                class="text-black font-['Russo_One'] text-[30px] font-normal mb-6"
-            >
-                Compétences mobilisées
-            </h2>
-            <div class="flex gap-6">
-                {/* Skill icons will be added later */}
+            <SectionTitle text="Compétences mobilisées" />
+
+            <div class="flex gap-8 justify-start mt-8">
+                {
+                    project.competences &&
+                        project.competences.map((competence: string) => (
+                            <div class="relative">
+                                {/* Line decorations in corners with smaller size */}
+                                <img
+                                    src={line1.src || "/placeholder.svg"}
+                                    alt=""
+                                    class="absolute z-30"
+                                    style="width: 25px; top: -6px; left: 0px;"
+                                />
+                                <img
+                                    src={line2.src || "/placeholder.svg"}
+                                    alt=""
+                                    class="absolute z-30"
+                                    style="width: 25px; bottom: -6px; right: 0px;"
+                                />
+
+                                {/* Skewed background using project color with black border */}
+                                <div
+                                    class="absolute inset-0 z-0 transform skew-x-[-15deg] border-4 border-black"
+                                    style={`background-color: ${project.couleur};`}
+                                />
+                                {/* Logo container */}
+                                <div class="relative z-10 px-6 py-4">
+                                    <img
+                                        src={
+                                            logoMap[competence]?.src ||
+                                            "/placeholder.svg" ||
+                                            "/placeholder.svg"
+                                        }
+                                        alt={competence}
+                                        class="w-16 h-16 object-contain"
+                                    />
+                                </div>
+                            </div>
+                        ))
+                }
             </div>
         </div>
     </section>
@@ -131,7 +188,7 @@ const inspParagraphs = inspText
                 <div class="max-w-7xl mx-auto px-8">
                     <SectionTitle text="Inspirations" />
 
-                    <div class="flex gap-16 items-start">
+                    <div class="flex gap-16 items-center">
                         {/* Text content - left side, reduced to 1/2 width */}
                         <div class="w-1/2 space-y-6">
                             {inspParagraphs.map((paragraph: string) => (
@@ -152,7 +209,6 @@ const inspParagraphs = inspText
                                     <img
                                         src={
                                             getImageUrl(project, image) ||
-                                            "/placeholder.svg" ||
                                             "/placeholder.svg" ||
                                             "/placeholder.svg"
                                         }
@@ -189,19 +245,18 @@ const inspParagraphs = inspText
                             </div>
                         )}
 
-                        {/* Arrow */}
+                        {/* Arrow - replaced with custom SVG using project color */}
                         {project.logo_old && project.logo_new && (
                             <svg
-                                width="100"
-                                height="24"
-                                viewBox="0 0 100 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="120"
+                                height="41"
+                                viewBox="0 0 120 41"
                                 fill="none"
-                                class="text-purple-400"
                             >
                                 <path
-                                    d="M0 12H98M98 12L86 2M98 12L86 22"
-                                    stroke="currentColor"
-                                    stroke-width="3"
+                                    d="M120 20.207L85 -0.000228882V40.4143L120 20.207ZM0 20.207L0 23.707L88.5 23.707V20.207V16.707L0 16.707L0 20.207Z"
+                                    fill={project.couleur}
                                 />
                             </svg>
                         )}
@@ -237,7 +292,6 @@ const inspParagraphs = inspText
                             <img
                                 src={
                                     getImageUrl(project, image) ||
-                                    "/placeholder.svg" ||
                                     "/placeholder.svg" ||
                                     "/placeholder.svg"
                                 }

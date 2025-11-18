@@ -10,6 +10,8 @@ import competencesBg from "../assets/competences-bg.svg";
 import spike from "../assets/spike.svg";
 import arrow from "../assets/arrow.svg";
 import heroPC from "../assets/hero-pc.svg";
+import personnage from "../assets/a_propos/personnage.svg";
+import bubble from "../assets/bubble.svg";
 ---
 
 <Layout title="Titouan Winkel - Designer web">
@@ -23,11 +25,11 @@ import heroPC from "../assets/hero-pc.svg";
 						src={heroAstro || "/placeholder.svg"}
 						alt="Hero background"
 						height={400}
-						class="absolute top-47 -left-80 -z-10"
+						class="absolute top-35 -left-80 -z-10"
 					/>
 					<!-- Applied exact Figma styles: Russo One, 30px, white -->
 					<h2
-						class="relative z-10 mb-40"
+						class="relative z-10 mb-65"
 						style="font-family: 'Russo One', sans-serif; font-size: 30px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
 					>
 						Chaque projet est une nouvelle aventure.
@@ -57,7 +59,9 @@ import heroPC from "../assets/hero-pc.svg";
 					style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
 				>
 					<p>
-						Je m'appelle Titouan Winkel, actuellement étudiant en deuxième année de <span
+						Je m'appelle Titouan <span
+							class="text-purple-600 font-semibold">Winkel</span
+						>, actuellement étudiant en deuxième année de <span
 							class="text-purple-600 font-semibold"
 							>BUT Métiers du Multimédia et de l'Internet</span
 						>. Passionné par la création visuelle et la
@@ -77,10 +81,21 @@ import heroPC from "../assets/hero-pc.svg";
 					</p>
 				</div>
 
-				<div
-					class="flex items-center justify-center min-h-[400px] bg-gray-100 rounded-lg"
-				>
-					<p class="text-gray-500 text-xl">dessin svg</p>
+				<!-- Replace placeholder with personnage SVG -->
+				<!-- Added relative positioning and bubble decoration behind character -->
+				<div class="flex items-center justify-center relative">
+					<!-- Decorative bubble behind character -->
+					<Image
+						src={bubble || "/placeholder.svg"}
+						alt=""
+						class="absolute -z-10 w-96 h-96 opacity-50"
+						style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
+					/>
+					<Image
+						src={personnage || "/placeholder.svg"}
+						alt="Personnage illustration"
+						class="w-auto h-80 relative z-10"
+					/>
 				</div>
 			</div>
 		</section>
@@ -191,7 +206,7 @@ import heroPC from "../assets/hero-pc.svg";
 						>
 					</p>
 
-					<!-- Pass arrow and text inside button slot -->
+					<!-- Updated link to point to /contact page -->
 					<SkewButton href="/contact">
 						<div class="flex items-center gap-3">
 							<Image

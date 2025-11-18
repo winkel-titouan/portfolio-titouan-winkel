@@ -7,6 +7,15 @@ import line2 from '../../assets/boutons/line2.svg';
 import bubble from '../../assets/bubble.svg';
 import arrowDown from '../../assets/arrow-down.svg';
 import elementPageProjet from '../../assets/element_page_projet.svg';
+import javascriptLogo from '../../assets/logos/js.svg';
+import astroLogo from '../../assets/logos/astrojs.svg';
+import tailwindLogo from '../../assets/logos/tailwindcss.svg';
+import sqlLogo from '../../assets/logos/sql.svg';
+import pocketbaseLogo from '../../assets/logos/pocketbase.svg';
+import capcutLogo from '../../assets/logos/capcut.svg';
+import cssLogo from '../../assets/logos/css.svg';
+import htmlLogo from '../../assets/logos/html.svg';
+import figmaLogo from '../../assets/logos/figma.svg';
 
 let projets: Projet[] = [];
 
@@ -21,6 +30,18 @@ try {
 }
 
 console.log('[v0] Projets array length:', projets.length);
+
+const logoMap: Record<string, any> = {
+    javascript: javascriptLogo,
+    astro: astroLogo,
+    tailwind: tailwindLogo,
+    sql: sqlLogo,
+    pocketbase: pocketbaseLogo,
+    capcut: capcutLogo,
+    css: cssLogo,
+    html: htmlLogo,
+    figma: figmaLogo,
+};
 
 function getImageUrl(projet: Projet): string {
   if (projet.prod_finale && projet.prod_finale.length > 0) {
@@ -76,7 +97,40 @@ function getImageUrl(projet: Projet): string {
               <h2 class="text-black font-[Russo_One] text-[40px] font-normal leading-normal">
                 {projet.nom_projet}
               </h2>
-              <!-- Les icônes de compétences seront ajoutées plus tard -->
+              <div class="flex gap-3 ml-4">
+                {projet.competences && projet.competences.map((competence: string) => (
+                  <div class="relative">
+                    {/* Line decorations in corners with smaller size */}
+                    <img
+                      src={line1.src || "/placeholder.svg"}
+                      alt=""
+                      class="absolute z-30"
+                      style="width: 15px; top: -4px; left: -0px;"
+                    />
+                    <img
+                      src={line2.src || "/placeholder.svg"}
+                      alt=""
+                      class="absolute z-30"
+                      style="width: 15px; bottom: -4px; right: -0px;"
+                    />
+                    
+                    {/* Skewed background using project color with black border */}
+                    <div 
+                      class="absolute inset-0 -z-10 transform skew-x-[-15deg] border-3 border-black"
+                      style={`background-color: ${projet.couleur}; opacity: 1;`}
+                    />
+                    {/* Logo container */}
+                    <div class="px-3 py-2">
+                      <img 
+                        src={logoMap[competence]?.src || "/placeholder.svg"} 
+                        alt={competence}
+                        class="w-10 h-10 object-contain"
+                        title={competence}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <p class="text-black font-[Space_Grotesk] text-[20px] font-normal leading-normal max-w-md">
