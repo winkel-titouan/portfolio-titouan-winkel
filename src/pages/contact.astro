@@ -15,15 +15,27 @@ import SkewButton from "../components/SkewButton.astro";
                 style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 500;"
             >
                 <p>
-                    <span class="font-semibold">Mail :</span> titouan.winkel@edu.univ-fcomte.fr
+                    <span class="font-semibold">Mail :</span>
+                    <a
+                        href="mailto:titouan.winkel@edu.univ-fcomte.fr"
+                        class="text-purple-600 hover:text-purple-800 underline"
+                    >
+                        titouan.winkel@edu.univ-fcomte.fr
+                    </a>
                 </p>
                 <p>
-                    <span class="font-semibold">Téléphone :</span> 07 62 70 86 34
+                    <span class="font-semibold">Téléphone :</span>
+                    <a
+                        href="tel:+33762708634"
+                        class="text-purple-600 hover:text-purple-800 underline"
+                    >
+                        07 62 70 86 34
+                    </a>
                 </p>
             </div>
 
             <!-- Contact form -->
-            <form class="space-y-6" method="POST">
+            <form id="contact-form" class="space-y-6" method="POST">
                 <!-- First row: Prénom and Nom side by side -->
                 <div class="grid grid-cols-2 gap-6">
                     <div>
@@ -93,6 +105,58 @@ import SkewButton from "../components/SkewButton.astro";
                     </SkewButton>
                 </div>
             </form>
+
+            <!-- Status message display -->
+            <div id="form-status" class="mt-4 text-center hidden"></div>
         </div>
     </main>
 </Layout>
+
+<script>
+    const form = document.getElementById("contact-form") as HTMLFormElement;
+    const statusDiv = document.getElementById("form-status") as HTMLDivElement;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const data = {
+            prenom: formData.get("prenom"),
+            nom: formData.get("nom"),
+            email: formData.get("email"),
+            sujet: formData.get("sujet"),
+            message: formData.get("message"),
+        };
+
+        statusDiv.classList.remove("hidden");
+        statusDiv.textContent = "Envoi en cours...";
+        statusDiv.className = "mt-4 text-center text-purple-600";
+
+        try {
+            const response = await fetch("/api/contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                statusDiv.textContent = "Message envoyé avec succès !";
+                statusDiv.className =
+                    "mt-4 text-center text-green-600 font-semibold";
+                form.reset();
+            } else {
+                statusDiv.textContent = `Erreur : ${result.error}`;
+                statusDiv.className =
+                    "mt-4 text-center text-red-600 font-semibold";
+            }
+        } catch (error) {
+            statusDiv.textContent =
+                "Erreur lors de l'envoi du message. Veuillez réessayer.";
+            statusDiv.className = "mt-4 text-center text-red-600 font-semibold";
+        }
+    });
+</script>
