@@ -119,6 +119,8 @@ import SkewButton from "../components/SkewButton.astro";
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
+        console.log("[v0] Form submitted");
+
         const formData = new FormData(form);
         const data = {
             prenom: formData.get("prenom"),
@@ -128,11 +130,15 @@ import SkewButton from "../components/SkewButton.astro";
             message: formData.get("message"),
         };
 
+        console.log("[v0] Form data:", data);
+
         statusDiv.classList.remove("hidden");
         statusDiv.textContent = "Envoi en cours...";
         statusDiv.className = "mt-4 text-center text-purple-600";
 
         try {
+            console.log("[v0] Sending request to /api/contact");
+
             const response = await fetch("/api/contact", {
                 method: "POST",
                 headers: {
@@ -141,7 +147,10 @@ import SkewButton from "../components/SkewButton.astro";
                 body: JSON.stringify(data),
             });
 
+            console.log("[v0] Response status:", response.status);
+
             const result = await response.json();
+            console.log("[v0] Response data:", result);
 
             if (response.ok) {
                 statusDiv.textContent = "Message envoyé avec succès !";
@@ -149,11 +158,12 @@ import SkewButton from "../components/SkewButton.astro";
                     "mt-4 text-center text-green-600 font-semibold";
                 form.reset();
             } else {
-                statusDiv.textContent = `Erreur : ${result.error}`;
+                statusDiv.textContent = `Erreur : ${result.error}${result.details ? " - " + result.details : ""}`;
                 statusDiv.className =
                     "mt-4 text-center text-red-600 font-semibold";
             }
         } catch (error) {
+            console.error("[v0] Fetch error:", error);
             statusDiv.textContent =
                 "Erreur lors de l'envoi du message. Veuillez réessayer.";
             statusDiv.className = "mt-4 text-center text-red-600 font-semibold";
