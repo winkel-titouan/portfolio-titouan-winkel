@@ -1,0 +1,98 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SectionTitle from "../components/SectionTitle.astro";
+import SkewButton from "../components/SkewButton.astro";
+---
+
+<Layout title="Contact - Titouan Winkel">
+    <main class="container mx-auto px-6 py-16 flex flex-col items-center">
+        <div class="w-full max-w-5xl">
+            <SectionTitle text="Me contacter" />
+
+            <!-- Contact info at the top -->
+            <div
+                class="mb-8 flex gap-12 text-lg"
+                style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 500;"
+            >
+                <p>
+                    <span class="font-semibold">Mail :</span> titouan.winkel@edu.univ-fcomte.fr
+                </p>
+                <p>
+                    <span class="font-semibold">Téléphone :</span> 07 62 70 86 34
+                </p>
+            </div>
+
+            <!-- Contact form -->
+            <form class="space-y-6" method="POST">
+                <!-- First row: Prénom and Nom side by side -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <input
+                            type="text"
+                            name="prenom"
+                            placeholder="Prénom"
+                            required
+                            class="w-full px-6 py-4 bg-purple-200 border-3 border-black"
+                            style="font-family: 'Space Grotesk', sans-serif; font-size: 18px;"
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            name="nom"
+                            placeholder="Nom"
+                            required
+                            class="w-full px-6 py-4 bg-purple-200 border-3 border-black"
+                            style="font-family: 'Space Grotesk', sans-serif; font-size: 18px;"
+                        />
+                    </div>
+                </div>
+
+                <!-- Email field -->
+                <div>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="E-mail"
+                        required
+                        class="w-full px-6 py-4 bg-purple-200 border-3 border-black"
+                        style="font-family: 'Space Grotesk', sans-serif; font-size: 18px;"
+                    />
+                </div>
+
+                <!-- Subject field -->
+                <div>
+                    <input
+                        type="text"
+                        name="sujet"
+                        placeholder="Sujet"
+                        required
+                        class="w-full px-6 py-4 bg-purple-200 border-3 border-black"
+                        style="font-family: 'Space Grotesk', sans-serif; font-size: 18px;"
+                    />
+                </div>
+
+                <!-- Message textarea -->
+                <div>
+                    <textarea
+                        name="message"
+                        placeholder="Message"
+                        required
+                        rows="8"
+                        class="w-full px-6 py-4 bg-purple-200 border-3 border-black resize-none"
+                        style="font-family: 'Space Grotesk', sans-serif; font-size: 18px;"
+                    ></textarea>
+                </div>
+
+                <!-- Submit button using SkewButton -->
+                <div class="flex justify-center pt-4">
+                    <SkewButton href="#" text="Envoyer">
+                        <button type="submit" class="w-full h-full">
+                            Envoyer
+                        </button>
+                    </SkewButton>
+                </div>
+            </form>
+        </div>
+    </main>
+</Layout>

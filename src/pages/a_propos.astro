@@ -1,0 +1,142 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SectionTitle from "../components/SectionTitle.astro";
+import { Image } from "astro:assets";
+import artRural from "../assets/a_propos/art_rural.webp";
+import immeuble from "../assets/a_propos/immeuble.webp";
+import jdm from "../assets/a_propos/jdm.webp";
+import personnage from "../assets/a_propos/personnage.webp";
+---
+
+<Layout title="À propos - Titouan Winkel">
+    <main>
+        <!-- Hero section -->
+        <section class="container mx-auto px-6 py-16 relative">
+            <!-- Decorative purple circles -->
+            <div
+                class="absolute top-8 left-48 w-32 h-32 bg-purple-200 rounded-full opacity-50 -z-10"
+            >
+            </div>
+            <div
+                class="absolute top-12 left-60 w-24 h-24 bg-purple-300 rounded-full opacity-40 -z-10"
+            >
+            </div>
+            <div
+                class="absolute top-20 left-56 w-20 h-20 bg-purple-200 rounded-full opacity-30 -z-10"
+            >
+            </div>
+
+            <h1
+                class="text-center"
+                style="font-family: 'Russo One', sans-serif; font-size: 80px; font-weight: 400; color: #9333ea;"
+            >
+                À propos
+            </h1>
+        </section>
+
+        <!-- D'où viens section -->
+        <section class="container mx-auto px-6 py-16">
+            <!-- Fixed SectionTitle usage with text prop instead of slot -->
+            <SectionTitle text="Parcours" />
+
+            <!-- Content grid -->
+            <div class="grid grid-cols-3 gap-8 items-start mt-16">
+                <!-- Text on the left -->
+                <div
+                    class="space-y-4"
+                    style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 500; line-height: 1.6; color: #000;"
+                >
+                    <p>
+                        Je m'appelle Titouan Winkel, j'ai 19 ans et je suis en
+                        deuxième année de BUT MMI à Montbéliard. Depuis toujours
+                        attiré par l'art et l'expression visuelle, je me suis
+                        orienté vers le design, un domaine où je peux pleinement
+                        explorer ma créativité et donner du sens aux idées que
+                        j'imagine.
+                    </p>
+
+                    <p>
+                        À terme, j'ai pour objectif de devenir designer
+                        graphique, que ce soit au sein d'une entreprise reconnue
+                        ou en travaillant à mon compte. Ce qui m'anime avant
+                        tout, c'est la possibilité de créer, d'innover et de
+                        laisser une trace visuelle qui ait du sens.
+                    </p>
+                </div>
+
+                <!-- Character illustration in the center -->
+                <div class="flex items-center justify-center">
+                    <Image
+                        src={personnage || "/placeholder.svg"}
+                        alt="Character illustration"
+                        class="w-auto h-auto max-h-[500px]"
+                    />
+                </div>
+
+                <!-- Building image on the right -->
+                <div class="flex items-center justify-center">
+                    <Image
+                        src={immeuble || "/placeholder.svg"}
+                        alt="Building"
+                        class="w-full h-auto rounded-lg shadow-lg"
+                    />
+                </div>
+            </div>
+        </section>
+
+        <!-- Artistes section -->
+        <section class="container mx-auto px-6 py-16">
+            <!-- Fixed SectionTitle usage with text prop instead of slot -->
+            <SectionTitle text="Mes inspirations" />
+
+            <!-- Content grid -->
+            <div class="grid grid-cols-3 gap-8 items-start mt-16">
+                <!-- Street art image on the left -->
+                <div class="flex items-center justify-center">
+                    <Image
+                        src={artRural || "/placeholder.svg"}
+                        alt="Street art"
+                        class="w-full h-auto rounded-lg shadow-lg"
+                    />
+                </div>
+
+                <!-- JDM car images in the center -->
+                <div class="flex items-center justify-center">
+                    <Image
+                        src={jdm || "/placeholder.svg"}
+                        alt="JDM cars"
+                        class="w-full h-auto rounded-lg shadow-lg"
+                    />
+                </div>
+
+                <!-- Text on the right -->
+                <div
+                    class="space-y-4"
+                    style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 500; line-height: 1.6; color: #000;"
+                >
+                    <p>
+                        Je puise mes inspirations dans des formes d'arts
+                        accessibles et ancrées dans le quotidien. Les arts de
+                        rue, comme le graffiti ou les fresques, me marquent
+                        particulièrement : leur diversité, leur spontanéité et
+                        ce sentiment de liberté totale qu'ils dégagent m'ont
+                        toujours parlé. J'apprécie aussi la créativité qu'on
+                        retrouve dans des univers populaires comme la culture
+                        JDM, où la transformation d'un objet courant peut
+                        devenir un véritable moyen d'expression.
+                    </p>
+
+                    <p>
+                        Ce même sentiment de liberté, je le retrouve pleinement
+                        dans le design graphique et le web, au cœur de mon
+                        parcours MMI. Concevoir des identités visuelles,
+                        imaginer des univers cohérents, ou encore créer des
+                        sites web qui racontent quelque chose... ce sont des
+                        domaines où je peux explorer, expérimenter et donner une
+                        forme unique à chaque projet.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+</Layout>

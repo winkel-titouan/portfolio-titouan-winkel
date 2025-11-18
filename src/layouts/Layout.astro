@@ -14,10 +14,8 @@ const { title } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<title>{title}</title>
 	</head>
-	<body
-		class="min-h-screen bg-gradient-to-b from-purple-200 via-purple-50 to-white"
-		style="background-size: 100% 40vh; background-repeat: no-repeat;"
-	>
+	<body class="min-h-screen">
+		<!-- Gradient transparent du violet vers transparent pour une transition fluide -->
 		<Header />
 		<slot />
 		<Footer />

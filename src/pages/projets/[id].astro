@@ -3,9 +3,8 @@ import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import SkewButton from "../../components/SkewButton.astro";
+import SectionTitle from "../../components/SectionTitle.astro";
 import { pb } from "../../utils/pb";
-import line1 from "../../assets/boutons/line1.svg";
-import line2 from "../../assets/boutons/line2.svg";
 import bubble from "../../assets/bubble.svg";
 
 export async function getStaticPaths() {
@@ -25,8 +24,9 @@ function getImageUrl(record: any, filename: string) {
 }
 
 // Get the first image from prod_finale array
-const firstImage = project.prod_finale?.[0] || "";
-const imageUrl = firstImage ? getImageUrl(project, firstImage) : "";
+const heroImageUrl = project.logo_new
+    ? getImageUrl(project, project.logo_new)
+    : "";
 
 // Get inspirations images
 const inspirationImages = project.inspirations || [];
@@ -41,40 +41,46 @@ const logoOldUrl = project.logo_old
 const logoNewUrl = project.logo_new
     ? getImageUrl(project, project.logo_new)
     : "";
+
+const introText = project.introduction || "";
+const introWords = introText.split(" ");
+const halfLength = Math.ceil(introWords.length / 2);
+const introCol1 = introWords.slice(0, halfLength).join(" ");
+const introCol2 = introWords.slice(halfLength).join(" ");
+
+const inspText = project.inspiration_texte || "";
+const inspParagraphs = inspText
+    .split(". ")
+    .reduce((acc: string[], sentence: string, index: number) => {
+        const paragraphIndex = Math.floor(index / 3);
+        if (!acc[paragraphIndex]) acc[paragraphIndex] = "";
+        acc[paragraphIndex] +=
+            sentence + (index < inspText.split(". ").length - 1 ? ". " : "");
+        return acc;
+    }, [])
+    .filter((p) => p.trim());
 ---
 
 <Layout title={project.nom_projet}>
-
     <!-- Hero Section with project title and colored background -->
+    <!-- Added negative z-index to position hero behind header -->
     <section
-        class="relative py-32 overflow-hidden"
+        class="relative py-32 overflow-hidden -mt-32 pt-48 -z-10"
         style={`background-color: ${project.couleur};`}
     >
-        <!-- Decorative bubbles -->
-        <img
-            src={bubble.src || "/placeholder.svg"}
-            alt=""
-            class="absolute top-10 left-10 w-48 h-48 opacity-50"
-        />
-        <img
-            src={bubble.src || "/placeholder.svg"}
-            alt=""
-            class="absolute top-20 right-10 w-64 h-64 opacity-50"
-        />
-
         <div class="max-w-7xl mx-auto px-8 relative z-10">
             <div class="flex items-center justify-center gap-8">
                 {
-                    imageUrl && (
+                    heroImageUrl && (
                         <img
-                            src={imageUrl || "/placeholder.svg"}
+                            src={heroImageUrl || "/placeholder.svg"}
                             alt={`${project.nom_projet} logo`}
-                            class="w-24 h-24 object-contain"
+                            class="w-54 h-54 object-contain"
                         />
                     )
                 }
                 <h1
-                    class="text-black font-['Russo_One'] text-[80px] font-normal leading-normal"
+                    class="text-black font-['Russo_One'] text-[50px] font-normal leading-normal"
                 >
                     {project.nom_projet}
                 </h1>
@@ -99,35 +105,21 @@ const logoNewUrl = project.logo_new
     <!-- Introduction Section -->
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-8">
-            <div class="relative mb-8">
-                <img
-                    src={line1.src || "/placeholder.svg"}
-                    alt=""
-                    class="absolute -left-4 -top-2 w-12 h-12"
-                />
-                <h2
-                    class="text-black font-['Russo_One'] text-[30px] font-normal"
-                >
-                    Introduction
-                </h2>
-                <img
-                    src={line2.src || "/placeholder.svg"}
-                    alt=""
-                    class="absolute -right-4 -bottom-2 w-12 h-12"
-                />
-            </div>
+            <SectionTitle text="Introduction" />
 
-            <div class="grid grid-cols-2 gap-12">
-                <div
-                    class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed text-justify"
+            <div class="grid grid-cols-2 gap-16">
+                <p
+                    class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed"
+                    style="text-align: justify;"
                 >
-                    {project.introduction}
-                </div>
-                <div
-                    class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed text-justify"
+                    {introCol1}
+                </p>
+                <p
+                    class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed"
+                    style="text-align: justify;"
                 >
-                    {/* Second column for longer text or additional content */}
-                </div>
+                    {introCol2}
+                </p>
             </div>
         </div>
     </section>
@@ -137,38 +129,35 @@ const logoNewUrl = project.logo_new
         project.inspiration_texte && (
             <section class="py-16 bg-white">
                 <div class="max-w-7xl mx-auto px-8">
-                    <div class="relative mb-8">
-                        <img
-                            src={line1.src || "/placeholder.svg"}
-                            alt=""
-                            class="absolute -left-4 -top-2 w-12 h-12"
-                        />
-                        <h2 class="text-black font-['Russo_One'] text-[30px] font-normal">
-                            Inspirations
-                        </h2>
-                        <img
-                            src={line2.src || "/placeholder.svg"}
-                            alt=""
-                            class="absolute -right-4 -bottom-2 w-12 h-12"
-                        />
-                    </div>
+                    <SectionTitle text="Inspirations" />
 
-                    <div class="grid grid-cols-2 gap-12">
-                        <div class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed text-justify">
-                            {project.inspiration_texte}
+                    <div class="flex gap-16 items-start">
+                        {/* Text content - left side, reduced to 1/2 width */}
+                        <div class="w-1/2 space-y-6">
+                            {inspParagraphs.map((paragraph: string) => (
+                                <p
+                                    class="text-black font-['Space_Grotesk'] text-[20px] font-normal leading-relaxed"
+                                    style="text-align: justify;"
+                                >
+                                    {paragraph}
+                                </p>
+                            ))}
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        {/* Images - right side, 3 images horizontally in 290px total */}
+                        <div class="flex gap-2 max-w-[290px]">
                             {inspirationImages
-                                .slice(0, 4)
+                                .slice(0, 3)
                                 .map((image: string) => (
                                     <img
                                         src={
                                             getImageUrl(project, image) ||
+                                            "/placeholder.svg" ||
+                                            "/placeholder.svg" ||
                                             "/placeholder.svg"
                                         }
                                         alt="Inspiration"
-                                        class="w-full h-64 object-cover rounded-lg"
+                                        class="w-[200px] h-[250px] object-cover rounded"
                                     />
                                 ))}
                         </div>
@@ -183,21 +172,7 @@ const logoNewUrl = project.logo_new
         (project.logo_old || project.logo_new) && (
             <section class="py-16 bg-white">
                 <div class="max-w-7xl mx-auto px-8">
-                    <div class="relative mb-8">
-                        <img
-                            src={line1.src || "/placeholder.svg"}
-                            alt=""
-                            class="absolute -left-4 -top-2 w-12 h-12"
-                        />
-                        <h2 class="text-black font-['Russo_One'] text-[30px] font-normal">
-                            Logo
-                        </h2>
-                        <img
-                            src={line2.src || "/placeholder.svg"}
-                            alt=""
-                            class="absolute -right-4 -bottom-2 w-12 h-12"
-                        />
-                    </div>
+                    <SectionTitle text="Logo" />
 
                     <div class="flex items-center justify-center gap-16 mb-12">
                         {/* Old Logo */}
@@ -208,7 +183,7 @@ const logoNewUrl = project.logo_new
                                     alt="Ancien logo"
                                     class="w-48 h-48 object-contain mb-6"
                                 />
-                                <p class="text-black font-['Space_Grotesk'] text-[16px] font-normal text-center max-w-xs leading-relaxed">
+                                <p class="text-black font-['Space_Grotesk'] text-[20px] font-normal text-center max-w-xs leading-relaxed">
                                     {project.logo_old_txt}
                                 </p>
                             </div>
@@ -239,7 +214,7 @@ const logoNewUrl = project.logo_new
                                     alt="Nouveau logo"
                                     class="w-48 h-48 object-contain mb-6"
                                 />
-                                <p class="text-black font-['Space_Grotesk'] text-[16px] font-normal text-center max-w-xs leading-relaxed">
+                                <p class="text-black font-['Space_Grotesk'] text-[20px] font-normal text-center max-w-xs leading-relaxed">
                                     {project.logo_new_txt}
                                 </p>
                             </div>
@@ -255,38 +230,26 @@ const logoNewUrl = project.logo_new
         prodFinaleImages.length > 0 && (
             <section class="py-16 bg-white">
                 <div class="max-w-7xl mx-auto px-8">
-                    <div class="relative mb-8">
-                        <img
-                            src={line1.src || "/placeholder.svg"}
-                            alt=""
-                            class="absolute -left-4 -top-2 w-12 h-12"
-                        />
-                        <h2 class="text-black font-['Russo_One'] text-[30px] font-normal">
-                            Production Finale
-                        </h2>
-                        <img
-                            src={line2.src || "/placeholder.svg"}
-                            alt=""
-                            class="absolute -right-4 -bottom-2 w-12 h-12"
-                        />
-                    </div>
+                    <SectionTitle text="Production Finale" />
 
                     <div class="grid grid-cols-4 gap-8 mb-12">
                         {prodFinaleImages.map((image: string) => (
                             <img
                                 src={
                                     getImageUrl(project, image) ||
+                                    "/placeholder.svg" ||
+                                    "/placeholder.svg" ||
                                     "/placeholder.svg"
                                 }
                                 alt="Production finale"
-                                class="w-full object-contain"
+                                class="w-full h-[400px] object-contain"
                             />
                         ))}
                     </div>
 
                     {/* Visit Website Button */}
                     <div class="flex justify-start">
-                        <SkewButton href={project.lien_site || "#"}>
+                        <SkewButton href={project.lien_appli || "#"}>
                             Accéder au site web
                         </SkewButton>
                     </div>
@@ -294,5 +257,4 @@ const logoNewUrl = project.logo_new
             </section>
         )
     }
-
 </Layout>
