@@ -60,6 +60,16 @@ import SkewButton from "../components/SkewButton.astro";
                     </div>
                 </div>
 
+                <!-- Added hidden Web3Forms access key field -->
+                <input
+                    type="hidden"
+                    name="access_key"
+                    value="b145046a-7b32-4697-84ab-b5387ccd3e7a"
+                />
+
+                <!-- Added redirect URL for success page (optional) -->
+                <input type="hidden" name="redirect" value="false" />
+
                 <!-- Email field -->
                 <div>
                     <input
@@ -119,51 +129,32 @@ import SkewButton from "../components/SkewButton.astro";
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        console.log("[v0] Form submitted");
-
         const formData = new FormData(form);
-        const data = {
-            prenom: formData.get("prenom"),
-            nom: formData.get("nom"),
-            email: formData.get("email"),
-            sujet: formData.get("sujet"),
-            message: formData.get("message"),
-        };
-
-        console.log("[v0] Form data:", data);
 
         statusDiv.classList.remove("hidden");
         statusDiv.textContent = "Envoi en cours...";
         statusDiv.className = "mt-4 text-center text-purple-600";
 
         try {
-            console.log("[v0] Sending request to /api/contact");
-
-            const response = await fetch("/api/contact", {
+            const response = await fetch("https://api.web3forms.com/submit", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
+                body: formData,
             });
 
-            console.log("[v0] Response status:", response.status);
-
             const result = await response.json();
-            console.log("[v0] Response data:", result);
 
-            if (response.ok) {
+            if (result.success) {
                 statusDiv.textContent = "Message envoyé avec succès !";
                 statusDiv.className =
                     "mt-4 text-center text-green-600 font-semibold";
                 form.reset();
             } else {
-                statusDiv.textContent = `Erreur : ${result.error}${result.details ? " - " + result.details : ""}`;
+                statusDiv.textContent =
+                    "Erreur lors de l'envoi. Veuillez réessayer.";
                 statusDiv.className =
                     "mt-4 text-center text-red-600 font-semibold";
             }
         } catch (error) {
-            console.error("[v0] Fetch error:", error);
             statusDiv.textContent =
                 "Erreur lors de l'envoi du message. Veuillez réessayer.";
             statusDiv.className = "mt-4 text-center text-red-600 font-semibold";
