@@ -49,6 +49,8 @@ function getImageUrl(projet: Projet): string {
   }
   return '/placeholder.svg?height=400&width=300';
 }
+
+const allCompetences = Array.from(new Set(projets.flatMap(p => p.competences || [])));
 ---
 
 <Layout title="Mes Projets - Titouan Winkel">
@@ -77,10 +79,55 @@ function getImageUrl(projet: Projet): string {
       </div>
     </section>
 
+    <!-- Added search and filter section -->
+    <section class="max-w-7xl mx-auto px-4 md:px-8 mb-12 space-y-6">
+      <!-- Search bar -->
+      <div class="relative max-w-xl mx-auto">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher un projet..."
+          class="w-full px-4 py-3 pr-12 border-3 border-black font-[Space_Grotesk] text-base focus:outline-none focus:ring-2 focus:ring-black"
+        />
+        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+
+      <!-- Competence filters -->
+      <div class="flex flex-wrap gap-3 justify-center items-center">
+        <span class="text-black font-[Space_Grotesk] text-lg font-medium">Filtrer par :</span>
+        {allCompetences.map((competence) => (
+          <button
+            class="competence-filter relative px-4 py-2 border-3 border-black bg-white hover:bg-gray-100 transition-colors"
+            data-competence={competence}
+          >
+            <img 
+              src={logoMap[competence]?.src || "/placeholder.svg"} 
+              alt={competence}
+              class="w-8 h-8 object-contain inline-block"
+            />
+            <span class="ml-2 font-[Space_Grotesk] capitalize">{competence}</span>
+          </button>
+        ))}
+        <button
+          id="resetFilter"
+          class="px-4 py-2 border-3 border-black bg-black text-white hover:bg-gray-800 transition-colors font-[Space_Grotesk]"
+        >
+          Réinitialiser
+        </button>
+      </div>
+
+      <!-- Results counter -->
+      <p class="text-center text-black font-[Space_Grotesk] text-lg">
+        <span id="resultCount">{projets.length}</span> projet(s) trouvé(s)
+      </p>
+    </section>
+
     <!-- Made projects list responsive with stacked layout on mobile -->
-    <section class="space-y-16 md:space-y-32 px-4 md:px-0">
+    <section class="space-y-16 md:space-y-32 px-4 md:px-0" id="projectsList">
       {projets.map((projet, index) => (
-        <article class="relative flex flex-col md:flex-row items-center gap-4 md:gap-8">
+        <article class="relative flex flex-col md:flex-row items-center gap-4 md:gap-8 project-item" data-competences={JSON.stringify(projet.competences || [])} data-name={projet.nom_projet.toLowerCase()}>
           <!-- SVG hidden on mobile, shown on desktop -->
           <div class="absolute left-0 top-1/2 -translate-y-1/2 hidden md:block">
             <img 
@@ -153,3 +200,75 @@ function getImageUrl(projet: Projet): string {
     </section>
   </main>
 </Layout>
+
+<!-- Added filtering JavaScript -->
+<script>
+  let activeCompetence: string | null = null;
+
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+  const competenceFilters = document.querySelectorAll('.competence-filter');
+  const resetButton = document.getElementById('resetFilter');
+  const resultCount = document.getElementById('resultCount');
+  const projectItems = document.querySelectorAll('.project-item');
+
+  function filterProjects() {
+    const searchTerm = searchInput.value.toLowerCase();
+    let visibleCount = 0;
+
+    projectItems.forEach((item) => {
+      const projectName = item.getAttribute('data-name') || '';
+      const projectCompetences = JSON.parse(item.getAttribute('data-competences') || '[]');
+
+      const matchesSearch = projectName.includes(searchTerm);
+      const matchesCompetence = !activeCompetence || projectCompetences.includes(activeCompetence);
+
+      if (matchesSearch && matchesCompetence) {
+        (item as HTMLElement).style.display = 'flex';
+        visibleCount++;
+      } else {
+        (item as HTMLElement).style.display = 'none';
+      }
+    });
+
+    if (resultCount) {
+      resultCount.textContent = visibleCount.toString();
+    }
+  }
+
+  searchInput?.addEventListener('input', filterProjects);
+
+  competenceFilters.forEach((button) => {
+    button.addEventListener('click', () => {
+      const competence = button.getAttribute('data-competence');
+      
+      if (activeCompetence === competence) {
+        activeCompetence = null;
+        button.classList.remove('bg-gray-800', 'text-white');
+        button.classList.add('bg-white');
+      } else {
+        competenceFilters.forEach((btn) => {
+          btn.classList.remove('bg-gray-800', 'text-white');
+          btn.classList.add('bg-white');
+        });
+        
+        activeCompetence = competence;
+        button.classList.remove('bg-white');
+        button.classList.add('bg-gray-800', 'text-white');
+      }
+
+      filterProjects();
+    });
+  });
+
+  resetButton?.addEventListener('click', () => {
+    searchInput.value = '';
+    activeCompetence = null;
+    
+    competenceFilters.forEach((btn) => {
+      btn.classList.remove('bg-gray-800', 'text-white');
+      btn.classList.add('bg-white');
+    });
+
+    filterProjects();
+  });
+</script>
