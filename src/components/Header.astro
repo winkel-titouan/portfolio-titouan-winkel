@@ -64,39 +64,76 @@ import closeIcon from "../assets/mobile/cross-menu.svg";
     <!-- Mobile menu overlay -->
     <div
         id="mobile-menu"
-        class="fixed inset-0 bg-purple-50 z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden"
+        class="fixed inset-0 bg-gradient-to-br from-purple-100 via-purple-50 to-white z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden"
     >
-        <!-- Gradient en haut du menu -->
+        <!-- Gradient plus prononcé en haut du menu -->
         <div
-            class="absolute top-0 left-0 right-0 h-48 pointer-events-none"
-            style="background: linear-gradient(to bottom, rgba(216, 180, 254, 0.8), rgba(237, 233, 254, 0.4), transparent);"
+            class="absolute top-0 left-0 right-0 h-64 pointer-events-none"
+            style="background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(216, 180, 254, 0.3) 50%, transparent);"
         >
         </div>
 
+        <!-- Ajout d'un cercle décoratif en bas à droite -->
         <div
-            class="container mx-auto px-4 py-20 flex flex-col items-center gap-8 relative"
+            class="absolute bottom-10 right-10 w-64 h-64 bg-purple-200 rounded-full opacity-20 pointer-events-none"
+        >
+        </div>
+
+        <!-- Nouveau design avec espacement et effets visuels -->
+        <div
+            class="container mx-auto px-6 h-full flex flex-col justify-center items-start gap-6 relative"
         >
             <a
                 href="/projets"
-                class="mobile-menu-link text-4xl font-bold text-black hover:text-purple-600 transition-colors"
+                class="mobile-menu-link group relative text-5xl font-bold text-black transition-all duration-300 pl-6"
                 style="font-family: 'Russo One', sans-serif;"
             >
-                Projets
+                <!-- Barre violette animée à gauche -->
+                <span
+                    class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-1 bg-purple-600 transition-all duration-300 group-hover:w-4"
+                ></span>
+                <span
+                    class="inline-block transition-all duration-300 group-hover:translate-x-2 group-hover:text-purple-600"
+                >
+                    Projets
+                </span>
             </a>
             <a
                 href="/a_propos"
-                class="mobile-menu-link text-4xl font-bold text-black hover:text-purple-600 transition-colors"
+                class="mobile-menu-link group relative text-5xl font-bold text-black transition-all duration-300 pl-6"
                 style="font-family: 'Russo One', sans-serif;"
             >
-                A propos
+                <span
+                    class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-1 bg-purple-600 transition-all duration-300 group-hover:w-4"
+                ></span>
+                <span
+                    class="inline-block transition-all duration-300 group-hover:translate-x-2 group-hover:text-purple-600"
+                >
+                    A propos
+                </span>
             </a>
             <a
                 href="/contact"
-                class="mobile-menu-link text-4xl font-bold text-black hover:text-purple-600 transition-colors"
+                class="mobile-menu-link group relative text-5xl font-bold text-black transition-all duration-300 pl-6"
                 style="font-family: 'Russo One', sans-serif;"
             >
-                Contact
+                <span
+                    class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-1 bg-purple-600 transition-all duration-300 group-hover:w-4"
+                ></span>
+                <span
+                    class="inline-block transition-all duration-300 group-hover:translate-x-2 group-hover:text-purple-600"
+                >
+                    Contact
+                </span>
             </a>
+
+            <!-- Ajout d'une petite signature en bas du menu -->
+            <div
+                class="absolute bottom-10 left-6 text-purple-400 text-sm"
+                style="font-family: 'Space Grotesk', sans-serif;"
+            >
+                Designer web
+            </div>
         </div>
     </div>
 </header>
