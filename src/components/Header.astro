@@ -1,12 +1,14 @@
 ---
 import SkewButton from "./SkewButton.astro";
+import menuIcon from "../assets/mobile/menu-mobile.svg";
+import closeIcon from "../assets/mobile/cross-menu.svg";
 ---
 
 <header class="relative z-50">
     <!-- Gradient transparent du violet vers transparent -->
     <div
-        class="absolute top-0 left-0 right-0 h-[40vh] pointer-events-none -z-10"
-        style="background: linear-gradient(to bottom, rgba(216, 180, 254, 0.6), rgba(237, 233, 254, 0.3), transparent);"
+        class="absolute top-0 left-0 right-0 h-[60vh] pointer-events-none -z-10"
+        style="background: linear-gradient(to bottom, rgba(216, 180, 254, 0.6), rgba(237, 233, 254, 0.4) 40%, rgba(237, 233, 254, 0.2) 70%, transparent);"
     >
     </div>
 
@@ -31,7 +33,7 @@ import SkewButton from "./SkewButton.astro";
             </div>
 
             <!-- Desktop navigation - hidden on mobile -->
-            <div class="hidden md:flex items-center gap-4 lg:gap-17 mt-1">
+            <div class="hidden md:flex items-center gap-4 lg:gap-17 mt-3">
                 <SkewButton href="/projets" text="Projets" />
                 <SkewButton href="/a_propos" text="A propos" />
                 <SkewButton href="/contact" text="Contact" />
@@ -40,18 +42,21 @@ import SkewButton from "./SkewButton.astro";
             <!-- Hamburger button - visible only on mobile -->
             <button
                 id="hamburger-btn"
-                class="md:hidden flex flex-col gap-1.5 p-2 mt-2 z-50 relative"
+                class="md:hidden p-2 mt-2 z-50 relative"
                 aria-label="Toggle menu"
             >
-                <span
-                    class="w-7 h-0.5 bg-black transition-all duration-300 ease-in-out"
-                    id="line1"></span>
-                <span
-                    class="w-7 h-0.5 bg-black transition-all duration-300 ease-in-out"
-                    id="line2"></span>
-                <span
-                    class="w-7 h-0.5 bg-black transition-all duration-300 ease-in-out"
-                    id="line3"></span>
+                <img
+                    id="menu-icon"
+                    src={menuIcon.src || "/placeholder.svg"}
+                    alt="Menu"
+                    class="w-8 h-8 text-black transition-opacity duration-300"
+                />
+                <img
+                    id="close-icon"
+                    src={closeIcon.src || "/placeholder.svg"}
+                    alt="Close"
+                    class="w-8 h-8 text-black absolute top-2 left-2 opacity-0 transition-opacity duration-300"
+                />
             </button>
         </nav>
     </div>
@@ -61,8 +66,15 @@ import SkewButton from "./SkewButton.astro";
         id="mobile-menu"
         class="fixed inset-0 bg-purple-50 z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden"
     >
+        <!-- Gradient en haut du menu -->
         <div
-            class="container mx-auto px-4 py-20 flex flex-col items-center gap-8"
+            class="absolute top-0 left-0 right-0 h-48 pointer-events-none"
+            style="background: linear-gradient(to bottom, rgba(216, 180, 254, 0.8), rgba(237, 233, 254, 0.4), transparent);"
+        >
+        </div>
+
+        <div
+            class="container mx-auto px-4 py-20 flex flex-col items-center gap-8 relative"
         >
             <a
                 href="/projets"
@@ -93,9 +105,8 @@ import SkewButton from "./SkewButton.astro";
 <script>
     const hamburgerBtn = document.getElementById("hamburger-btn");
     const mobileMenu = document.getElementById("mobile-menu");
-    const line1 = document.getElementById("line1");
-    const line2 = document.getElementById("line2");
-    const line3 = document.getElementById("line3");
+    const menuIcon = document.getElementById("menu-icon");
+    const closeIcon = document.getElementById("close-icon");
     const mobileMenuLinks = document.querySelectorAll(".mobile-menu-link");
     let isOpen = false;
 
@@ -107,16 +118,8 @@ import SkewButton from "./SkewButton.astro";
             mobileMenu?.classList.remove("translate-x-full");
             mobileMenu?.classList.add("translate-x-0");
 
-            // Animate hamburger to X
-            line1?.style.setProperty(
-                "transform",
-                "rotate(45deg) translateY(8px)",
-            );
-            line2?.style.setProperty("opacity", "0");
-            line3?.style.setProperty(
-                "transform",
-                "rotate(-45deg) translateY(-8px)",
-            );
+            menuIcon?.style.setProperty("opacity", "0");
+            closeIcon?.style.setProperty("opacity", "1");
 
             // Prevent body scroll
             document.body.style.overflow = "hidden";
@@ -125,16 +128,8 @@ import SkewButton from "./SkewButton.astro";
             mobileMenu?.classList.remove("translate-x-0");
             mobileMenu?.classList.add("translate-x-full");
 
-            // Animate X back to hamburger
-            line1?.style.setProperty(
-                "transform",
-                "rotate(0deg) translateY(0px)",
-            );
-            line2?.style.setProperty("opacity", "1");
-            line3?.style.setProperty(
-                "transform",
-                "rotate(0deg) translateY(0px)",
-            );
+            menuIcon?.style.setProperty("opacity", "1");
+            closeIcon?.style.setProperty("opacity", "0");
 
             // Restore body scroll
             document.body.style.overflow = "";
