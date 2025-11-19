@@ -17,6 +17,7 @@ import capcutLogo from "../../assets/logos/capcut.svg";
 import cssLogo from "../../assets/logos/css.svg";
 import htmlLogo from "../../assets/logos/html.svg";
 import figmaLogo from "../../assets/logos/figma.svg";
+import wordpressLogo from "../../assets/logos/wordpress.svg"
 
 export async function getStaticPaths() {
     const projects = await pb.collection("projets").getFullList();
@@ -39,6 +40,7 @@ const logoMap: Record<string, any> = {
     css: cssLogo,
     html: htmlLogo,
     figma: figmaLogo,
+    wordpress: wordpressLogo,
 };
 
 // Helper function to get image URL from PocketBase
