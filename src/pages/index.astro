@@ -5,58 +5,93 @@ import SectionTitle from "../components/SectionTitle.astro";
 import SkillsCloud from "../components/SkillsCloud.astro";
 import SkewButton from "../components/SkewButton.astro";
 import { Image } from "astro:assets";
-import heroAstro from "../assets/hero-accueil.svg";
+import heroPC from "../assets/hero-pc.svg";
+import heroBg from "../assets/hero_bg.webp";
+import personnage from "../assets/a_propos/personnage.svg";
+import bubble from "../assets/bubble.svg";
 import competencesBg from "../assets/competences-bg.svg";
 import spike from "../assets/spike.svg";
 import arrow from "../assets/arrow.svg";
-import heroPC from "../assets/hero-pc.svg";
-import personnage from "../assets/a_propos/personnage.svg";
-import bubble from "../assets/bubble.svg";
+import { pb, type Projet } from "../utils/pb";
+
+let projets: Projet[] = [];
+try {
+	const records = await pb.collection("projets").getFullList<Projet>();
+	projets = records;
+} catch (error) {
+	console.error("Erreur lors de la récupération des projets:", error);
+}
+
+function getImageUrl(projet: Projet, filename: string): string {
+	return `https://portfolio.titouan-winkel.fr/api/files/projets/${projet.id}/${filename}`;
+}
+
+function getFirstInspirationImage(projet: Projet): string {
+	if (projet.inspirations && projet.inspirations.length > 0) {
+		return getImageUrl(projet, projet.inspirations[0]);
+	}
+	return "/placeholder.svg?height=300&width=400";
+}
+
+function getLogoUrl(projet: Projet): string {
+	if (projet.logo_new) {
+		return getImageUrl(projet, projet.logo_new);
+	}
+	return "/placeholder.svg?height=100&width=100";
+}
 ---
 
 <Layout title="Titouan Winkel - Designer web">
-	<main>
-		<!-- Hero section directly in index instead of separate component -->
-		<section class="container mx-auto px-6 py-16">
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-				<!-- Applied exact Figma dimensions (1193x426px) and shifted SVG left -->
-				<div class="text-white p-12 overflow-visible">
-					<Image
-						src={heroAstro || "/placeholder.svg"}
-						alt="Hero background"
-						height={400}
-						class="absolute top-35 -left-80 -z-10"
-					/>
-					<!-- Applied exact Figma styles: Russo One, 30px, white -->
-					<h2
-						class="relative z-10 mb-65"
-						style="font-family: 'Russo One', sans-serif; font-size: 30px; font-weight: 400; font-style: normal; line-height: normal; color: #FFF;"
-					>
-						Chaque projet est une nouvelle aventure.
-					</h2>
-				</div>
+	<!-- Added overflow-x-hidden to prevent horizontal scrolling -->
+	<main class="overflow-x-hidden">
+		<!-- Modified hero section to use hero_bg.webp aligned to the right -->
+		<section class="relative overflow-hidden">
+			<!-- Hero background image - positioned absolutely to right edge, outside container -->
+			<div class="absolute top-37 left-0 hidden lg:block -z-10">
+				<Image
+					src={heroBg || "/placeholder.svg"}
+					alt="Hero background"
+					class="w-auto h-100"
+				/>
+			</div>
 
-				<!-- Replaced placeholder text with hero-pc.svg image -->
-				<div class="flex items-center justify-center min-h-[300px]">
-					<Image
-						src={heroPC || "/placeholder.svg"}
-						alt="Hero computer illustration"
-						class="w-auto h-auto max-w-full"
-					/>
+			<div class="container mx-auto px-4 md:px-6 py-8 md:py-16">
+				<div
+					class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center"
+				>
+					<div
+						class="relative text-center lg:text-left text-black lg:text-white p-6 md:p-12"
+					>
+						<h2
+							class="relative z-10 text-xl md:text-3xl"
+							style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal; line-height: normal;"
+						>
+							Chaque projet est une nouvelle aventure.
+						</h2>
+					</div>
+
+					<div
+						class="flex items-center justify-center min-h-[200px] md:min-h-[300px] order-last lg:order-none"
+					>
+						<Image
+							src={heroPC || "/placeholder.svg"}
+							alt="Hero computer illustration"
+							class="w-3/4 md:w-full h-auto max-w-full"
+						/>
+					</div>
 				</div>
 			</div>
 		</section>
 
-		<!-- About section directly in index instead of separate component -->
-		<section class="container mx-auto px-6 py-16">
-			<!-- Using SectionTitle component instead of manual slash + text -->
+		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
 			<SectionTitle text="Qui suis-je ?" />
 
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-				<!-- Applied exact Figma styles for body text: Space Grotesk, 20px, weight 400, black -->
+			<div
+				class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start"
+			>
 				<div
-					class="space-y-4"
-					style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
+					class="space-y-4 text-base md:text-xl"
+					style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
 				>
 					<p>
 						Je m'appelle Titouan <span
@@ -81,35 +116,35 @@ import bubble from "../assets/bubble.svg";
 					</p>
 				</div>
 
-				<!-- Replace placeholder with personnage SVG -->
-				<!-- Added relative positioning and bubble decoration behind character -->
 				<div class="flex items-center justify-center relative">
-					<!-- Decorative bubble behind character -->
 					<Image
 						src={bubble || "/placeholder.svg"}
 						alt=""
-						class="absolute -z-10 w-96 h-96 opacity-50"
+						class="absolute -z-10 w-64 md:w-96 h-64 md:h-96 opacity-50"
 						style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
 					/>
 					<Image
 						src={personnage || "/placeholder.svg"}
 						alt="Personnage illustration"
-						class="w-auto h-80 relative z-10"
+						class="w-auto h-48 md:h-80 relative z-10"
 					/>
 				</div>
 			</div>
 		</section>
 
-		<!-- Competences section directly in index instead of separate component -->
-		<section class="py-16">
-			<div class="container mx-auto px-6">
+		<!-- Added overflow-x-hidden to contain competences section -->
+		<section class="py-8 md:py-16 overflow-x-hidden">
+			<div class="container mx-auto px-4 md:px-6">
 				<SectionTitle text="Compétences" />
 			</div>
 
-			<!-- Changed to flex with fixed widths to prevent layout shifts -->
-			<div class="flex gap-10 items-start mt-5">
-				<!-- Added fixed width and flex-shrink-0 to prevent movement -->
-				<div class="space-y-4 flex-shrink-0 w-[420px]">
+			<div
+				class="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start mt-5 px-4 md:px-0"
+			>
+				<!-- Added max-w-full to prevent overflow -->
+				<div
+					class="space-y-4 w-full lg:w-[420px] lg:flex-shrink-0 max-w-full"
+				>
 					<div class="relative w-fit">
 						<Image
 							src={competencesBg || "/placeholder.svg"}
@@ -117,7 +152,7 @@ import bubble from "../assets/bubble.svg";
 							class="w-auto h-auto"
 						/>
 						<span
-							class="absolute inset-0 flex items-center px-8 text-white text-lg mb-4"
+							class="absolute inset-0 flex items-center px-4 md:px-8 text-white text-sm md:text-lg mb-4"
 							style="font-family: 'Russo One', sans-serif;"
 						>
 							Design
@@ -130,7 +165,7 @@ import bubble from "../assets/bubble.svg";
 							class="w-auto h-auto"
 						/>
 						<span
-							class="absolute inset-0 flex items-center px-8 text-white text-lg mb-4"
+							class="absolute inset-0 flex items-center px-4 md:px-8 text-white text-sm md:text-lg mb-4"
 							style="font-family: 'Russo One', sans-serif;"
 						>
 							Développement web
@@ -143,7 +178,7 @@ import bubble from "../assets/bubble.svg";
 							class="w-auto h-auto"
 						/>
 						<span
-							class="absolute inset-0 flex items-center px-8 text-white text-lg mb-4"
+							class="absolute inset-0 flex items-center px-4 md:px-8 text-white text-sm md:text-lg mb-4"
 							style="font-family: 'Russo One', sans-serif;"
 						>
 							Communication
@@ -156,7 +191,7 @@ import bubble from "../assets/bubble.svg";
 							class="w-auto h-auto"
 						/>
 						<span
-							class="absolute inset-0 flex items-center px-8 text-white text-lg mb-4"
+							class="absolute inset-0 flex items-center px-4 md:px-8 text-white text-sm md:text-lg mb-4"
 							style="font-family: 'Russo One', sans-serif;"
 						>
 							Audiovisuel
@@ -164,23 +199,26 @@ import bubble from "../assets/bubble.svg";
 					</div>
 				</div>
 
-				<!-- Added flex-shrink-0 to prevent logo cloud from moving -->
-				<div class="w-[450px] flex-shrink-0 mt-8">
+				<!-- Fixed scale-75 to prevent overflow with proper origin -->
+				<div
+					class="w-full lg:w-[450px] lg:flex-shrink-0 mt-4 lg:mt-8 scale-75 md:scale-100 origin-center md:origin-left"
+				>
 					<SkillsCloud />
 				</div>
 
-				<!-- Reduced width from 400px to 350px -->
-				<div class="pt-8 pl-4 w-[350px] flex-shrink-0">
+				<div
+					class="pt-4 lg:pt-8 lg:pl-4 w-full lg:w-[350px] lg:flex-shrink-0"
+				>
 					<h3
-						class="mb-4"
-						style="font-family: 'Russo One', sans-serif; font-size: 30px; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
+						class="mb-4 text-xl md:text-3xl"
+						style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
 					>
 						Description :
 					</h3>
 					<p
 						id="skill-description"
-						class="text-justify leading-relaxed"
-						style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; color: #000;"
+						class="text-justify leading-relaxed text-sm md:text-xl"
+						style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; color: #000;"
 					>
 						Cliquez sur une icone
 					</p>
@@ -188,25 +226,142 @@ import bubble from "../assets/bubble.svg";
 			</div>
 		</section>
 
-		<!-- Contact section directly in index instead of separate component -->
-		<section class="container mx-auto px-6 py-16">
+		<!-- Added projects carousel section with responsive styling -->
+		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
+			<SectionTitle text="Mes projets" />
+
+			<div class="relative mt-8 md:mt-12">
+				<div class="carousel-container overflow-hidden">
+					<div
+						class="carousel-track flex gap-4 md:gap-8 transition-transform duration-500 ease-in-out"
+					>
+						{
+							projets.map((projet) => (
+								<div class="carousel-item flex-shrink-0 w-64 md:w-80">
+									<a
+										href={`/projets/${projet.id}`}
+										class="block group"
+									>
+										<div class="relative bg-white border-4 border-black rounded-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+											<div class="relative h-36 md:h-48 overflow-hidden">
+												<img
+													src={
+														getFirstInspirationImage(
+															projet,
+														) || "/placeholder.svg"
+													}
+													alt={projet.nom_projet}
+													class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+												/>
+												<div class="absolute top-2 left-2 md:top-4 md:left-4 bg-white border-2 border-black rounded-lg p-1 md:p-2">
+													<img
+														src={
+															getLogoUrl(
+																projet,
+															) ||
+															"/placeholder.svg" ||
+															"/placeholder.svg" ||
+															"/placeholder.svg"
+														}
+														alt={`${projet.nom_projet} logo`}
+														class="w-8 h-8 md:w-12 md:h-12 object-contain"
+													/>
+												</div>
+											</div>
+
+											<div class="p-4 md:p-6">
+												<h3
+													class="text-lg md:text-xl mb-2"
+													style="font-family: 'Russo One', sans-serif;"
+												>
+													{projet.nom_projet}
+												</h3>
+												<p
+													class="text-xs md:text-sm line-clamp-3"
+													style="font-family: 'Space Grotesk', sans-serif;"
+												>
+													{projet.description}
+												</p>
+											</div>
+										</div>
+									</a>
+								</div>
+							))
+						}
+					</div>
+				</div>
+
+				<button
+					id="carousel-prev"
+					class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 bg-white border-2 md:border-4 border-black rounded-full p-2 md:p-3 hover:bg-gray-100 transition-colors z-10"
+					aria-label="Previous project"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						class="md:w-6 md:h-6"
+					>
+						<polyline points="15 18 9 12 15 6"></polyline>
+					</svg>
+				</button>
+				<button
+					id="carousel-next"
+					class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 bg-white border-2 md:border-4 border-black rounded-full p-2 md:p-3 hover:bg-gray-100 transition-colors z-10"
+					aria-label="Next project"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						class="md:w-6 md:h-6"
+					>
+						<polyline points="9 18 15 12 9 6"></polyline>
+					</svg>
+				</button>
+			</div>
+
+			<div class="flex justify-center mt-8 md:mt-12">
+				<SkewButton href="/projets">
+					<div class="flex items-center gap-3">
+						<Image
+							src={arrow || "/placeholder.svg"}
+							alt=""
+							class="w-5 h-5 md:w-6 md:h-6"
+						/>
+						<span class="text-sm md:text-base"
+							>Voir tous les projets</span
+						>
+					</div>
+				</SkewButton>
+			</div>
+		</section>
+
+		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
 			<SectionTitle text="Me contacter" />
 
-			<div class="flex justify-between items-start mt-8">
-				<!-- Left side: text and CTA -->
+			<div
+				class="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-0 mt-8"
+			>
 				<div class="space-y-6">
-					<!-- Applied Space Grotesk, 20px for body text -->
 					<p
-						style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
+						class="text-base md:text-xl"
+						style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
 					>
 						Intéressé par mon travail, des questions, une offre
-						d'emploi...{" "}
-						<span class="text-purple-600 font-semibold"
+						d'emploi... <span class="text-purple-600 font-semibold"
 							>Contacter moi !</span
 						>
 					</p>
 
-					<!-- Updated link to point to /contact page -->
 					<SkewButton href="/contact">
 						<div class="flex items-center gap-3">
 							<Image
@@ -214,13 +369,14 @@ import bubble from "../assets/bubble.svg";
 								alt=""
 								class="w-6 h-6"
 							/>
-							<span>Accéder au formulaire</span>
+							<span class="text-sm md:text-base"
+								>Accéder au formulaire</span
+							>
 						</div>
 					</SkewButton>
 				</div>
 
-				<!-- Added negative margin to move spike up -->
-				<div class="-mt-16">
+				<div class="hidden md:block md:-mt-16">
 					<Image
 						src={spike || "/placeholder.svg"}
 						alt=""
@@ -233,7 +389,6 @@ import bubble from "../assets/bubble.svg";
 </Layout>
 
 <script>
-	// Skill descriptions object
 	const skillDescriptions: Record<string, string> = {
 		illustrator:
 			"Adobe Illustrator est un logiciel de création graphique vectorielle professionnel, idéal pour la conception de logos, illustrations et designs complexes.",
@@ -261,10 +416,8 @@ import bubble from "../assets/bubble.svg";
 			"Tailwind CSS est un framework CSS utility-first qui permet de construire rapidement des interfaces modernes en composant des classes utilitaires.",
 	};
 
-	// Get description element
 	const descriptionElement = document.getElementById("skill-description");
 
-	// Add click event listeners to all skill buttons
 	document.querySelectorAll("[data-skill]").forEach((button) => {
 		button.addEventListener("click", (e) => {
 			const skillName = (e.currentTarget as HTMLElement).getAttribute(
@@ -277,4 +430,39 @@ import bubble from "../assets/bubble.svg";
 			}
 		});
 	});
+
+	// Added carousel functionality script
+	const carouselTrack = document.querySelector(
+		".carousel-track",
+	) as HTMLElement;
+	const prevButton = document.getElementById("carousel-prev");
+	const nextButton = document.getElementById("carousel-next");
+	const carouselItems = document.querySelectorAll(".carousel-item");
+
+	let currentIndex = 0;
+	const itemsToShow = window.innerWidth < 768 ? 1 : 3;
+	const itemWidth = window.innerWidth < 768 ? 256 + 16 : 320 + 32;
+	const maxIndex = Math.max(0, carouselItems.length - itemsToShow);
+
+	function updateCarousel() {
+		const offset = -currentIndex * itemWidth;
+		if (carouselTrack) {
+			carouselTrack.style.transform = `translateX(${offset}px)`;
+		}
+	}
+
+	prevButton?.addEventListener("click", () => {
+		currentIndex = Math.max(0, currentIndex - 1);
+		updateCarousel();
+	});
+
+	nextButton?.addEventListener("click", () => {
+		currentIndex = Math.min(maxIndex, currentIndex + 1);
+		updateCarousel();
+	});
+
+	setInterval(() => {
+		currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+		updateCarousel();
+	}, 5000);
 </script>

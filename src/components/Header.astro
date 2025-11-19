@@ -10,15 +10,11 @@ import SkewButton from "./SkewButton.astro";
     >
     </div>
 
-    <!-- Added responsive padding and flex direction -->
     <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <nav
-            class="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-4 sm:gap-0"
-        >
+        <nav class="flex items-start justify-between">
             <div
                 class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3"
             >
-                <!-- Made title responsive with smaller text on mobile -->
                 <a href="/" class="hover:opacity-80 transition-opacity">
                     <h1
                         class="text-black leading-normal text-3xl sm:text-4xl lg:text-5xl"
@@ -27,7 +23,6 @@ import SkewButton from "./SkewButton.astro";
                         Titouan Winkel
                     </h1>
                 </a>
-                <!-- Made subtitle responsive -->
                 <span
                     class="text-purple-600 text-base sm:text-lg lg:text-xl"
                     style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal;"
@@ -35,14 +30,123 @@ import SkewButton from "./SkewButton.astro";
                 >
             </div>
 
-            <!-- Made navigation responsive with column layout on mobile -->
-            <div
-                class="flex flex-row sm:flex-row items-center gap-3 sm:gap-4 lg:gap-17 mt-2"
-            >
+            <!-- Desktop navigation - hidden on mobile -->
+            <div class="hidden md:flex items-center gap-4 lg:gap-17 mt-2">
                 <SkewButton href="/projets" text="Projets" />
                 <SkewButton href="/a_propos" text="A propos" />
                 <SkewButton href="/contact" text="Contact" />
             </div>
+
+            <!-- Hamburger button - visible only on mobile -->
+            <button
+                id="hamburger-btn"
+                class="md:hidden flex flex-col gap-1.5 p-2 mt-2 z-50 relative"
+                aria-label="Toggle menu"
+            >
+                <span
+                    class="w-7 h-0.5 bg-black transition-all duration-300 ease-in-out"
+                    id="line1"></span>
+                <span
+                    class="w-7 h-0.5 bg-black transition-all duration-300 ease-in-out"
+                    id="line2"></span>
+                <span
+                    class="w-7 h-0.5 bg-black transition-all duration-300 ease-in-out"
+                    id="line3"></span>
+            </button>
         </nav>
     </div>
+
+    <!-- Mobile menu overlay -->
+    <div
+        id="mobile-menu"
+        class="fixed inset-0 bg-purple-50 z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden"
+    >
+        <div
+            class="container mx-auto px-4 py-20 flex flex-col items-center gap-8"
+        >
+            <a
+                href="/projets"
+                class="mobile-menu-link text-4xl font-bold text-black hover:text-purple-600 transition-colors"
+                style="font-family: 'Russo One', sans-serif;"
+            >
+                Projets
+            </a>
+            <a
+                href="/a_propos"
+                class="mobile-menu-link text-4xl font-bold text-black hover:text-purple-600 transition-colors"
+                style="font-family: 'Russo One', sans-serif;"
+            >
+                A propos
+            </a>
+            <a
+                href="/contact"
+                class="mobile-menu-link text-4xl font-bold text-black hover:text-purple-600 transition-colors"
+                style="font-family: 'Russo One', sans-serif;"
+            >
+                Contact
+            </a>
+        </div>
+    </div>
 </header>
+
+<!-- JavaScript for hamburger menu toggle -->
+<script>
+    const hamburgerBtn = document.getElementById("hamburger-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const line1 = document.getElementById("line1");
+    const line2 = document.getElementById("line2");
+    const line3 = document.getElementById("line3");
+    const mobileMenuLinks = document.querySelectorAll(".mobile-menu-link");
+    let isOpen = false;
+
+    function toggleMenu() {
+        isOpen = !isOpen;
+
+        if (isOpen) {
+            // Open menu
+            mobileMenu?.classList.remove("translate-x-full");
+            mobileMenu?.classList.add("translate-x-0");
+
+            // Animate hamburger to X
+            line1?.style.setProperty(
+                "transform",
+                "rotate(45deg) translateY(8px)",
+            );
+            line2?.style.setProperty("opacity", "0");
+            line3?.style.setProperty(
+                "transform",
+                "rotate(-45deg) translateY(-8px)",
+            );
+
+            // Prevent body scroll
+            document.body.style.overflow = "hidden";
+        } else {
+            // Close menu
+            mobileMenu?.classList.remove("translate-x-0");
+            mobileMenu?.classList.add("translate-x-full");
+
+            // Animate X back to hamburger
+            line1?.style.setProperty(
+                "transform",
+                "rotate(0deg) translateY(0px)",
+            );
+            line2?.style.setProperty("opacity", "1");
+            line3?.style.setProperty(
+                "transform",
+                "rotate(0deg) translateY(0px)",
+            );
+
+            // Restore body scroll
+            document.body.style.overflow = "";
+        }
+    }
+
+    hamburgerBtn?.addEventListener("click", toggleMenu);
+
+    // Close menu when clicking on a link
+    mobileMenuLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+            if (isOpen) toggleMenu();
+        });
+    });
+</script>
