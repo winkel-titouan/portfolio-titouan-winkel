@@ -12,33 +12,6 @@ import arrow from "../assets/arrow.svg";
 import heroPC from "../assets/hero-pc.svg";
 import personnage from "../assets/a_propos/personnage.svg";
 import bubble from "../assets/bubble.svg";
-import { pb, type Projet } from "../utils/pb";
-
-let projets: Projet[] = [];
-try {
-  const records = await pb.collection('projets').getFullList<Projet>();
-  projets = records;
-} catch (error) {
-  console.error('Erreur lors de la récupération des projets:', error);
-}
-
-function getImageUrl(projet: Projet, filename: string): string {
-  return `https://portfolio.titouan-winkel.fr/api/files/projets/${projet.id}/${filename}`;
-}
-
-function getFirstInspirationImage(projet: Projet): string {
-  if (projet.inspirations && projet.inspirations.length > 0) {
-    return getImageUrl(projet, projet.inspirations[0]);
-  }
-  return '/placeholder.svg?height=300&width=400';
-}
-
-function getLogoUrl(projet: Projet): string {
-  if (projet.logo_new) {
-    return getImageUrl(projet, projet.logo_new);
-  }
-  return '/placeholder.svg?height=100&width=100';
-}
 ---
 
 <Layout title="Titouan Winkel - Designer web">
@@ -215,94 +188,6 @@ function getLogoUrl(projet: Projet): string {
 			</div>
 		</section>
 
-		<!-- New Projects Carousel Section -->
-		<section class="container mx-auto px-6 py-16">
-			<SectionTitle text="Mes projets" />
-			
-			<div class="relative mt-12">
-				<!-- Carousel container -->
-				<div class="carousel-container overflow-hidden">
-					<div class="carousel-track flex gap-8 transition-transform duration-500 ease-in-out">
-						{projets.map((projet) => (
-							<div class="carousel-item flex-shrink-0 w-80">
-								<!-- Project card -->
-								<a href={`/projets/${projet.id}`} class="block group">
-									<div class="relative bg-white border-4 border-black rounded-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-										<!-- Project image -->
-										<div class="relative h-48 overflow-hidden">
-											<img 
-												src={getFirstInspirationImage(projet) || "/placeholder.svg"} 
-												alt={projet.nom_projet}
-												class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-											/>
-											<!-- Logo overlay -->
-											<div class="absolute top-4 left-4 bg-white border-2 border-black rounded-lg p-2">
-												<img 
-													src={getLogoUrl(projet) || "/placeholder.svg"} 
-													alt={`${projet.nom_projet} logo`}
-													class="w-12 h-12 object-contain"
-												/>
-											</div>
-										</div>
-										
-										<!-- Project info -->
-										<div class="p-6">
-											<h3 
-												class="text-xl mb-2"
-												style="font-family: 'Russo One', sans-serif;"
-											>
-												{projet.nom_projet}
-											</h3>
-											<p 
-												class="text-sm line-clamp-3"
-												style="font-family: 'Space Grotesk', sans-serif;"
-											>
-												{projet.description}
-											</p>
-										</div>
-									</div>
-								</a>
-							</div>
-						))}
-					</div>
-				</div>
-
-				<!-- Navigation buttons -->
-				<button 
-					id="carousel-prev" 
-					class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white border-4 border-black rounded-full p-3 hover:bg-gray-100 transition-colors z-10"
-					aria-label="Previous project"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<polyline points="15 18 9 12 15 6"></polyline>
-					</svg>
-				</button>
-				<button 
-					id="carousel-next" 
-					class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white border-4 border-black rounded-full p-3 hover:bg-gray-100 transition-colors z-10"
-					aria-label="Next project"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<polyline points="9 18 15 12 9 6"></polyline>
-					</svg>
-				</button>
-			</div>
-
-			<!-- Call to action -->
-			<div class="flex justify-center mt-12">
-				<SkewButton href="/projets">
-					<div class="flex items-center gap-3">
-						<Image
-							src={arrow || "/placeholder.svg"}
-							alt=""
-							class="w-6 h-6"
-						/>
-						<span>Voir tous les projets</span>
-					</div>
-				</SkewButton>
-			</div>
-		</section>
-
 		<!-- Contact section directly in index instead of separate component -->
 		<section class="container mx-auto px-6 py-16">
 			<SectionTitle text="Me contacter" />
@@ -392,40 +277,4 @@ function getLogoUrl(projet: Projet): string {
 			}
 		});
 	});
-</script>
-
-<!-- Carousel functionality script -->
-<script>
-	const carouselTrack = document.querySelector('.carousel-track') as HTMLElement;
-	const prevButton = document.getElementById('carousel-prev');
-	const nextButton = document.getElementById('carousel-next');
-	const carouselItems = document.querySelectorAll('.carousel-item');
-	
-	let currentIndex = 0;
-	const itemsToShow = 3;
-	const itemWidth = 320 + 32; // width + gap
-	const maxIndex = Math.max(0, carouselItems.length - itemsToShow);
-
-	function updateCarousel() {
-		const offset = -currentIndex * itemWidth;
-		if (carouselTrack) {
-			carouselTrack.style.transform = `translateX(${offset}px)`;
-		}
-	}
-
-	prevButton?.addEventListener('click', () => {
-		currentIndex = Math.max(0, currentIndex - 1);
-		updateCarousel();
-	});
-
-	nextButton?.addEventListener('click', () => {
-		currentIndex = Math.min(maxIndex, currentIndex + 1);
-		updateCarousel();
-	});
-
-	// Auto-play carousel
-	setInterval(() => {
-		currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
-		updateCarousel();
-	}, 5000);
 </script>

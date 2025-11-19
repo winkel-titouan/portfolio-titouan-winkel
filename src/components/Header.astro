@@ -10,27 +10,35 @@ import SkewButton from "./SkewButton.astro";
     >
     </div>
 
-    <div class="container mx-auto px-6 py-6">
-        <nav class="flex items-start justify-between">
-            <div class="flex items-baseline gap-3">
-                <!-- Applied exact Figma styles for Titouan: 50px, Russo One, black -->
+    <!-- Added responsive padding and flex direction -->
+    <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <nav
+            class="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-4 sm:gap-0"
+        >
+            <div
+                class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3"
+            >
+                <!-- Made title responsive with smaller text on mobile -->
                 <a href="/" class="hover:opacity-80 transition-opacity">
                     <h1
-                        class="text-black leading-normal"
-                        style="font-family: 'Russo One', sans-serif; font-size: 50px; font-weight: 400; font-style: normal;"
+                        class="text-black leading-normal text-3xl sm:text-4xl lg:text-5xl"
+                        style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal;"
                     >
                         Titouan Winkel
                     </h1>
                 </a>
-                <!-- Applied exact Figma styles: Space Grotesk, 20px, weight 400 -->
+                <!-- Made subtitle responsive -->
                 <span
-                    class="text-purple-600"
-                    style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal;"
+                    class="text-purple-600 text-base sm:text-lg lg:text-xl"
+                    style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal;"
                     >Designer web</span
                 >
             </div>
 
-            <div class="flex items-center gap-17 mt-2">
+            <!-- Made navigation responsive with column layout on mobile -->
+            <div
+                class="flex flex-row sm:flex-row items-center gap-3 sm:gap-4 lg:gap-17 mt-2"
+            >
                 <SkewButton href="/projets" text="Projets" />
                 <SkewButton href="/a_propos" text="A propos" />
                 <SkewButton href="/contact" text="Contact" />
