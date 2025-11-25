@@ -1,12 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SkewButton from '../../components/SkewButton.astro';
-import { pb, type Projet } from '../../utils/pb';
+import { pb } from '../../utils/pb';
 import line1 from '../../assets/boutons/line1.svg';
 import line2 from '../../assets/boutons/line2.svg';
 import bubble from '../../assets/bubble.svg';
 import arrowDown from '../../assets/arrow-down.svg';
-import elementPageProjet from '../../assets/element_page_projet.svg';
+import lineTop from '../../assets/card/line-top.svg';
+import lineBot from '../../assets/card/line-bot.svg';
 import javascriptLogo from '../../assets/logos/js.svg';
 import astroLogo from '../../assets/logos/astrojs.svg';
 import tailwindLogo from '../../assets/logos/tailwindcss.svg';
@@ -16,56 +17,44 @@ import capcutLogo from '../../assets/logos/capcut.svg';
 import cssLogo from '../../assets/logos/css.svg';
 import htmlLogo from '../../assets/logos/html.svg';
 import figmaLogo from '../../assets/logos/figma.svg';
-import wordpressLogo from "../../assets/logos/wordpress.svg"
 
-let projets: Projet[] = [];
+let projets = [];
+let errorMessage = '';
 
 try {
   console.log('[v0] Fetching projects from PocketBase...');
-  const records = await pb.collection('projets').getFullList<Projet>();
+  const records = await pb.collection('projets').getFullList({
+    sort: '-created',
+  });
   console.log('[v0] Projects fetched:', records.length, 'projects');
   console.log('[v0] First project:', records[0]);
   projets = records;
 } catch (error) {
+  errorMessage = `Erreur: ${error.message}`;
   console.error('[v0] Erreur lors de la récupération des projets:', error);
 }
 
 console.log('[v0] Projets array length:', projets.length);
 
-const logoMap: Record<string, any> = {
-    javascript: javascriptLogo,
-    astro: astroLogo,
-    tailwind: tailwindLogo,
-    sql: sqlLogo,
-    pocketbase: pocketbaseLogo,
-    capcut: capcutLogo,
-    css: cssLogo,
-    html: htmlLogo,
-    figma: figmaLogo,
-    wordpress: wordpressLogo,
-};
-
-function getImageUrl(projet: Projet): string {
+function getImageUrl(projet) {
   if (projet.prod_finale && projet.prod_finale.length > 0) {
     return `https://portfolio.titouan-winkel.fr/api/files/projets/${projet.id}/${projet.prod_finale[0]}`;
   }
   return '/placeholder.svg?height=400&width=300';
 }
-
-const allCompetences = Array.from(new Set(projets.flatMap(p => p.competences || [])));
 ---
 
 <Layout title="Mes Projets - Titouan Winkel">
   <main class="min-h-screen pt-32 pb-20">
     <!-- Centered title section with single bubble -->
-    <section class="relative max-w-7xl mx-auto px-4 md:px-8 mb-16 md:mb-32">
+    <section class="relative max-w-7xl mx-auto px-4 md:px-8 mb-16 md:mb-52">
       <!-- Single bubble behind title -->
-      <div class="absolute top-14 left-118 -translate-y-1/2 -translate-x-1/2 z-0 hidden md:block">
+      <div class="absolute top-14 left-2/5 -translate-y-1/2 -translate-x-1/2 z-0 hidden md:block">
         <img src={bubble.src || "/placeholder.svg"} alt="" class="w-48 h-48 opacity-60" />
       </div>
 
       <!-- Made title responsive with smaller text on mobile -->
-      <div class="relative z-10 flex justify-center">
+      <div class="relative z-50 flex justify-center">
         <div class="relative inline-block">
           <img src={line1.src || "/placeholder.svg"} alt="" class="absolute -top-2 -left-8 w-8 h-8 md:w-12 md:h-12" />
           <h1 class="text-black font-[Russo_One] text-3xl md:text-[50px] font-normal leading-normal">
@@ -74,203 +63,111 @@ const allCompetences = Array.from(new Set(projets.flatMap(p => p.competences || 
           <img src={line2.src || "/placeholder.svg"} alt="" class="absolute -bottom-2 -right-8 w-8 h-8 md:w-12 md:h-12" />
         </div>
       </div>
-
-      <!-- Using arrow-down.svg -->
-      <div class="flex justify-center mt-8 md:mt-50">
-        <img src={arrowDown.src || "/placeholder.svg"} alt="Scroll down" class="w-6 h-10" />
-      </div>
     </section>
 
-    <!-- Added search and filter section -->
+    <!-- Simplified search section without competence filters -->
     <section class="max-w-7xl mx-auto px-4 md:px-8 mb-12 space-y-6">
-      <!-- Search bar -->
-      <div class="relative max-w-xl mx-auto">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Rechercher un projet..."
-          class="w-full px-4 py-3 pr-12 border-3 border-black font-[Space_Grotesk] text-base focus:outline-none focus:ring-2 focus:ring-black"
-        />
-        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-      </div>
-
-      <!-- Competence filters -->
-      <div class="flex flex-wrap gap-3 justify-center items-center">
-        <span class="text-black font-[Space_Grotesk] text-lg font-medium">Filtrer par :</span>
-        {allCompetences.map((competence) => (
-          <button
-            class="competence-filter relative px-4 py-2 border-3 border-black bg-white hover:bg-gray-100 transition-colors"
-            data-competence={competence}
-          >
-            <img 
-              src={logoMap[competence]?.src || "/placeholder.svg"} 
-              alt={competence}
-              class="w-8 h-8 object-contain inline-block"
-            />
-            <span class="ml-2 font-[Space_Grotesk] capitalize">{competence}</span>
-          </button>
-        ))}
-        <button
-          id="resetFilter"
-          class="px-4 py-2 border-3 border-black bg-black text-white hover:bg-gray-800 transition-colors font-[Space_Grotesk]"
+      <!-- Sort filter -->
+      <div class="flex justify-center items-center gap-4">
+        <span class="text-black font-[Space_Grotesk] text-lg font-medium">Trier par :</span>
+        <select
+          id="sortSelect"
+          class="px-4 py-3 border-3 border-black font-[Space_Grotesk] text-base bg-white focus:outline-none focus:ring-2 focus:ring-black"
         >
-          Réinitialiser
-        </button>
+          <option value="recent">Du plus récent au plus ancien</option>
+          <option value="ancien">Du plus ancien au plus récent</option>
+        </select>
       </div>
 
       <!-- Results counter -->
       <p class="text-center text-black font-[Space_Grotesk] text-lg">
-        <span id="resultCount">{projets.length}</span> projet(s) trouvé(s)
+        <span id="resultCount">{projets.length}</span> projet(s)
       </p>
     </section>
 
-    <!-- Made projects list responsive with stacked layout on mobile -->
-    <section class="space-y-16 md:space-y-32 px-4 md:px-0" id="projectsList">
-      {projets.map((projet, index) => (
-        <article class="relative flex flex-col md:flex-row items-center gap-4 md:gap-8 project-item" data-competences={JSON.stringify(projet.competences || [])} data-name={projet.nom_projet.toLowerCase()}>
-          <!-- SVG hidden on mobile, shown on desktop -->
-          <div class="absolute left-0 top-1/2 -translate-y-1/2 hidden md:block">
-            <img 
-              src={elementPageProjet.src || "/placeholder.svg"} 
-              alt="" 
-              class="h-60"
-              style={`filter: hue-rotate(${index * 30}deg);`}
-            />
-          </div>
+    <!-- Display error message if projects failed to load -->
+    {errorMessage && (
+      <div class="max-w-7xl mx-auto px-4 md:px-8 mb-8">
+        <p class="text-red-600 text-center font-[Space_Grotesk]">{errorMessage}</p>
+      </div>
+    )}
 
-          <!-- Content responsive with no left margin on mobile -->
-          <div class="flex-1 space-y-4 md:space-y-6 z-10 relative md:ml-64">
-            <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
-              <h2 class="text-black font-[Russo_One] text-2xl md:text-[40px] font-normal leading-normal">
-                {projet.nom_projet}
-              </h2>
-              <div class="flex gap-2 md:gap-3 md:ml-4 flex-wrap">
-                {projet.competences && projet.competences.map((competence: string) => (
-                  <div class="relative">
-                    {/* Line decorations in corners with smaller size */}
-                    <img
-                      src={line1.src || "/placeholder.svg"}
-                      alt=""
-                      class="absolute z-30"
-                      style="width: 15px; top: -3.5px; left: -0px;"
-                    />
-                    <img
-                      src={line2.src || "/placeholder.svg"}
-                      alt=""
-                      class="absolute z-30"
-                      style="width: 15px; bottom: -4px; right: -0px;"
-                    />
-                    
-                    {/* Skewed background using project color with black border */}
-                    <div 
-                      class="absolute inset-0 -z-10 transform skew-x-[-15deg] border-3 border-black"
-                      style={`background-color: ${projet.couleur}; opacity: 1;`}
-                    />
-                    <div class="px-2 py-1 md:px-3 md:py-2">
-                      <img 
-                        src={logoMap[competence]?.src || "/placeholder.svg"} 
-                        alt={competence}
-                        class="w-8 h-8 md:w-10 md:h-10 object-contain"
-                        title={competence}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+    <!-- Simplified project cards without competences -->
+    <section class="max-w-7xl mx-auto px-4 md:px-20" id="projectsList">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-20">
+        {projets.map((projet) => (
+          <article 
+            class="project-item relative p-6 flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
+            data-name={projet.nom_projet.toLowerCase()}
+            data-created={projet.created}
+            style="background: linear-gradient(353deg, rgba(234, 221, 255, 0.23) 10.66%, #A983E2 67.17%, rgba(234, 221, 255, 0.23) 109.64%);"
+            onclick={`window.location.href='/projets/${projet.id}'`}
+          >
+            <!-- Added corner decorations -->
+            <img 
+              src={lineTop.src || "/placeholder.svg"} 
+              alt="" 
+              class="absolute -top-1 -left-3 w-7 h-7" 
+            />
+            <img 
+              src={lineBot.src || "/placeholder.svg"} 
+              alt="" 
+              class="absolute -bottom-5 -right-3 w-7 h-7" 
+            />
+
+            <!-- Project image -->
+            <div class="w-full flex justify-center items-center min-h-[200px]">
+              <img 
+                src={getImageUrl(projet) || "/placeholder.svg"} 
+                alt={projet.nom_projet}
+                class="max-w-full h-auto max-h-[250px] object-contain"
+              />
             </div>
 
-            <p class="text-black font-[Space_Grotesk] text-base md:text-[20px] font-normal leading-normal max-w-md">
+            <!-- Project title -->
+            <h2 class="text-black font-[Russo_One] text-2xl font-normal">
+              {projet.nom_projet}
+            </h2>
+
+            <!-- Project description -->
+            <p class="text-black font-[Space_Grotesk] text-base leading-relaxed flex-grow">
               {projet.description}
             </p>
 
-            <!-- Added link to project detail page with projet.id -->
-            <SkewButton href={`/projets/${projet.id}`}>
-              Voir plus
-            </SkewButton>
-          </div>
-
-          <!-- Image hidden on mobile, shown on desktop -->
-          <img 
-            src={getImageUrl(projet) || "/placeholder.svg"} 
-            alt={projet.nom_projet}
-            class="hidden md:block w-60 h-auto flex-shrink-0 z-10 mr-30"
-          />
-        </article>
-      ))}
+            
+          </article>
+        ))}
+      </div>
     </section>
   </main>
 </Layout>
 
-<!-- Added filtering JavaScript -->
+<!-- Simplified filtering without competences -->
 <script>
-  let activeCompetence: string | null = null;
+  const sortSelect = document.getElementById('sortSelect') as HTMLSelectElement;
+  const projectsList = document.getElementById('projectsList')?.querySelector('.grid');
 
-  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
-  const competenceFilters = document.querySelectorAll('.competence-filter');
-  const resetButton = document.getElementById('resetFilter');
-  const resultCount = document.getElementById('resultCount');
-  const projectItems = document.querySelectorAll('.project-item');
+  function sortProjects() {
+    if (!projectsList) return;
 
-  function filterProjects() {
-    const searchTerm = searchInput.value.toLowerCase();
-    let visibleCount = 0;
+    const projectItems = Array.from(projectsList.children) as HTMLElement[];
+    const sortValue = sortSelect.value;
 
-    projectItems.forEach((item) => {
-      const projectName = item.getAttribute('data-name') || '';
-      const projectCompetences = JSON.parse(item.getAttribute('data-competences') || '[]');
+    // Get the created dates from data attributes
+    projectItems.sort((a, b) => {
+      const dateA = new Date(a.getAttribute('data-created') || '').getTime();
+      const dateB = new Date(b.getAttribute('data-created') || '').getTime();
 
-      const matchesSearch = projectName.includes(searchTerm);
-      const matchesCompetence = !activeCompetence || projectCompetences.includes(activeCompetence);
-
-      if (matchesSearch && matchesCompetence) {
-        (item as HTMLElement).style.display = 'flex';
-        visibleCount++;
+      if (sortValue === 'recent') {
+        return dateB - dateA; // Most recent first
       } else {
-        (item as HTMLElement).style.display = 'none';
+        return dateA - dateB; // Oldest first
       }
     });
 
-    if (resultCount) {
-      resultCount.textContent = visibleCount.toString();
-    }
+    // Re-append in sorted order
+    projectItems.forEach(item => projectsList.appendChild(item));
   }
 
-  searchInput?.addEventListener('input', filterProjects);
-
-  competenceFilters.forEach((button) => {
-    button.addEventListener('click', () => {
-      const competence = button.getAttribute('data-competence');
-      
-      if (activeCompetence === competence) {
-        activeCompetence = null;
-        button.classList.remove('bg-gray-800', 'text-white');
-        button.classList.add('bg-white');
-      } else {
-        competenceFilters.forEach((btn) => {
-          btn.classList.remove('bg-gray-800', 'text-white');
-          btn.classList.add('bg-white');
-        });
-        
-        activeCompetence = competence;
-        button.classList.remove('bg-white');
-        button.classList.add('bg-gray-800', 'text-white');
-      }
-
-      filterProjects();
-    });
-  });
-
-  resetButton?.addEventListener('click', () => {
-    searchInput.value = '';
-    activeCompetence = null;
-    
-    competenceFilters.forEach((btn) => {
-      btn.classList.remove('bg-gray-800', 'text-white');
-      btn.classList.add('bg-white');
-    });
-
-    filterProjects();
-  });
+  sortSelect?.addEventListener('change', sortProjects);
 </script>

@@ -6,34 +6,34 @@ import SkillsCloud from "../components/SkillsCloud.astro";
 import SkewButton from "../components/SkewButton.astro";
 import { Image } from "astro:assets";
 import heroPC from "../assets/hero-pc.svg";
-import heroBg from "../assets/hero_bg_new.webp";
 import personnage from "../assets/a_propos/personnage.svg";
 import bubble from "../assets/bubble.svg";
 import competencesBg from "../assets/competences-bg.svg";
 import spike from "../assets/spike.svg";
 import arrow from "../assets/arrow.svg";
-import { pb, type Projet } from "../utils/pb";
+import download from "../assets/boutons/download.svg";
+import { pb } from "../utils/pb";
 
-let projets: Projet[] = [];
+let projets = [];
 try {
-	const records = await pb.collection("projets").getFullList<Projet>();
+	const records = await pb.collection("projets").getFullList();
 	projets = records;
 } catch (error) {
 	console.error("Erreur lors de la récupération des projets:", error);
 }
 
-function getImageUrl(projet: Projet, filename: string): string {
+function getImageUrl(projet, filename) {
 	return `https://portfolio.titouan-winkel.fr/api/files/projets/${projet.id}/${filename}`;
 }
 
-function getFirstInspirationImage(projet: Projet): string {
+function getFirstInspirationImage(projet) {
 	if (projet.inspirations && projet.inspirations.length > 0) {
 		return getImageUrl(projet, projet.inspirations[0]);
 	}
 	return "/placeholder.svg?height=300&width=400";
 }
 
-function getLogoUrl(projet: Projet): string {
+function getLogoUrl(projet) {
 	if (projet.logo_new) {
 		return getImageUrl(projet, projet.logo_new);
 	}
@@ -44,34 +44,56 @@ function getLogoUrl(projet: Projet): string {
 <Layout title="Titouan Winkel - Designer web">
 	<!-- Added overflow-x-hidden to prevent horizontal scrolling -->
 	<main class="overflow-x-hidden">
-		<!-- Modified hero section to use hero_bg.webp aligned to the right -->
-		<section class="relative overflow-hidden">
+		<!-- Redesigned hero section with text and two buttons -->
+		<!-- Added flex and items-center to vertically center content, reduced py padding -->
+		<section
+			class="relative overflow-hidden flex items-center min-h-[70vh]"
+		>
 			<!-- Hero background image - positioned absolutely to right edge, outside container -->
-			<div class="absolute top-23 left-0 hidden lg:block -z-10">
-				<Image
-					src={heroBg || "/placeholder.svg"}
-					alt="Hero background"
-					class="w-auto h-100"
-				/>
-			</div>
 
-			<div class="container mx-auto px-4 md:px-6 py-8 md:py-16">
+			<div class="container mx-auto px-4 md:px-6">
 				<div
 					class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center"
 				>
-					<div
-						class="relative text-center lg:text-left text-black lg:text-white p-6 md:p-12"
-					>
-						<h2
-							class="relative z-10 text-xl md:text-3xl md:-mt-23 block lg:hidden"
-							style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal; line-height: normal;"
+					<div class="space-y-6 md:space-y-8">
+						<h1
+							class="text-3xl md:text-5xl lg:text-6xl"
+							style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal; line-height: 1.2; color: #000;"
 						>
 							Chaque projet est une nouvelle aventure.
-						</h2>
+						</h1>
+
+						<div class="flex flex-col gap-4 md:gap-6">
+							<SkewButton href="/projets">
+								<div class="flex items-center gap-3">
+									<Image
+										src={arrow || "/placeholder.svg"}
+										alt=""
+										class="w-5 h-5 md:w-6 md:h-6"
+									/>
+									<span class="text-sm md:text-base"
+										>Découvrir tous mes projets</span
+									>
+								</div>
+							</SkewButton>
+
+							<SkewButton href="#">
+								<div class="flex items-center gap-3">
+									<Image
+										src={download || "/placeholder.svg"}
+										alt=""
+										class="w-5 h-5 md:w-6 md:h-6"
+									/>
+									<span class="text-sm md:text-base"
+										>Télécharger mon CV</span
+									>
+								</div>
+							</SkewButton>
+						</div>
 					</div>
 
 					<div
-						class="flex items-center justify-center min-h-[200px] md:min-h-[300px] order-last lg:order-none"
+						class="flex items-center justify-center min-h-[200px] md:min-h-[300px]"
 					>
 						<Image
 							src={heroPC || "/placeholder.svg"}
@@ -330,13 +352,13 @@ function getLogoUrl(projet: Projet): string {
 				</button>
 			</div>
 
-			<div class="flex md:ml-9 mt-8 md:mt-12">
+			<div class="flex md:ml-20 mt-8 md:mt-12">
 				<SkewButton href="/projets">
 					<div class="flex items-center gap-3">
 						<Image
 							src={arrow || "/placeholder.svg"}
 							alt=""
-							class="w-5 h-5 md:w-6 md:h-6"
+							class="w-6 h-6"
 						/>
 						<span class="text-sm md:text-base"
 							>Voir tous les projets</span
@@ -359,7 +381,7 @@ function getLogoUrl(projet: Projet): string {
 					>
 						Intéressé par mon travail, des questions, une offre
 						d'emploi... <span class="text-purple-600 font-semibold"
-							>Contactez moi !</span
+							>Contacter moi !</span
 						>
 					</p>
 					<div class="md:mt-15">
@@ -378,7 +400,7 @@ function getLogoUrl(projet: Projet): string {
 					</div>
 				</div>
 
-				<div class="hidden md:block md:-mt-16 md:mr-20">
+				<div class="hidden md:block md:-mt-16 md:mr-25">
 					<Image
 						src={spike || "/placeholder.svg"}
 						alt=""
@@ -391,7 +413,7 @@ function getLogoUrl(projet: Projet): string {
 </Layout>
 
 <script>
-	const skillDescriptions: Record<string, string> = {
+	const skillDescriptions = {
 		illustrator:
 			"Adobe Illustrator est un logiciel de création graphique vectorielle professionnel, idéal pour la conception de logos, illustrations et designs complexes.",
 		figma: "Figma est un outil de design d'interface collaboratif en ligne, parfait pour créer des maquettes web et mobile avec une approche en équipe.",

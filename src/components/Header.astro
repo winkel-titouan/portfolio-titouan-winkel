@@ -2,6 +2,7 @@
 import SkewButton from "./SkewButton.astro";
 import menuIcon from "../assets/mobile/menu-mobile.svg";
 import closeIcon from "../assets/mobile/cross-menu.svg";
+import logo from "../assets/logos/logo.svg";
 ---
 
 <header class="relative z-50">
@@ -15,21 +16,23 @@ import closeIcon from "../assets/mobile/cross-menu.svg";
     <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <nav class="flex items-start justify-between">
             <div
-                class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3"
+                class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3"
             >
-                <a href="/" class="hover:opacity-80 transition-opacity">
-                    <h1
-                        class="text-black leading-normal text-3xl sm:text-4xl lg:text-5xl"
-                        style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal;"
-                    >
-                        Titouan Winkel
-                    </h1>
-                </a>
-                <span
-                    class="text-purple-600 text-base sm:text-lg lg:text-xl"
-                    style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal;"
-                    >Designer web</span
+                <a
+                    href="/"
+                    class="hover:opacity-80 transition-opacity flex items-end gap-0"
                 >
+                    <img
+                        src={logo.src || "/placeholder.svg"}
+                        alt="TW Logo"
+                        class="h-12 sm:h-14 lg:h-16 w-auto"
+                    />
+                    <span
+                        class="text-purple-600 text-base sm:text-lg lg:text-xl -mb-2"
+                        style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-style: normal; line-height: normal;"
+                        >Designer web</span
+                    >
+                </a>
             </div>
 
             <!-- Desktop navigation - hidden on mobile -->
