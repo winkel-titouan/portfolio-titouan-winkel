@@ -11,7 +11,10 @@ import bubble from "../assets/bubble.svg";
 import competencesBg from "../assets/competences-bg.svg";
 import spike from "../assets/spike.svg";
 import arrow from "../assets/arrow.svg";
+import arrowLeft from "../assets/arrow-left.svg";
 import download from "../assets/boutons/download.svg";
+import lineTop from "../assets/card/line-top.svg";
+import lineBot from "../assets/card/line-bot.svg";
 import { pb } from "../utils/pb";
 
 let projets = [];
@@ -77,9 +80,8 @@ function getLogoUrl(projet) {
 								</div>
 							</SkewButton>
 
-							<SkewButton
-								href="https://pdftolink.online/share/tmp-mif7i1hi-5c379c53-e7e3-4344-a34d-1dc40bb8a516"
-							>
+							<!-- Updated CV download link to point to actual file in public folder -->
+							<SkewButton href="/CV_Titouan_Winkel.pdf" download>
 								<div class="flex items-center gap-3">
 									<Image
 										src={download || "/placeholder.svg"}
@@ -250,13 +252,16 @@ function getLogoUrl(projet) {
 			</div>
 		</section>
 
-		<!-- Added projects carousel section with responsive styling -->
+		<!-- Redesigned carousel section with project card style -->
 		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
 			<div class="md:ml-20">
 				<SectionTitle text="Mes projets" />
 			</div>
 			<div class="relative mt-8 md:mt-12">
-				<div class="carousel-container overflow-hidden">
+				<!-- Removed overflow-hidden from carousel container -->
+				<div
+					class="carousel-container cursor-grab active:cursor-grabbing"
+				>
 					<div
 						class="carousel-track flex gap-4 md:gap-8 transition-transform duration-500 ease-in-out"
 					>
@@ -267,8 +272,13 @@ function getLogoUrl(projet) {
 										href={`/projets/${projet.id}`}
 										class="block group"
 									>
-										<div class="relative bg-white border-4 border-black rounded-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-											<div class="relative h-36 md:h-48 overflow-hidden">
+										<!-- Added border-3 border-black, removed corner SVGs, adjusted image to full width -->
+										<div
+											class="relative border-3 border-black flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:scale-105 hover:shadow-2xl min-h-[400px]"
+											style="background: linear-gradient(353deg, rgba(234, 221, 255, 0.23) 10.66%, #A983E2 67.17%, rgba(234, 221, 255, 0.23) 109.64%);"
+										>
+											<!-- Image now takes full width with no negative margins -->
+											<div class="w-full">
 												<img
 													src={
 														getFirstInspirationImage(
@@ -276,38 +286,24 @@ function getLogoUrl(projet) {
 														) || "/placeholder.svg"
 													}
 													alt={projet.nom_projet}
-													class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+													class="w-full h-48 object-cover"
 												/>
-												<div class="absolute top-2 left-2 md:top-4 md:left-4 bg-white border-2 border-black rounded-lg p-1 md:p-2">
-													<img
-														src={
-															getLogoUrl(
-																projet,
-															) ||
-															"/placeholder.svg" ||
-															"/placeholder.svg" ||
-															"/placeholder.svg"
-														}
-														alt={`${projet.nom_projet} logo`}
-														class="w-8 h-8 md:w-12 md:h-12 object-contain"
-													/>
-												</div>
 											</div>
 
-											<div class="p-4 md:p-6">
-												<h3
-													class="text-lg md:text-xl mb-2"
-													style="font-family: 'Russo One', sans-serif;"
-												>
-													{projet.nom_projet}
-												</h3>
-												<p
-													class="text-xs md:text-sm line-clamp-3"
-													style="font-family: 'Space Grotesk', sans-serif;"
-												>
-													{projet.description}
-												</p>
-											</div>
+											<!-- Project title -->
+											<h3
+												class="text-black text-xl md:text-2xl px-6"
+												style="font-family: 'Russo One', sans-serif;"
+											>
+												{projet.nom_projet}
+											</h3>
+
+											<!-- Project description -->
+											<p
+												class="text-black text-xs md:text-sm line-clamp-3 flex-grow px-6 pb-6"
+												style="font-family: 'Space Grotesk', sans-serif;"
+												set:html={projet.description}
+											/>
 										</div>
 									</a>
 								</div>
@@ -318,39 +314,27 @@ function getLogoUrl(projet) {
 
 				<button
 					id="carousel-prev"
-					class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 bg-white border-2 md:border-4 border-black rounded-full p-2 md:p-3 hover:bg-gray-100 transition-colors z-10"
+					class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 border-3 border-black rounded-full p-3 md:p-4 z-10 cursor-pointer"
+					style="background-color: #ede3fc;"
 					aria-label="Previous project"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						class="md:w-6 md:h-6"
-					>
-						<polyline points="15 18 9 12 15 6"></polyline>
-					</svg>
+					<Image
+						src={arrowLeft || "/placeholder.svg"}
+						alt=""
+						class="w-5 h-5 md:w-6 md:h-6 text-white"
+					/>
 				</button>
 				<button
 					id="carousel-next"
-					class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 bg-white border-2 md:border-4 border-black rounded-full p-2 md:p-3 hover:bg-gray-100 transition-colors z-10"
+					class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 border-3 border-black rounded-full p-3 md:p-4 z-10 cursor-pointer"
+					style="background-color: #ede3fc;"
 					aria-label="Next project"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						class="md:w-6 md:h-6"
-					>
-						<polyline points="9 18 15 12 9 6"></polyline>
-					</svg>
+					<Image
+						src={arrow || "/placeholder.svg"}
+						alt=""
+						class="w-5 h-5 md:w-6 md:h-6 text-white"
+					/>
 				</button>
 			</div>
 
@@ -457,9 +441,11 @@ function getLogoUrl(projet) {
 		});
 	});
 
-	// Added carousel functionality script
 	const carouselTrack = document.querySelector(
 		".carousel-track",
+	) as HTMLElement;
+	const carouselContainer = document.querySelector(
+		".carousel-container",
 	) as HTMLElement;
 	const prevButton = document.getElementById("carousel-prev");
 	const nextButton = document.getElementById("carousel-next");
@@ -470,12 +456,118 @@ function getLogoUrl(projet) {
 	const itemWidth = window.innerWidth < 768 ? 256 + 16 : 320 + 32;
 	const maxIndex = Math.max(0, carouselItems.length - itemsToShow);
 
+	// Drag/swipe functionality
+	let isDragging = false;
+	let startPos = 0;
+	let currentTranslate = 0;
+	let prevTranslate = 0;
+	let animationID: number;
+
 	function updateCarousel() {
 		const offset = -currentIndex * itemWidth;
 		if (carouselTrack) {
 			carouselTrack.style.transform = `translateX(${offset}px)`;
+			prevTranslate = offset;
+			currentTranslate = offset;
 		}
 	}
+
+	function setPositionByIndex() {
+		currentTranslate = -currentIndex * itemWidth;
+		prevTranslate = currentTranslate;
+		if (carouselTrack) {
+			carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
+		}
+	}
+
+	// Mouse events
+	carouselContainer?.addEventListener("mousedown", (e) => {
+		isDragging = true;
+		startPos = e.clientX;
+		if (carouselContainer) {
+			carouselContainer.style.cursor = "grabbing";
+		}
+		if (carouselTrack) {
+			carouselTrack.style.transition = "none";
+		}
+	});
+
+	carouselContainer?.addEventListener("mousemove", (e) => {
+		if (!isDragging) return;
+		const currentPosition = e.clientX;
+		const diff = currentPosition - startPos;
+		currentTranslate = prevTranslate + diff;
+		if (carouselTrack) {
+			carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
+		}
+	});
+
+	carouselContainer?.addEventListener("mouseup", (e) => {
+		if (!isDragging) return;
+		isDragging = false;
+		if (carouselContainer) {
+			carouselContainer.style.cursor = "grab";
+		}
+		if (carouselTrack) {
+			carouselTrack.style.transition = "transform 0.5s ease-in-out";
+		}
+
+		const movedBy = currentTranslate - prevTranslate;
+		if (movedBy < -50 && currentIndex < maxIndex) {
+			currentIndex += 1;
+		} else if (movedBy > 50 && currentIndex > 0) {
+			currentIndex -= 1;
+		}
+		setPositionByIndex();
+	});
+
+	carouselContainer?.addEventListener("mouseleave", () => {
+		if (isDragging) {
+			isDragging = false;
+			if (carouselContainer) {
+				carouselContainer.style.cursor = "grab";
+			}
+			if (carouselTrack) {
+				carouselTrack.style.transition = "transform 0.5s ease-in-out";
+			}
+			setPositionByIndex();
+		}
+	});
+
+	// Touch events
+	carouselContainer?.addEventListener("touchstart", (e) => {
+		isDragging = true;
+		startPos = e.touches[0].clientX;
+		if (carouselTrack) {
+			carouselTrack.style.transition = "none";
+		}
+	});
+
+	carouselContainer?.addEventListener("touchmove", (e) => {
+		if (!isDragging) return;
+		const currentPosition = e.touches[0].clientX;
+		const diff = currentPosition - startPos;
+		currentTranslate = prevTranslate + diff;
+		if (carouselTrack) {
+			carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
+		}
+	});
+
+	carouselContainer?.addEventListener("touchend", () => {
+		if (!isDragging) return;
+		isDragging = false;
+		if (carouselTrack) {
+			carouselTrack.style.transition = "transform 0.5s ease-in-out";
+		}
+
+		const movedBy = currentTranslate - prevTranslate;
+		if (movedBy < -50 && currentIndex < maxIndex) {
+			currentIndex += 1;
+		} else if (movedBy > 50 && currentIndex > 0) {
+			currentIndex -= 1;
+		}
+		setPositionByIndex();
+	});
 
 	prevButton?.addEventListener("click", () => {
 		currentIndex = Math.max(0, currentIndex - 1);
@@ -488,7 +580,9 @@ function getLogoUrl(projet) {
 	});
 
 	setInterval(() => {
-		currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
-		updateCarousel();
+		if (!isDragging) {
+			currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+			updateCarousel();
+		}
 	}, 5000);
 </script>
