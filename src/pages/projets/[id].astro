@@ -17,7 +17,7 @@ import capcutLogo from "../../assets/logos/capcut.svg";
 import cssLogo from "../../assets/logos/css.svg";
 import htmlLogo from "../../assets/logos/html.svg";
 import figmaLogo from "../../assets/logos/figma.svg";
-import wordpressLogo from "../../assets/logos/wordpress.svg"
+import wordpressLogo from "../../assets/logos/wordpress.svg";
 
 export async function getStaticPaths() {
     const projects = await pb.collection("projets").getFullList();
@@ -90,10 +90,10 @@ const inspParagraphs = inspText
     <!-- Hero Section with project title and colored background -->
     <!-- Added negative z-index to position hero behind header -->
     <section
-        class="relative py-16 md:py-32 overflow-hidden -mt-32 pt-32 md:pt-48 -z-10"
+        class="relative py-16 md:py-32 overflow-hidden -mt-32 pt-32 md:pt-65 -z-10"
         style={`background-color: ${project.couleur};`}
     >
-        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-50">
             <div
                 class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8"
             >

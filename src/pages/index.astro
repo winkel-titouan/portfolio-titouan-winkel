@@ -47,6 +47,23 @@ function getLogoUrl(projet) {
 ---
 
 <Layout title="Titouan Winkel - Designer web">
+	<!-- Added floating animation keyframes -->
+	<style>
+		@keyframes float {
+			0%,
+			100% {
+				transform: translateY(0px);
+			}
+			50% {
+				transform: translateY(-20px);
+			}
+		}
+
+		.floating {
+			animation: float 3s ease-in-out infinite;
+		}
+	</style>
+
 	<!-- Added overflow-x-hidden to prevent horizontal scrolling -->
 	<main class="overflow-x-hidden">
 		<!-- Redesigned hero section with text and two buttons -->
@@ -54,9 +71,7 @@ function getLogoUrl(projet) {
 		<section
 			class="relative overflow-hidden flex items-center min-h-[70vh]"
 		>
-			<!-- Hero background image - positioned absolutely to right edge, outside container -->
-
-			<div class="container mx-auto px-4 md:px-6">
+			<div class="container mx-auto px-4 md:px-6 z-60">
 				<div
 					class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center"
 				>
@@ -98,13 +113,14 @@ function getLogoUrl(projet) {
 						</div>
 					</div>
 
+					<!-- Added floating class for animation -->
 					<div
 						class="flex items-center justify-center min-h-[200px] md:min-h-[300px]"
 					>
 						<Image
 							src={heroPC || "/placeholder.svg"}
 							alt="Hero computer illustration"
-							class="w-3/4 md:w-full h-auto max-w-full"
+							class="w-3/4 md:w-full h-auto max-w-full floating"
 						/>
 					</div>
 				</div>
@@ -160,83 +176,65 @@ function getLogoUrl(projet) {
 			</div>
 		</section>
 
-		<!-- Added overflow-x-hidden to contain competences section -->
+		<!-- Redesigned competences section with category names, bars, and no SVG backgrounds -->
 		<section class="py-8 md:py-16 overflow-x-hidden">
 			<div class="container mx-auto px-4 md:px-6 md:ml-20 mb-15">
 				<SectionTitle text="Compétences" />
 			</div>
 
+			<!-- Centered category names with single purple bar underneath all categories -->
 			<div
-				class="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start mt-5 px-4 md:px-0"
+				class="container mx-auto px-4 md:px-6 mb-8 flex justify-center"
 			>
-				<!-- Added max-w-full to prevent overflow -->
-				<div
-					class="space-y-4 w-full lg:w-[420px] lg:flex-shrink-0 max-w-full"
-				>
-					<div class="relative w-fit">
-						<Image
-							src={competencesBg || "/placeholder.svg"}
-							alt=""
-							class="w-auto h-auto"
-						/>
-						<span
-							class="absolute inset-0 flex items-center px-4 md:px-8 text-white text-sm md:text-lg mb-4"
-							style="font-family: 'Russo One', sans-serif;"
+				<div class="space-y-3">
+					<div
+						class="flex flex-wrap gap-6 md:gap-12 justify-center items-center"
+					>
+						<h3
+							class="text-xl opacity-75 whitespace-nowrap"
+							style="font-family: 'Russo One', sans-serif; font-weight: 400; color: #000;"
 						>
 							Design
-						</span>
-					</div>
-					<div class="relative w-fit">
-						<Image
-							src={competencesBg || "/placeholder.svg"}
-							alt=""
-							class="w-auto h-auto"
-						/>
-						<span
-							class="absolute inset-0 flex items-center px-4 md:px-8 text-white text-sm md:text-lg mb-4"
-							style="font-family: 'Russo One', sans-serif;"
+						</h3>
+
+						<h3
+							class="text-xl opacity-75 whitespace-nowrap"
+							style="font-family: 'Russo One', sans-serif; font-weight: 400; color: #000;"
 						>
 							Développement web
-						</span>
-					</div>
-					<div class="relative w-fit">
-						<Image
-							src={competencesBg || "/placeholder.svg"}
-							alt=""
-							class="w-auto h-auto"
-						/>
-						<span
-							class="absolute inset-0 flex items-center px-4 md:px-8 text-white text-sm md:text-lg mb-4"
-							style="font-family: 'Russo One', sans-serif;"
+						</h3>
+
+						<h3
+							class="text-xl opacity-75 whitespace-nowrap"
+							style="font-family: 'Russo One', sans-serif; font-weight: 400; color: #000;"
 						>
 							Communication
-						</span>
-					</div>
-					<div class="relative w-fit">
-						<Image
-							src={competencesBg || "/placeholder.svg"}
-							alt=""
-							class="w-auto h-auto"
-						/>
-						<span
-							class="absolute inset-0 flex items-center px-4 md:px-8 text-white text-sm md:text-lg mb-4"
-							style="font-family: 'Russo One', sans-serif;"
+						</h3>
+
+						<h3
+							class="text-xl opacity-75 whitespace-nowrap"
+							style="font-family: 'Russo One', sans-serif; font-weight: 400; color: #000;"
 						>
 							Audiovisuel
-						</span>
+						</h3>
+					</div>
+					<!-- Single purple bar under all categories -->
+					<div class="h-1 md:w-200 w-100%" style="background-color: #D5B9FF;">
 					</div>
 				</div>
+			</div>
 
-				<!-- Fixed scale-75 to prevent overflow with proper origin -->
+			<!-- Increased gap from gap-6 lg:gap-10 to gap-12 lg:gap-24 -->
+			<div
+				class="flex flex-col lg:flex-row gap-15 lg:gap-40 items-center justify-center px-4 md:px-6 container mx-auto"
+			>
 				<div
-					class="w-full lg:w-[350px] lg:flex-shrink-0 mt-0 lg:mt-8 scale-75 md:scale-100 origin-center md:origin-left"
+					class="w-full lg:w-[350px] lg:flex-shrink-0 scale-75 md:scale-100 origin-center"
 				>
 					<SkillsCloud />
 				</div>
 
-				<div
-					class="pt-4 lg:pt-8 lg:pl-4 w-full lg:w-[350px] lg:flex-shrink-0 md:ml-22"
-				>
+				<div class="w-full lg:w-[350px] lg:flex-shrink-0">
 					<h3
 						class="mb-4 text-xl md:text-3xl"
 						style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
@@ -257,7 +255,7 @@ function getLogoUrl(projet) {
 		<!-- Redesigned carousel section with project card style -->
 		<!-- Added flex justify-center to center carousel on page -->
 		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
-			<div class="md:ml-20">
+			<div class="md:ml-8">
 				<SectionTitle text="Mes projets" />
 			</div>
 			<div class="relative mt-8 md:mt-12 flex justify-center">
@@ -270,7 +268,7 @@ function getLogoUrl(projet) {
 					>
 						{
 							projets.map((projet) => (
-								<div class="carousel-item flex-shrink-0 w-64 md:w-80">
+								<div class="carousel-item flex-shrink-0 w-64 md:w-70">
 									<a
 										href={`/projets/${projet.id}`}
 										class="block group"
@@ -312,7 +310,7 @@ function getLogoUrl(projet) {
 				</div>
 			</div>
 
-			<div class="flex md:ml-20 mt-8 md:mt-10">
+			<div class="flex md:ml-8 mt-8 md:mt-10">
 				<SkewButton href="/projets">
 					<div class="flex items-center gap-3">
 						<Image
@@ -328,7 +326,7 @@ function getLogoUrl(projet) {
 			</div>
 		</section>
 
-		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16 md:ml-20">
+		<section class="container mx-auto px-4 md:px-4 py-8 md:py-16 md:ml-20">
 			<SectionTitle text="Me contacter" />
 
 			<div

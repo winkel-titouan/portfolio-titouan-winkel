@@ -19,7 +19,7 @@ import arrowDown from "../assets/arrow-down.svg";
         <section class="relative max-w-7xl mx-auto px-8 mb-20">
             <!-- Single bubble behind title -->
             <div
-                class="absolute top-14 left-118 -translate-y-1/2 -translate-x-1/2 z-0"
+                class="absolute top-14 left-2/5 -translate-y-1/2 -translate-x-1/2 z-0"
             >
                 <img
                     src={bubble.src || "/placeholder.svg"}
@@ -29,7 +29,7 @@ import arrowDown from "../assets/arrow-down.svg";
             </div>
 
             <!-- Centered title with decorations -->
-            <div class="relative z-10 flex justify-center">
+            <div class="relative z-10 flex justify-center md:z-60">
                 <div class="relative inline-block">
                     <img
                         src={line1.src || "/placeholder.svg"}
@@ -61,14 +61,6 @@ import arrowDown from "../assets/arrow-down.svg";
 
         <!-- Enhanced Qui suis-je section with hover effects and better visual hierarchy -->
         <section class="relative max-w-7xl mx-auto px-8 mb-32">
-            <!-- Decorative floating bubble -->
-            <div class="absolute -top-16 right-32 z-0 animate-float">
-                <img
-                    src={bubble.src || "/placeholder.svg"}
-                    alt=""
-                    class="w-40 h-40 opacity-30"
-                />
-            </div>
 
             <SectionTitle text="Qui suis-je ?" />
 
@@ -106,16 +98,7 @@ import arrowDown from "../assets/arrow-down.svg";
                         <img
                             src={bubble.src || "/placeholder.svg"}
                             alt=""
-                            class="w-36 h-36 opacity-40"
-                        />
-                    </div>
-                    <div
-                        class="absolute bottom-8 -left-8 z-0 animate-float-delayed"
-                    >
-                        <img
-                            src={bubble.src || "/placeholder.svg"}
-                            alt=""
-                            class="w-24 h-24 opacity-30"
+                            class="w-36 h-36"
                         />
                     </div>
 
@@ -125,21 +108,13 @@ import arrowDown from "../assets/arrow-down.svg";
                         <div
                             class="row-span-2 flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl p-6 border-4 border-black relative hover:shadow-2xl hover:scale-105 transition-all duration-300 hover:-rotate-1"
                         >
-                            <img
-                                src={line1.src || "/placeholder.svg"}
-                                alt=""
-                                class="absolute -top-3 -left-4 w-12 h-12"
-                            />
+                            
                             <Image
                                 src={personnage || "/placeholder.svg"}
                                 alt="Character illustration"
                                 class="w-auto h-auto max-h-[320px]"
                             />
-                            <img
-                                src={line2.src || "/placeholder.svg"}
-                                alt=""
-                                class="absolute -bottom-3.5 -right-4 w-12 h-12"
-                            />
+                           
                         </div>
 
                         <!-- Building image with hover effect -->
