@@ -19,7 +19,9 @@ import { pb } from "../utils/pb";
 
 let projets = [];
 try {
-	const records = await pb.collection("projets").getFullList();
+	const records = await pb.collection("projets").getFullList({
+		filter: "caroussel = true",
+	});
 	projets = records;
 } catch (error) {
 	console.error("Erreur lors de la récupération des projets:", error);
@@ -253,17 +255,18 @@ function getLogoUrl(projet) {
 		</section>
 
 		<!-- Redesigned carousel section with project card style -->
+		<!-- Added flex justify-center to center carousel on page -->
 		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
 			<div class="md:ml-20">
 				<SectionTitle text="Mes projets" />
 			</div>
-			<div class="relative mt-8 md:mt-12">
-				<!-- Removed overflow-hidden from carousel container -->
+			<div class="relative mt-8 md:mt-12 flex justify-center">
+				<!-- Removed overflow-hidden to prevent cutting off content -->
 				<div
 					class="carousel-container cursor-grab active:cursor-grabbing"
 				>
 					<div
-						class="carousel-track flex gap-4 md:gap-8 transition-transform duration-500 ease-in-out"
+						class="carousel-track flex gap-4 md:gap-12 transition-transform duration-500 ease-in-out"
 					>
 						{
 							projets.map((projet) => (
@@ -272,12 +275,10 @@ function getLogoUrl(projet) {
 										href={`/projets/${projet.id}`}
 										class="block group"
 									>
-										<!-- Added border-3 border-black, removed corner SVGs, adjusted image to full width -->
 										<div
-											class="relative border-3 border-black flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:scale-105 hover:shadow-2xl min-h-[400px]"
-											style="background: linear-gradient(353deg, rgba(234, 221, 255, 0.23) 10.66%, #A983E2 67.17%, rgba(234, 221, 255, 0.23) 109.64%);"
+											class="relative border-3 border-black flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:scale-105 hover:shadow-2xl min-h-[350px]"
+											style=""
 										>
-											<!-- Image now takes full width with no negative margins -->
 											<div class="w-full">
 												<img
 													src={
@@ -290,7 +291,6 @@ function getLogoUrl(projet) {
 												/>
 											</div>
 
-											<!-- Project title -->
 											<h3
 												class="text-black text-xl md:text-2xl px-6"
 												style="font-family: 'Russo One', sans-serif;"
@@ -298,7 +298,6 @@ function getLogoUrl(projet) {
 												{projet.nom_projet}
 											</h3>
 
-											<!-- Project description -->
 											<p
 												class="text-black text-xs md:text-sm line-clamp-3 flex-grow px-6 pb-6"
 												style="font-family: 'Space Grotesk', sans-serif;"
@@ -311,34 +310,9 @@ function getLogoUrl(projet) {
 						}
 					</div>
 				</div>
-
-				<button
-					id="carousel-prev"
-					class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 border-3 border-black rounded-full p-3 md:p-4 z-10 cursor-pointer"
-					style="background-color: #ede3fc;"
-					aria-label="Previous project"
-				>
-					<Image
-						src={arrowLeft || "/placeholder.svg"}
-						alt=""
-						class="w-5 h-5 md:w-6 md:h-6 text-white"
-					/>
-				</button>
-				<button
-					id="carousel-next"
-					class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 border-3 border-black rounded-full p-3 md:p-4 z-10 cursor-pointer"
-					style="background-color: #ede3fc;"
-					aria-label="Next project"
-				>
-					<Image
-						src={arrow || "/placeholder.svg"}
-						alt=""
-						class="w-5 h-5 md:w-6 md:h-6 text-white"
-					/>
-				</button>
 			</div>
 
-			<div class="flex md:ml-20 mt-8 md:mt-12">
+			<div class="flex md:ml-20 mt-8 md:mt-10">
 				<SkewButton href="/projets">
 					<div class="flex items-center gap-3">
 						<Image
@@ -447,8 +421,6 @@ function getLogoUrl(projet) {
 	const carouselContainer = document.querySelector(
 		".carousel-container",
 	) as HTMLElement;
-	const prevButton = document.getElementById("carousel-prev");
-	const nextButton = document.getElementById("carousel-next");
 	const carouselItems = document.querySelectorAll(".carousel-item");
 
 	let currentIndex = 0;
@@ -462,15 +434,6 @@ function getLogoUrl(projet) {
 	let currentTranslate = 0;
 	let prevTranslate = 0;
 	let animationID: number;
-
-	function updateCarousel() {
-		const offset = -currentIndex * itemWidth;
-		if (carouselTrack) {
-			carouselTrack.style.transform = `translateX(${offset}px)`;
-			prevTranslate = offset;
-			currentTranslate = offset;
-		}
-	}
 
 	function setPositionByIndex() {
 		currentTranslate = -currentIndex * itemWidth;
@@ -568,21 +531,4 @@ function getLogoUrl(projet) {
 		}
 		setPositionByIndex();
 	});
-
-	prevButton?.addEventListener("click", () => {
-		currentIndex = Math.max(0, currentIndex - 1);
-		updateCarousel();
-	});
-
-	nextButton?.addEventListener("click", () => {
-		currentIndex = Math.min(maxIndex, currentIndex + 1);
-		updateCarousel();
-	});
-
-	setInterval(() => {
-		if (!isDragging) {
-			currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
-			updateCarousel();
-		}
-	}, 5000);
 </script>
