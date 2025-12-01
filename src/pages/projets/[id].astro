@@ -28,12 +28,15 @@ export async function getStaticPaths() {
     }));
 }
 
-const { project } = Astro.props;
+const project = Astro.props.project;
 
-const logoMap: Record<string, any> = {
+const logoMap = {
     javascript: javascriptLogo,
+    js: javascriptLogo,
     astro: astroLogo,
+    astrojs: astroLogo,
     tailwind: tailwindLogo,
+    tailwindcss: tailwindLogo,
     sql: sqlLogo,
     pocketbase: pocketbaseLogo,
     capcut: capcutLogo,
@@ -44,7 +47,7 @@ const logoMap: Record<string, any> = {
 };
 
 // Helper function to get image URL from PocketBase
-function getImageUrl(record: any, filename: string) {
+function getImageUrl(record, filename) {
     return `https://portfolio.titouan-winkel.fr/api/files/${record.collectionId}/${record.id}/${filename}`;
 }
 
@@ -59,14 +62,6 @@ const inspirationImages = project.inspirations || [];
 // Get production finale images
 const prodFinaleImages = project.prod_finale || [];
 
-// Get logo images
-const logoOldUrl = project.logo_old
-    ? getImageUrl(project, project.logo_old)
-    : "";
-const logoNewUrl = project.logo_new
-    ? getImageUrl(project, project.logo_new)
-    : "";
-
 const introText = project.introduction || "";
 const introWords = introText.split(" ");
 const halfLength = Math.ceil(introWords.length / 2);
@@ -76,7 +71,7 @@ const introCol2 = introWords.slice(halfLength).join(" ");
 const inspText = project.inspiration_texte || "";
 const inspParagraphs = inspText
     .split(". ")
-    .reduce((acc: string[], sentence: string, index: number) => {
+    .reduce((acc, sentence, index) => {
         const paragraphIndex = Math.floor(index / 3);
         if (!acc[paragraphIndex]) acc[paragraphIndex] = "";
         acc[paragraphIndex] +=
@@ -125,64 +120,73 @@ const inspParagraphs = inspText
             >
                 {
                     project.competences &&
-                        project.competences.map((competence: string) => (
-                            <div class="relative flex-shrink-0">
-                                <img
-                                    src={line1.src || "/placeholder.svg"}
-                                    alt=""
-                                    class="absolute z-30 w-[20px] md:w-[25px]"
-                                    style="top: -5px; left: 0px;"
-                                />
-                                <img
-                                    src={line2.src || "/placeholder.svg"}
-                                    alt=""
-                                    class="absolute z-30 w-[20px] md:w-[25px]"
-                                    style="bottom: -5px; right: 0px;"
-                                />
+                        project.competences.map((competence) => {
+                            const logoKey = competence.toLowerCase();
+                            const logo =
+                                logoMap[logoKey] || logoMap[competence];
+                            const logoSrc = logo
+                                ? logo.src
+                                : "/placeholder.svg";
 
-                                <div
-                                    class="absolute inset-0 z-0 transform skew-x-[-15deg] border-3 md:border-4 border-black"
-                                    style={`background-color: ${project.couleur};`}
-                                />
-                                <div class="relative z-10 px-4 py-3 md:px-6 md:py-4">
+                            return (
+                                <div class="relative flex-shrink-0">
                                     <img
-                                        src={
-                                            logoMap[competence]?.src ||
-                                            "/placeholder.svg" ||
-                                            "/placeholder.svg"
-                                        }
-                                        alt={competence}
-                                        class="w-12 h-12 md:w-16 md:h-16 object-contain"
+                                        src={line1.src || "/placeholder.svg"}
+                                        alt=""
+                                        class="absolute z-30 w-[20px] md:w-[25px]"
+                                        style="top: -5px; left: 0px;"
                                     />
+                                    <img
+                                        src={line2.src || "/placeholder.svg"}
+                                        alt=""
+                                        class="absolute z-30 w-[20px] md:w-[25px]"
+                                        style="bottom: -5px; right: 0px;"
+                                    />
+
+                                    <div
+                                        class="absolute inset-0 z-0 transform skew-x-[-15deg] border-3 md:border-4 border-black"
+                                        style={`background-color: ${project.couleur};`}
+                                    />
+                                    <div class="relative z-10 px-4 py-3 md:px-6 md:py-4">
+                                        <img
+                                            src={logoSrc || "/placeholder.svg"}
+                                            alt={competence}
+                                            class="w-12 h-12 md:w-16 md:h-16 object-contain"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                 }
             </div>
         </div>
     </section>
 
     <!-- Introduction Section -->
-    <section class="py-12 md:py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <SectionTitle text="Introduction" />
+    {
+        introText && (
+            <section class="py-12 md:py-16 bg-white">
+                <div class="max-w-7xl mx-auto px-4 md:px-8">
+                    <SectionTitle text="Introduction" />
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
-                <p
-                    class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal leading-relaxed"
-                    style="text-align: justify;"
-                >
-                    {introCol1}
-                </p>
-                <p
-                    class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal leading-relaxed"
-                    style="text-align: justify;"
-                >
-                    {introCol2}
-                </p>
-            </div>
-        </div>
-    </section>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+                        <p
+                            class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal leading-relaxed"
+                            style="text-align: justify;"
+                        >
+                            {introCol1}
+                        </p>
+                        <p
+                            class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal leading-relaxed"
+                            style="text-align: justify;"
+                        >
+                            {introCol2}
+                        </p>
+                    </div>
+                </div>
+            </section>
+        )
+    }
 
     <!-- Inspirations Section -->
     {
@@ -194,7 +198,7 @@ const inspParagraphs = inspText
                     <div class="flex flex-col md:flex-row gap-8 md:gap-16 items-start">
                         {/* Text content - full width on mobile, 1/2 on desktop */}
                         <div class="w-full md:w-1/2 space-y-4 md:space-y-6">
-                            {inspParagraphs.map((paragraph: string) => (
+                            {inspParagraphs.map((paragraph) => (
                                 <p
                                     class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal leading-relaxed"
                                     style="text-align: justify;"
@@ -206,76 +210,17 @@ const inspParagraphs = inspText
 
                         {/* Images - hidden on mobile, shown on desktop */}
                         <div class="hidden md:flex gap-2 max-w-[290px]">
-                            {inspirationImages
-                                .slice(0, 3)
-                                .map((image: string) => (
-                                    <img
-                                        src={
-                                            getImageUrl(project, image) ||
-                                            "/placeholder.svg" ||
-                                            "/placeholder.svg"
-                                        }
-                                        alt="Inspiration"
-                                        class="w-[200px] h-[250px] object-cover rounded"
-                                    />
-                                ))}
+                            {inspirationImages.slice(0, 3).map((image) => (
+                                <img
+                                    src={
+                                        getImageUrl(project, image) ||
+                                        "/placeholder.svg"
+                                    }
+                                    alt="Inspiration"
+                                    class="w-[200px] h-[250px] object-cover rounded"
+                                />
+                            ))}
                         </div>
-                    </div>
-                </div>
-            </section>
-        )
-    }
-
-    <!-- Logo Evolution Section -->
-    {
-        (project.logo_old || project.logo_new) && (
-            <section class="py-12 md:py-16 bg-white">
-                <div class="max-w-7xl mx-auto px-4 md:px-8">
-                    <SectionTitle text="Logo" />
-
-                    <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 mb-8 md:mb-12">
-                        {/* Old Logo */}
-                        {project.logo_old && (
-                            <div class="flex flex-col items-center">
-                                <img
-                                    src={logoOldUrl || "/placeholder.svg"}
-                                    alt="Ancien logo"
-                                    class="w-32 h-32 md:w-48 md:h-48 object-contain mb-4 md:mb-6"
-                                />
-                                <p class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal text-center max-w-xs leading-relaxed">
-                                    {project.logo_old_txt}
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Arrow - smaller on mobile */}
-                        {project.logo_old && project.logo_new && (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="w-16 md:w-[120px] h-auto rotate-90 md:rotate-0"
-                                viewBox="0 0 120 41"
-                                fill="none"
-                            >
-                                <path
-                                    d="M120 20.207L85 -0.000228882V40.4143L120 20.207ZM0 20.207L0 23.707L88.5 23.707V20.207V16.707L0 16.707L0 20.207Z"
-                                    fill={project.couleur}
-                                />
-                            </svg>
-                        )}
-
-                        {/* New Logo */}
-                        {project.logo_new && (
-                            <div class="flex flex-col items-center">
-                                <img
-                                    src={logoNewUrl || "/placeholder.svg"}
-                                    alt="Nouveau logo"
-                                    class="w-32 h-32 md:w-48 md:h-48 object-contain mb-4 md:mb-6"
-                                />
-                                <p class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal text-center max-w-xs leading-relaxed">
-                                    {project.logo_new_txt}
-                                </p>
-                            </div>
-                        )}
                     </div>
                 </div>
             </section>
@@ -290,11 +235,10 @@ const inspParagraphs = inspText
                     <SectionTitle text="Production Finale" />
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-8 md:mb-12">
-                        {prodFinaleImages.map((image: string) => (
+                        {prodFinaleImages.map((image) => (
                             <img
                                 src={
                                     getImageUrl(project, image) ||
-                                    "/placeholder.svg" ||
                                     "/placeholder.svg"
                                 }
                                 alt="Production finale"
