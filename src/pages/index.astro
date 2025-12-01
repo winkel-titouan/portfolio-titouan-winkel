@@ -233,12 +233,15 @@ function getLogoUrl(projet) {
 				class="flex flex-col lg:flex-row gap-12 lg:gap-24 items-center justify-center px-4 md:px-6 container mx-auto"
 			>
 				<div
-					class="w-full lg:w-[350px] lg:flex-shrink-0 scale-75 md:scale-100 origin-center"
+					class="w-full lg:w-[350px] lg:flex-shrink-0 scale-75 md:scale-100 origin-center md:ml-40"
 				>
 					<SkillsCloud />
 				</div>
 
-				<div class="w-full lg:w-[350px] lg:flex-shrink-0">
+				<!-- Added order-first, text-center, mx-auto, and -mt-8 for mobile to center and move description up -->
+				<div
+					class="w-full lg:w-[350px] lg:flex-shrink-0 lg:order-none text-center lg:text-left mx-auto -mt-8 lg:mt-0"
+				>
 					<h3
 						class="mb-4 text-xl md:text-3xl"
 						style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
