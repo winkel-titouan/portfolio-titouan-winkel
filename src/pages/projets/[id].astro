@@ -30,6 +30,8 @@ export async function getStaticPaths() {
 
 const project = Astro.props.project;
 
+const projectColor = project.couleur || "#A983E2";
+
 const logoMap = {
     javascript: javascriptLogo,
     js: javascriptLogo,
@@ -82,45 +84,100 @@ const inspParagraphs = inspText
 ---
 
 <Layout title={project.nom_projet}>
+    <!-- Added back to projects link in top left -->
+    <a
+        id="back-link"
+        href="/projets"
+        class="fixed top-32 left-4 md:left-8 z-40 flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
+    >
+        <svg
+            class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform duration-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"></path>
+        </svg>
+        <span class="font-['Space_Grotesk'] text-sm md:text-base font-medium"
+            >Retour</span
+        >
+    </a>
+
     <!-- Hero Section with project title and colored background -->
     <!-- Added negative z-index to position hero behind header -->
-    <section
-        class="relative py-16 md:py-32 overflow-hidden -mt-32 pt-32 md:pt-65 -z-10"
-        style={`background-color: ${project.couleur};`}
-    >
-        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-50">
+    <section class="relative py-24 md:py-40 overflow-hidden -mt-32 pt-56">
+        <!-- Animated background gradient -->
+        <div
+            class="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-purple-100 -z-10"
+            style={`background: linear-gradient(to bottom right, ${projectColor}10, white, ${projectColor}20);`}
+        >
+        </div>
+
+        <!-- Decorative floating elements -->
+        <div
+            class="absolute top-20 right-20 w-72 h-72 rounded-full opacity-10 blur-3xl animate-pulse"
+            style={`background-color: ${projectColor};`}
+        >
+        </div>
+        <div
+            class="absolute bottom-20 left-20 w-96 h-96 rounded-full opacity-10 blur-3xl animate-pulse"
+            style={`background-color: ${projectColor}; animation-delay: 1s;`}
+        >
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
             <div
-                class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8"
+                id="hero-content"
+                class="flex flex-col items-center justify-center gap-6 md:gap-8 transition-opacity duration-300 md:opacity-100"
             >
                 {
                     heroImageUrl && (
-                        <img
-                            src={heroImageUrl || "/placeholder.svg"}
-                            alt={`${project.nom_projet} logo`}
-                            class="w-16 md:w-24 h-auto object-contain"
-                        />
+                        <div class="relative group z-50">
+                            <img
+                                src={heroImageUrl || "/placeholder.svg"}
+                                alt={`${project.nom_projet} logo`}
+                                class="relative w-20 md:w-32 h-auto object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-300"
+                            />
+                        </div>
                     )
                 }
                 <h1
-                    class="text-black font-['Russo_One'] text-2xl md:text-[50px] font-normal leading-normal text-center md:text-left"
+                    class="text-black font-['Russo_One'] text-3xl md:text-6xl font-normal leading-tight text-center relative z-50"
                 >
-                    {project.nom_projet}
+                    <span class="relative inline-block">
+                        {project.nom_projet}
+                        <div
+                            class="absolute -bottom-2 left-0 right-0 h-1"
+                            style={`background: linear-gradient(to right, transparent, ${projectColor}, transparent);`}
+                        >
+                        </div>
+                    </span>
                 </h1>
             </div>
         </div>
     </section>
 
     <!-- Skills Section with logos -->
-    <section class="py-8 md:py-22 bg-white">
-        <div class="max-w-7xl mx-auto px-4 md:px-8">
+    <section class="py-12 md:py-20 bg-white relative overflow-hidden">
+        <div
+            class="absolute top-0 right-0 w-64 h-64 rounded-full opacity-30 blur-3xl"
+            style={`background-color: ${projectColor};`}
+        >
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
             <SectionTitle text="Compétences mobilisées" />
 
             <div
-                class="flex gap-4 md:gap-8 justify-start mt-6 md:mt-18 overflow-x-auto md:overflow-visible px-2 py-4 md:px-0 md:py-0"
+                class="flex flex-wrap gap-6 md:gap-8 justify-center mt-8 md:mt-12"
             >
                 {
                     project.competences &&
-                        project.competences.map((competence) => {
+                        project.competences.map((competence, index) => {
                             const logoKey = competence.toLowerCase();
                             const logo =
                                 logoMap[logoKey] || logoMap[competence];
@@ -129,30 +186,29 @@ const inspParagraphs = inspText
                                 : "/placeholder.svg";
 
                             return (
-                                <div class="relative flex-shrink-0">
-                                    <img
-                                        src={line1.src || "/placeholder.svg"}
-                                        alt=""
-                                        class="absolute z-30 w-[20px] md:w-[25px]"
-                                        style="top: -5px; left: 0px;"
-                                    />
-                                    <img
-                                        src={line2.src || "/placeholder.svg"}
-                                        alt=""
-                                        class="absolute z-30 w-[20px] md:w-[25px]"
-                                        style="bottom: -5px; right: 0px;"
+                                <div
+                                    class="group relative"
+                                    style={`animation-delay: ${index * 100}ms;`}
+                                >
+                                    {/* Gradient glow effect */}
+                                    <div
+                                        class="absolute -inset-2 rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-all duration-300"
+                                        style={`background: linear-gradient(to bottom right, ${projectColor}, ${projectColor});`}
                                     />
 
+                                    {/* Card container */}
                                     <div
-                                        class="absolute inset-0 z-0 transform skew-x-[-15deg] border-3 md:border-4 border-black"
-                                        style={`background-color: ${project.couleur};`}
-                                    />
-                                    <div class="relative z-10 px-4 py-3 md:px-6 md:py-4">
+                                        class="relative bg-gradient-to-br from-purple-50 to-white p-6 md:p-8 rounded-2xl border-2 shadow-lg group-hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-1"
+                                        style={`background: linear-gradient(to bottom right, ${projectColor}10, white); border-color: ${projectColor}30;`}
+                                    >
                                         <img
                                             src={logoSrc || "/placeholder.svg"}
                                             alt={competence}
-                                            class="w-12 h-12 md:w-16 md:h-16 object-contain"
+                                            class="w-16 h-16 md:w-20 md:h-20 object-contain transform group-hover:scale-110 transition-transform duration-300"
                                         />
+                                        <p class="mt-3 text-center text-sm font-['Space_Grotesk'] text-black/70 font-medium">
+                                            {competence}
+                                        </p>
                                     </div>
                                 </div>
                             );
@@ -165,23 +221,47 @@ const inspParagraphs = inspText
     <!-- Introduction Section -->
     {
         introText && (
-            <section class="py-12 md:py-16 bg-white">
-                <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <section
+                class="py-12 md:py-20 relative overflow-hidden"
+                style={`background: linear-gradient(to bottom, white, ${projectColor}10);`}
+            >
+                <div
+                    class="absolute bottom-0 left-0 w-full h-px"
+                    style={`background: linear-gradient(to right, transparent, ${projectColor}50, transparent);`}
+                />
+
+                <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
                     <SectionTitle text="Introduction" />
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
-                        <p
-                            class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal leading-relaxed"
-                            style="text-align: justify;"
+                    <div class="relative mt-8 md:mt-12">
+                        {/* Decorative quote mark */}
+                        <div
+                            class="absolute -top-8 -left-4 text-9xl font-['Russo_One'] opacity-50"
+                            style={`color: ${projectColor}30;`}
                         >
-                            {introCol1}
-                        </p>
-                        <p
-                            class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal leading-relaxed"
-                            style="text-align: justify;"
-                        >
-                            {introCol2}
-                        </p>
+                            "
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 relative">
+                            <div class="relative">
+                                <div
+                                    class="absolute -left-4 top-0 bottom-0 w-1 rounded-full"
+                                    style={`background: linear-gradient(to bottom, ${projectColor}, ${projectColor}50);`}
+                                />
+                                <p
+                                    class="text-black/80 font-['Space_Grotesk'] text-base md:text-xl font-normal leading-relaxed pl-4"
+                                    style="text-align: justify;"
+                                >
+                                    {introCol1}
+                                </p>
+                            </div>
+                            <p
+                                class="text-black/80 font-['Space_Grotesk'] text-base md:text-xl font-normal leading-relaxed"
+                                style="text-align: justify;"
+                            >
+                                {introCol2}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -191,36 +271,88 @@ const inspParagraphs = inspText
     <!-- Inspirations Section -->
     {
         project.inspiration_texte && (
-            <section class="py-12 md:py-16 bg-white">
-                <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <section
+                class="py-12 md:py-24 relative overflow-hidden"
+                style={`background: linear-gradient(to bottom, ${projectColor}10, white, ${projectColor}10);`}
+            >
+                <div
+                    class="absolute top-10 right-10 w-64 h-64 rounded-full opacity-20 blur-3xl"
+                    style={`background-color: ${projectColor};`}
+                />
+                <div
+                    class="absolute bottom-10 left-10 w-64 h-64 rounded-full opacity-20 blur-3xl"
+                    style={`background-color: ${projectColor};`}
+                />
+
+                <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
                     <SectionTitle text="Inspirations" />
 
-                    <div class="flex flex-col md:flex-row gap-8 md:gap-16 items-start">
-                        {/* Text content - full width on mobile, 1/2 on desktop */}
-                        <div class="w-full md:w-1/2 space-y-4 md:space-y-6">
-                            {inspParagraphs.map((paragraph) => (
-                                <p
-                                    class="text-black font-['Space_Grotesk'] text-sm md:text-[20px] font-normal leading-relaxed"
-                                    style="text-align: justify;"
-                                >
-                                    {paragraph}
-                                </p>
-                            ))}
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mt-8">
+                        {/* Text content with decorative card */}
+                        <div class="relative">
+                            <div
+                                class="absolute -inset-4 rounded-2xl transform rotate-1 opacity-50"
+                                style={`background: linear-gradient(to bottom right, ${projectColor}20, ${projectColor}10);`}
+                            />
+                            <div
+                                class="relative bg-white p-6 md:p-8 rounded-2xl shadow-lg border-2"
+                                style={`border-color: ${projectColor}30;`}
+                            >
+                                <div class="space-y-4 md:space-y-6">
+                                    {inspParagraphs.map((paragraph, index) => (
+                                        <p
+                                            class="text-black/80 font-['Space_Grotesk'] text-sm md:text-lg font-normal leading-relaxed"
+                                            style="text-align: justify;"
+                                        >
+                                            {index === 0 && (
+                                                <span
+                                                    class="text-5xl float-left font-['Russo_One'] leading-none mr-2 mt-1"
+                                                    style={`color: ${projectColor};`}
+                                                >
+                                                    "
+                                                </span>
+                                            )}
+                                            {paragraph}
+                                        </p>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Images - hidden on mobile, shown on desktop */}
-                        <div class="hidden md:flex gap-2 max-w-[290px]">
-                            {inspirationImages.slice(0, 3).map((image) => (
-                                <img
-                                    src={
-                                        getImageUrl(project, image) ||
-                                        "/placeholder.svg"
-                                    }
-                                    alt="Inspiration"
-                                    class="w-[200px] h-[250px] object-cover rounded"
-                                />
-                            ))}
-                        </div>
+                        {/* Images gallery with modern grid */}
+                        {inspirationImages.length > 0 && (
+                            <div class="grid grid-cols-2 gap-4 auto-rows-[200px]">
+                                {inspirationImages
+                                    .slice(0, 3)
+                                    .map((image, index) => (
+                                        <div
+                                            class={`
+                                            ${index === 0 ? "col-span-2 row-span-2" : "col-span-1"}
+                                            relative group overflow-hidden rounded-xl shadow-lg
+                                            hover:shadow-2xl transition-all duration-300
+                                        `}
+                                        >
+                                            <div
+                                                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                                                style={`background: linear-gradient(to top, ${projectColor}99, transparent);`}
+                                            />
+                                            <img
+                                                src={
+                                                    getImageUrl(
+                                                        project,
+                                                        image,
+                                                    ) || "/placeholder.svg"
+                                                }
+                                                alt={`Inspiration ${index + 1}`}
+                                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                                            />
+                                            <div class="absolute bottom-4 left-4 text-white font-['Russo_One'] text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                                #{index + 1}
+                                            </div>
+                                        </div>
+                                    ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -230,31 +362,98 @@ const inspParagraphs = inspText
     <!-- Production Finale Section -->
     {
         prodFinaleImages.length > 0 && (
-            <section class="py-12 md:py-16 bg-white">
-                <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <section class="py-12 md:py-20 bg-white relative overflow-hidden">
+                <div
+                    class="absolute top-0 left-1/2 w-96 h-96 rounded-full opacity-20 blur-3xl -translate-x-1/2"
+                    style={`background-color: ${projectColor};`}
+                />
+
+                <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
                     <SectionTitle text="Production Finale" />
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-8 md:mb-12">
-                        {prodFinaleImages.map((image) => (
-                            <img
-                                src={
-                                    getImageUrl(project, image) ||
-                                    "/placeholder.svg"
-                                }
-                                alt="Production finale"
-                                class="w-full h-auto md:h-[400px] object-contain"
-                            />
+                    {/* Modern masonry-style grid */}
+                    <div class="columns-1 md:columns-2 lg:columns-3 gap-6 md:gap-8 mt-8 md:mt-12 space-y-6 md:space-y-8">
+                        {prodFinaleImages.map((image, index) => (
+                            <div class="break-inside-avoid group">
+                                <div
+                                    class="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-2"
+                                    style={`background: linear-gradient(to bottom right, ${projectColor}10, white);`}
+                                >
+                                    <div
+                                        class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                                        style={`background: linear-gradient(to top, ${projectColor}30, transparent);`}
+                                    />
+                                    <img
+                                        src={
+                                            getImageUrl(project, image) ||
+                                            "/placeholder.svg" ||
+                                            "/placeholder.svg"
+                                        }
+                                        alt={`Production finale ${index + 1}`}
+                                        class="w-full h-auto max-w-md mx-auto object-contain rounded-xl transform group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                    {/* Image counter badge */}
+                                    <div
+                                        class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-['Russo_One'] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"
+                                        style={`color: ${projectColor};`}
+                                    >
+                                        {index + 1}/{prodFinaleImages.length}
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
 
                     {/* Visit Website Button */}
-                    <div class="flex justify-start">
-                        <SkewButton href={project.lien_appli || "#"}>
-                            Accéder au site web
-                        </SkewButton>
-                    </div>
+                    {project.lien_appli && (
+                        <div class="flex justify-center mt-12 md:mt-16">
+                            <div class="relative group">
+                                <div
+                                    class="absolute -inset-2 rounded-xl opacity-20 group-hover:opacity-40 blur-xl transition-opacity duration-300"
+                                    style={`background: linear-gradient(to right, ${projectColor}, ${projectColor});`}
+                                />
+                                <SkewButton href={project.lien_appli}>
+                                    Accéder au site web
+                                </SkewButton>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </section>
         )
     }
 </Layout>
+
+<script>
+    const backLink = document.getElementById("back-link");
+    let lastScrollTop = 0;
+
+    window.addEventListener("scroll", () => {
+        const scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop;
+
+        if (scrollTop > 100) {
+            // When scrolled down, stick to top
+            backLink?.classList.remove("top-32");
+            backLink?.classList.add("top-4");
+        } else {
+            // When at top, position below header
+            backLink?.classList.remove("top-4");
+            backLink?.classList.add("top-32");
+        }
+    });
+
+    // Existing mobile menu toggle script
+    document.addEventListener("mobileMenuToggle", (event) => {
+        const heroContent = document.getElementById("hero-content");
+        if (heroContent && window.innerWidth < 768) {
+            if (event.detail.isOpen) {
+                heroContent.style.opacity = "0";
+                heroContent.style.pointerEvents = "none";
+            } else {
+                heroContent.style.opacity = "1";
+                heroContent.style.pointerEvents = "auto";
+            }
+        }
+    });
+</script>

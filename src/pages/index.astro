@@ -68,10 +68,14 @@ function getLogoUrl(projet) {
 	<main class="overflow-x-hidden">
 		<!-- Redesigned hero section with text and two buttons -->
 		<!-- Added flex and items-center to vertically center content, reduced py padding -->
+		<!-- Added id="hero-content" and md:block to show only on desktop, hide on mobile when menu is open -->
 		<section
 			class="relative overflow-hidden flex items-center min-h-[70vh]"
 		>
-			<div class="container mx-auto px-4 md:px-6 z-60">
+			<div
+				id="hero-content"
+				class="container mx-auto px-4 md:px-6 z-60 transition-opacity duration-300"
+			>
 				<div
 					class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center"
 				>
@@ -219,7 +223,7 @@ function getLogoUrl(projet) {
 						</h3>
 					</div>
 					<!-- Single purple bar under all categories -->
-					<div class="h-1 md:w-200 w-full" style="background-color: #D5B9FF;">
+					<div class="h-1 w-full" style="background-color: #D5B9FF;">
 					</div>
 				</div>
 			</div>
@@ -499,6 +503,20 @@ function getLogoUrl(projet) {
 		});
 	}
 	// Mobile uses native horizontal scroll, no custom JavaScript needed
+
+	// Hide hero content when mobile menu is open
+	window.addEventListener("mobileMenuToggle", (e: CustomEvent) => {
+		const heroContent = document.getElementById("hero-content");
+		if (heroContent) {
+			if (e.detail.isOpen) {
+				heroContent.style.opacity = "0";
+				heroContent.style.pointerEvents = "none";
+			} else {
+				heroContent.style.opacity = "1";
+				heroContent.style.pointerEvents = "auto";
+			}
+		}
+	});
 </script>
 
 <style>
