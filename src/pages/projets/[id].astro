@@ -20,6 +20,7 @@ import cssLogo from "../../assets/logos/css.svg";
 import htmlLogo from "../../assets/logos/html.svg";
 import figmaLogo from "../../assets/logos/figma.svg";
 import wordpressLogo from "../../assets/logos/wordpress.svg";
+import affinityLogo from "../../assets/logos/affinity.png";
 
 export async function getStaticPaths() {
     const projects = await pb.collection("projets").getFullList();
@@ -58,6 +59,7 @@ const logoMap = {
     html: htmlLogo,
     figma: figmaLogo,
     wordpress: wordpressLogo,
+    affinity: affinityLogo,
 };
 
 // Helper function to get image URL from PocketBase
