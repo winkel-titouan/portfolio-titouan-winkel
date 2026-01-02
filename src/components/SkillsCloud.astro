@@ -15,11 +15,13 @@ import davinciResolveLogo from "../assets/logos/davinci_resolve.svg";
 import sketchbookLogo from "../assets/logos/sketchbook.svg";
 import tailwindcssLogo from "../assets/logos/tailwindcss.svg";
 import daisyuiLogo from "../assets/logos/daisyui.svg";
+import affinityLogo from "../assets/logos/affinity.png";
 ---
 
 <div class="space-y-6">
     <!-- Shifted all logos 80px to the left for better centering -->
-    <div class="w-[495px] h-[372px] relative -ml-10 md:ml-0">
+    <!-- Added responsive positioning: -ml-20 to shift left on mobile only -->
+    <div class="w-[495px] h-[372px] relative -ml-20 md:ml-0">
         <!-- Illustrator -->
         <button
             class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
@@ -242,6 +244,20 @@ import daisyuiLogo from "../assets/logos/daisyui.svg";
                 src={tailwindcssLogo.src || "/placeholder.svg"}
                 alt="Tailwind CSS"
                 class="w-14 h-14 object-contain"
+            />
+        </button>
+
+        <!-- Affinity -->
+        <button
+            class="absolute cursor-pointer transition-transform hover:scale-110 hover:drop-shadow-lg"
+            style="left: 345px; top: 10px;"
+            title="Affinity"
+            data-skill="affinity"
+        >
+            <img
+                src={affinityLogo.src || "/placeholder.svg"}
+                alt="Affinity"
+                class="w-16 h-16 object-contain"
             />
         </button>
     </div>
