@@ -1,0 +1,61 @@
+---
+import lineTop from "../assets/card/line-top.svg";
+import lineBot from "../assets/card/line-bot.svg";
+
+interface Props {
+    href: string;
+    project: {
+        id: string;
+        nom_projet: string;
+        description?: string;
+        created?: string;
+    };
+    imageUrl: string;
+}
+
+const { href, project, imageUrl } = Astro.props;
+---
+
+<a
+    href={href}
+    class="project-card-link block h-full"
+    data-name={(project.nom_projet || "").toLowerCase()}
+    data-created={project.created}
+>
+    <article
+        class="project-card relative p-6 flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer h-full"
+        style="background: linear-gradient(353deg, rgba(234, 221, 255, 0.23) 10.66%, #A983E2 67.17%, rgba(234, 221, 255, 0.23) 109.64%);"
+    >
+        <img
+            src={lineTop.src || "/placeholder.svg"}
+            alt=""
+            class="absolute -top-1 -left-3 w-7 h-7"
+            aria-hidden="true"
+        />
+        <img
+            src={lineBot.src || "/placeholder.svg"}
+            alt=""
+            class="absolute -bottom-5 -right-3 w-7 h-7"
+            aria-hidden="true"
+        />
+
+        <div class="w-full flex justify-center items-center min-h-[200px]">
+            <img
+                src={imageUrl || "/placeholder.svg"}
+                alt={project.nom_projet}
+                class="max-w-full h-auto max-h-[250px] object-contain"
+            />
+        </div>
+
+        <h2 class="text-black font-[Russo_One] text-2xl font-normal">
+            {project.nom_projet}
+        </h2>
+
+        <p
+            class="text-black font-[Space_Grotesk] text-base leading-relaxed"
+            style="flex-grow: 1;"
+        >
+            {project.description}
+        </p>
+    </article>
+</a>
