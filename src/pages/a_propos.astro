@@ -3,9 +3,9 @@ import Layout from "../layouts/Layout.astro";
 import SectionTitle from "../components/SectionTitle.astro";
 import { Image } from "astro:assets";
 import illustrationTravail from "../assets/a_propos/illustration_travail.webp";
-import artRural from "../assets/a_propos/art_rural.webp";
+import Crac19 from "../assets/a_propos/crac19.webp";
 import immeuble from "../assets/a_propos/immeuble.webp";
-import jdm from "../assets/a_propos/jdm.webp";
+import PouletsRotis from "../assets/a_propos/nos_poulets_rotis.png";
 import personnage from "../assets/a_propos/personnage.svg";
 import line1 from "../assets/boutons/line1.svg";
 import line2 from "../assets/boutons/line2.svg";
@@ -61,7 +61,6 @@ import arrowDown from "../assets/arrow-down.svg";
 
         <!-- Enhanced Qui suis-je section with hover effects and better visual hierarchy -->
         <section class="relative max-w-7xl mx-auto px-8 mb-32">
-
             <SectionTitle text="Qui suis-je ?" />
 
             <!-- Two-column layout with enhanced spacing -->
@@ -72,20 +71,23 @@ import arrowDown from "../assets/arrow-down.svg";
                     style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 400; line-height: 1.8; color: #000;"
                 >
                     <p class="text-balance">
-                        Je m'appelle Titouan Winkel, j'ai 20 ans et je suis en
-                        deuxième année de BUT MMI à Montbéliard. Depuis toujours
-                        attiré par l'art et l'expression visuelle, je me suis
-                        orienté vers le design, un domaine où je peux pleinement
-                        explorer ma créativité et donner du sens aux idées que
-                        j'imagine.
+                        Je m'appelle Titouan Winkel, j'ai 20 ans et je suis
+                        actuellement en troisième année de BUT Métiers du
+                        Multimédia et de l'Internet (MMI) à Montbéliard.
+                        Originaire des environs de Strasbourg, je me suis
+                        naturellement orienté vers le design graphique, un
+                        domaine qui me permet d'allier créativité, réflexion et
+                        communication visuelle.
                     </p>
 
                     <p class="text-balance">
-                        À terme, j'ai pour objectif de devenir designer
-                        graphique, que ce soit au sein d'une entreprise reconnue
-                        ou en travaillant à mon compte. Ce qui m'anime avant
-                        tout, c'est la possibilité de créer, d'innover et de
-                        laisser une trace visuelle qui ait du sens.
+                        Aujourd'hui, mon objectif est de devenir graphiste et de
+                        concevoir des supports de communication qui ont un réel
+                        impact : affiches, flyers, identités visuelles, logos ou
+                        tout autre support permettant de transmettre un message
+                        de manière claire et efficace. Ce qui me motive, c'est
+                        de donner du sens à chaque création en trouvant le juste
+                        équilibre entre esthétique et fonctionnalité.
                     </p>
                 </div>
 
@@ -108,13 +110,11 @@ import arrowDown from "../assets/arrow-down.svg";
                         <div
                             class="row-span-2 flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl p-6 border-4 border-black relative hover:shadow-2xl hover:scale-105 transition-all duration-300 hover:-rotate-1"
                         >
-                            
                             <Image
                                 src={personnage || "/placeholder.svg"}
                                 alt="Character illustration"
                                 class="w-auto h-auto max-h-[320px]"
                             />
-                           
                         </div>
 
                         <!-- Building image with hover effect -->
@@ -203,8 +203,8 @@ import arrowDown from "../assets/arrow-down.svg";
                                 class="absolute -top-3 -left-3 w-10 h-10 z-10"
                             />
                             <Image
-                                src={artRural || "/placeholder.svg"}
-                                alt="Street art"
+                                src={Crac19 || "/placeholder.svg"}
+                                alt="Affiche Crac19"
                                 class="w-full h-64 object-cover"
                             />
                             <img
@@ -232,8 +232,8 @@ import arrowDown from "../assets/arrow-down.svg";
                                 class="relative overflow-hidden rounded-xl border-2 border-black transform rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 hover:shadow-2xl flex-1"
                             >
                                 <Image
-                                    src={jdm || "/placeholder.svg"}
-                                    alt="JDM cars"
+                                    src={PouletsRotis || "/placeholder.svg"}
+                                    alt="Flyer Nos Poulets Rotis"
                                     class="w-full h-56 object-cover"
                                 />
                             </div>
@@ -247,25 +247,24 @@ import arrowDown from "../assets/arrow-down.svg";
                     style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 400; line-height: 1.8; color: #000;"
                 >
                     <p class="text-balance">
-                        Je puise mes inspirations dans des formes d'arts
-                        accessibles et ancrées dans le quotidien. Les arts de
-                        rue, comme le graffiti ou les fresques, me marquent
-                        particulièrement : leur diversité, leur spontanéité et
-                        ce sentiment de liberté totale qu'ils dégagent m'ont
-                        toujours parlé. J'apprécie aussi la créativité qu'on
-                        retrouve dans des univers populaires comme la culture
-                        JDM, où la transformation d'un objet courant peut
-                        devenir un véritable moyen d'expression.
+                        Mon approche du design est résolument minimaliste. Je
+                        privilégie des compositions simples, épurées et
+                        réfléchies, où chaque élément a une raison d'être. Pour
+                        moi, un bon design est avant tout un design qui
+                        communique rapidement et efficacement, sans surcharge
+                        visuelle. J'aime créer des visuels capables de capter
+                        l'attention tout en guidant naturellement le regard vers
+                        l'essentiel.
                     </p>
 
                     <p class="text-balance">
-                        Ce même sentiment de liberté, je le retrouve pleinement
-                        dans le design graphique et le web, au cœur de mon
-                        parcours MMI. Concevoir des identités visuelles,
-                        imaginer des univers cohérents, ou encore créer des
-                        sites web qui racontent quelque chose... ce sont des
-                        domaines où je peux explorer, expérimenter et donner une
-                        forme unique à chaque projet.
+                        À travers chacun de mes projets, je cherche à concevoir
+                        des identités visuelles cohérentes et des supports de
+                        communication efficaces, capables de répondre aux
+                        besoins de leurs utilisateurs tout en affirmant une
+                        identité forte. Le design est pour moi un moyen de
+                        rendre les idées plus lisibles, plus mémorables et plus
+                        impactantes.
                     </p>
                 </div>
             </div>
