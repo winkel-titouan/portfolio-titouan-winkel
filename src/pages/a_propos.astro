@@ -11,6 +11,9 @@ import line1 from "../assets/boutons/line1.svg";
 import line2 from "../assets/boutons/line2.svg";
 import bubble from "../assets/bubble.svg";
 import arrowDown from "../assets/arrow-down.svg";
+import SkewButton from "../components/SkewButton.astro";
+import arrow from "../assets/arrow.svg";
+import spike from "../assets/spike.svg";
 ---
 
 <Layout title="À propos - Titouan Winkel">
@@ -233,6 +236,48 @@ import arrowDown from "../assets/arrow-down.svg";
                         rendre les idées plus lisibles, plus mémorables et plus
                         impactantes.
                     </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="container mx-auto px-4 md:px-4 py-8 md:py-16 md:ml-20">
+            <SectionTitle text="Me contacter" />
+
+            <div
+                class="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-0 mt-8"
+            >
+                <div class="space-y-6">
+                    <p
+                        class="text-base md:text-xl"
+                        style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
+                    >
+                        Intéressé par mon travail, des questions, une offre
+                        d'emploi... <span class="text-purple-600 font-semibold"
+                            >Contactez moi !</span
+                        >
+                    </p>
+                    <div class="md:mt-15">
+                        <SkewButton href="/contact">
+                            <div class="flex items-center gap-3">
+                                <Image
+                                    src={arrow || "/placeholder.svg"}
+                                    alt=""
+                                    class="w-6 h-6"
+                                />
+                                <span class="text-sm md:text-base"
+                                    >Accéder au formulaire</span
+                                >
+                            </div>
+                        </SkewButton>
+                    </div>
+                </div>
+
+                <div class="hidden md:block md:-mt-16 md:mr-25">
+                    <Image
+                        src={spike || "/placeholder.svg"}
+                        alt=""
+                        class="w-auto h-auto"
+                    />
                 </div>
             </div>
         </section>
