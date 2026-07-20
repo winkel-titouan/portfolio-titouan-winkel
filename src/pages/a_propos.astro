@@ -165,76 +165,27 @@ import arrowDown from "../assets/arrow-down.svg";
                 />
             </div>
 
-            <SectionTitle text="Mes inspirations" />
+            <SectionTitle text="Inspirations & Références" />
 
-            <!-- Two-column layout with enhanced spacing -->
-            <div class="grid md:grid-cols-2 gap-16 items-center mt-16">
-                <!-- Images column with enhanced decorative layout -->
+            <!-- Two-column layout: images A4 côte à côte -->
+            <div class="grid md:grid-cols-2 gap-12 items-start mt-16">
+                <!-- Images column: two A4 images côte à côte, affichées en entier -->
                 <div class="relative">
-                    <!-- Decorative bubbles -->
-                    <div
-                        class="absolute -top-12 -left-12 z-0 animate-float-delayed"
-                    >
-                        <img
-                            src={bubble.src || "/placeholder.svg"}
-                            alt=""
-                            class="w-40 h-40 opacity-35"
-                        />
-                    </div>
-                    <div
-                        class="absolute top-1/2 right-0 z-0 animate-pulse-slow"
-                    >
-                        <img
-                            src={bubble.src || "/placeholder.svg"}
-                            alt=""
-                            class="w-28 h-28 opacity-25"
-                        />
-                    </div>
-
-                    <!-- Enhanced images grid with staggered layout -->
-                    <div class="relative z-10 space-y-6">
-                        <!-- Street art image with enhanced styling -->
-                        <div
-                            class="relative overflow-hidden rounded-xl border-2 border-black transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 hover:shadow-2xl max-w-md"
-                        >
-                            <img
-                                src={line1.src || "/placeholder.svg"}
-                                alt=""
-                                class="absolute -top-3 -left-3 w-10 h-10 z-10"
-                            />
-                            <Image
-                                src={Crac19 || "/placeholder.svg"}
-                                alt="Affiche Crac19"
-                                class="w-full h-64 object-cover"
-                            />
-                            <img
-                                src={line2.src || "/placeholder.svg"}
-                                alt=""
-                                class="absolute -bottom-3 -right-3 w-10 h-10 z-10"
-                            />
-                        </div>
-
-                        <!-- JDM cars section with multiple images feel -->
-                        <div class="flex gap-4 items-center ml-8">
-                            <!-- Small decorative bubble -->
-                            <div
-                                class="w-20 h-20 flex items-center justify-center"
-                            >
-                                <img
-                                    src={bubble.src || "/placeholder.svg"}
-                                    alt=""
-                                    class="w-full h-full opacity-40 animate-pulse-slow"
+                    <div class="relative z-10">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="w-full md:w-1/2 flex justify-center">
+                                <Image
+                                    src={Crac19 || "/placeholder.svg"}
+                                    alt="Affiche Crac19"
+                                    class="w-full h-auto object-contain max-h-[900px] rounded-xl border-2 border-black"
                                 />
                             </div>
 
-                            <!-- JDM image with enhanced styling -->
-                            <div
-                                class="relative overflow-hidden rounded-xl border-2 border-black transform rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 hover:shadow-2xl flex-1"
-                            >
+                            <div class="w-full md:w-1/2 flex justify-center">
                                 <Image
                                     src={PouletsRotis || "/placeholder.svg"}
                                     alt="Flyer Nos Poulets Rotis"
-                                    class="w-full h-56 object-cover"
+                                    class="w-full h-auto object-contain max-h-[900px] rounded-xl border-2 border-black"
                                 />
                             </div>
                         </div>
