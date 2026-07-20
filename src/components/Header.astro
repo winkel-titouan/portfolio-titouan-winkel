@@ -5,189 +5,144 @@ import closeIcon from "../assets/mobile/cross-menu.svg";
 import logo from "../assets/logos/logo.svg";
 ---
 
-<header class="relative z-50">
-    <!-- Gradient transparent du violet vers transparent -->
-    <div
-        class="absolute top-0 left-0 right-0 h-[60vh] pointer-events-none -z-50"
-        style="background: linear-gradient(to bottom, rgba(216, 180, 254, 0.6), rgba(237, 233, 254, 0.4) 40%, rgba(237, 233, 254, 0.2) 70%, transparent);"
-    >
-    </div>
+<header class="relative z-50 bg-transparent border-b-4 border-black">
+    <div class="container mx-auto px-4 sm:px-6 py-3">
+        <nav class="flex items-center justify-between">
+            <a
+                href="/"
+                class="flex items-center gap-3 hover:opacity-90 transition-opacity"
+            >
+                <img
+                    src={logo.src || "/placeholder.svg"}
+                    alt="TW Logo"
+                    class="h-10 w-auto"
+                />
+                <span
+                    class="text-purple-600 text-sm font-semibold"
+                    style="font-family: 'Space Grotesk', sans-serif"
+                    >Graphiste</span
+                >
+            </a>
 
-    <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <nav class="flex items-start justify-between">
             <div
-                class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3"
+                class="hidden md:flex items-center text-lg font-bold uppercase gap-10"
             >
                 <a
-                    href="/"
-                    class="hover:opacity-80 transition-opacity flex items-end gap-1"
+                    href="/projets"
+                    class="text-black hover:text-purple-600 transition-colors duration-200"
+                    >Projet</a
                 >
-                    <img
-                        src={logo.src || "/placeholder.svg"}
-                        alt="TW Logo"
-                        class="h-12 sm:h-14 lg:h-16 w-auto"
-                    />
-                    <span
-                        class="text-purple-600 text-base sm:text-lg lg:text-xl -mb-2"
-                        style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-style: normal; line-height: normal;"
-                        >Graphiste</span
-                    >
-                </a>
+                <span class="text-black opacity-70">|</span>
+                <a
+                    href="/a_propos"
+                    class="text-black hover:text-purple-600 transition-colors duration-200"
+                    >A propos</a
+                >
+                <span class="text-black opacity-70">|</span>
+                <a
+                    href="/contact"
+                    class="text-black hover:text-purple-600 transition-colors duration-200"
+                    >Contact</a
+                >
             </div>
 
-            <!-- Desktop navigation - hidden on mobile -->
-            <div class="hidden md:flex items-center gap-4 lg:gap-17 mt-3">
-                <SkewButton href="/projets" text="Projets" />
-                <SkewButton href="/a_propos" text="A propos" />
-                <SkewButton href="/contact" text="Contact" />
-            </div>
-
-            <!-- Hamburger button - visible only on mobile -->
             <button
                 id="hamburger-btn"
-                class="md:hidden p-2 mt-2 z-50 relative"
+                class="md:hidden p-2"
                 aria-label="Toggle menu"
+                data-menu-src={menuIcon.src}
+                data-close-src={closeIcon.src}
             >
                 <img
-                    id="menu-icon"
+                    id="hamburger-icon"
                     src={menuIcon.src || "/placeholder.svg"}
                     alt="Menu"
-                    class="w-8 h-8 text-black transition-opacity duration-300"
-                />
-                <img
-                    id="close-icon"
-                    src={closeIcon.src || "/placeholder.svg"}
-                    alt="Close"
-                    class="w-8 h-8 text-black absolute top-2 left-2 opacity-0 transition-opacity duration-300"
+                    class="w-8 h-8"
                 />
             </button>
         </nav>
     </div>
 
-    <!-- Mobile menu overlay -->
+    <!-- Mobile menu - simple centered column -->
     <div
         id="mobile-menu"
-        class="fixed inset-0 bg-gradient-to-br from-purple-100 via-purple-50 to-white z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden"
+        class="fixed inset-0 bg-white z-40 transform -translate-y-full transition-transform duration-200 ease-in-out md:hidden"
     >
-        <!-- Gradient plus prononcé en haut du menu -->
-        <div
-            class="absolute top-0 left-0 right-0 h-64 pointer-events-none"
-            style="background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(216, 180, 254, 0.3) 50%, transparent);"
+        <!-- Close button placed in top-right of mobile menu -->
+        <button
+            id="mobile-close"
+            aria-label="Close menu"
+            class="absolute top-4 right-4 p-2 z-50"
         >
-        </div>
-
-        <!-- Ajout d'un cercle décoratif en bas à droite -->
+            <img
+                src={closeIcon.src || "/placeholder.svg"}
+                alt="Close"
+                class="w-8 h-8"
+            />
+        </button>
         <div
-            class="absolute bottom-10 right-10 w-64 h-64 bg-purple-200 rounded-full opacity-20 pointer-events-none"
-        >
-        </div>
-
-        <!-- Nouveau design avec espacement et effets visuels -->
-        <div
-            class="container mx-auto px-6 h-full flex flex-col justify-center items-start gap-6 relative"
+            class="container mx-auto px-6 h-full flex flex-col justify-center items-center gap-6"
         >
             <a
                 href="/projets"
-                class="mobile-menu-link group relative text-5xl font-bold text-black transition-all duration-300 pl-6"
-                style="font-family: 'Russo One', sans-serif;"
+                class="text-2xl md:text-3xl font-bold text-black hover:text-purple-600 transition-colors duration-200"
+                >Projets</a
             >
-                <!-- Barre violette animée à gauche -->
-                <span
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-1 bg-purple-600 transition-all duration-300 group-hover:w-4"
-                ></span>
-                <span
-                    class="inline-block transition-all duration-300 group-hover:translate-x-2 group-hover:text-purple-600"
-                >
-                    Projets
-                </span>
-            </a>
             <a
                 href="/a_propos"
-                class="mobile-menu-link group relative text-5xl font-bold text-black transition-all duration-300 pl-6"
-                style="font-family: 'Russo One', sans-serif;"
+                class="text-2xl md:text-3xl font-bold text-black hover:text-purple-600 transition-colors duration-200"
+                >A propos</a
             >
-                <span
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-1 bg-purple-600 transition-all duration-300 group-hover:w-4"
-                ></span>
-                <span
-                    class="inline-block transition-all duration-300 group-hover:translate-x-2 group-hover:text-purple-600"
-                >
-                    A propos
-                </span>
-            </a>
             <a
                 href="/contact"
-                class="mobile-menu-link group relative text-5xl font-bold text-black transition-all duration-300 pl-6"
-                style="font-family: 'Russo One', sans-serif;"
+                class="text-2xl md:text-3xl font-bold text-black hover:text-purple-600 transition-colors duration-200"
+                >Contact</a
             >
-                <span
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-1 bg-purple-600 transition-all duration-300 group-hover:w-4"
-                ></span>
-                <span
-                    class="inline-block transition-all duration-300 group-hover:translate-x-2 group-hover:text-purple-600"
-                >
-                    Contact
-                </span>
-            </a>
-
-            <!-- Ajout d'une petite signature en bas du menu -->
-            <div
-                class="absolute bottom-10 left-6 text-purple-400 text-sm"
-                style="font-family: 'Space Grotesk', sans-serif;"
-            >
-                Graphiste
-            </div>
         </div>
     </div>
 </header>
 
-<!-- JavaScript for hamburger menu toggle -->
+<!-- Vertical purple gradient that descends from the bottom of the header -->
+<div
+    aria-hidden="true"
+    class="w-full pointer-events-none"
+    style="height:64px; background: linear-gradient(to bottom, rgba(168,85,247,0.18) 0%, rgba(165,105,255,0.06) 40%, rgba(165,105,255,0.02) 70%, transparent 100%); margin-bottom: -64px;"
+>
+</div>
+
 <script>
     const hamburgerBtn = document.getElementById("hamburger-btn");
     const mobileMenu = document.getElementById("mobile-menu");
-    const menuIcon = document.getElementById("menu-icon");
-    const closeIcon = document.getElementById("close-icon");
-    const mobileMenuLinks = document.querySelectorAll(".mobile-menu-link");
+    /** @type {HTMLImageElement | null} */
+    const hamburgerIcon = document.getElementById("hamburger-icon");
     let isOpen = false;
 
     function toggleMenu() {
         isOpen = !isOpen;
-
+        const menuSrc =
+            hamburgerBtn?.getAttribute("data-menu-src") || "/placeholder.svg";
+        const closeSrc =
+            hamburgerBtn?.getAttribute("data-close-src") || "/placeholder.svg";
         if (isOpen) {
-            // Open menu
-            mobileMenu?.classList.remove("translate-x-full");
-            mobileMenu?.classList.add("translate-x-0");
-
-            menuIcon?.style.setProperty("opacity", "0");
-            closeIcon?.style.setProperty("opacity", "1");
-
-            // Prevent body scroll
+            mobileMenu?.classList.remove("-translate-y-full");
+            mobileMenu?.classList.add("translate-y-0");
+            if (hamburgerIcon) hamburgerIcon.setAttribute("src", closeSrc);
             document.body.style.overflow = "hidden";
         } else {
-            // Close menu
-            mobileMenu?.classList.remove("translate-x-0");
-            mobileMenu?.classList.add("translate-x-full");
-
-            menuIcon?.style.setProperty("opacity", "1");
-            closeIcon?.style.setProperty("opacity", "0");
-
-            // Restore body scroll
+            mobileMenu?.classList.remove("translate-y-0");
+            mobileMenu?.classList.add("-translate-y-full");
+            if (hamburgerIcon) hamburgerIcon.setAttribute("src", menuSrc);
             document.body.style.overflow = "";
         }
-
         window.dispatchEvent(
-            new CustomEvent("mobileMenuToggle", {
-                detail: { isOpen },
-            }),
+            new CustomEvent("mobileMenuToggle", { detail: { isOpen } }),
         );
     }
 
     hamburgerBtn?.addEventListener("click", toggleMenu);
-
-    // Close menu when clicking on a link
-    mobileMenuLinks.forEach((link) => {
-        link.addEventListener("click", () => {
-            if (isOpen) toggleMenu();
-        });
+    const mobileCloseBtn = document.getElementById("mobile-close");
+    mobileCloseBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (isOpen) toggleMenu();
     });
 </script>

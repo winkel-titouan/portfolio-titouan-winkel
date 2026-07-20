@@ -68,12 +68,15 @@ function getProjectCardImageUrl(projet: ProjectRecord) {
 		<!-- Redesigned hero section with text and two buttons -->
 		<!-- Added flex and items-center to vertically center content, reduced py padding -->
 		<!-- Added id="hero-content" and md:block to show only on desktop, hide on mobile when menu is open -->
-		<section
-			class="relative overflow-hidden flex items-center min-h-[70vh]"
-		>
+		<section class="relative isolate overflow-hidden flex items-center min-h-[70vh]">
+			<div
+				aria-hidden="true"
+				class="absolute inset-0 -z-10"
+				style="opacity:0.8; background: linear-gradient(180deg, #D5B9FF 70.67%, #FFF 100%);"
+			></div>
 			<div
 				id="hero-content"
-				class="container mx-auto px-4 md:px-6 z-60 transition-opacity duration-300"
+				class="relative z-10 container mx-auto px-4 md:px-6 transition-opacity duration-300"
 			>
 				<div
 					class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center"
