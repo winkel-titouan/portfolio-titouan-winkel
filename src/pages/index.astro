@@ -142,8 +142,12 @@ function getProjectCardImageUrl(projet: ProjectRecord) {
 				<SectionTitle text="Mes projets" />
 			</div>
 			<div class="relative mt-8 md:mt-12 flex justify-center">
-				<div class="carousel-container w-full overflow-x-auto md:overflow-visible scrollbar-hide">
-					<div class="carousel-track flex gap-4 md:gap-12 md:transition-transform md:duration-500 md:ease-in-out md:justify-center py-4 md:py-8">
+				<div
+					class="carousel-container w-full overflow-x-auto md:overflow-visible scrollbar-hide"
+				>
+					<div
+						class="carousel-track flex gap-4 md:gap-12 md:transition-transform md:duration-500 md:ease-in-out md:justify-center py-4 md:py-8"
+					>
 						{
 							projets.map((projet) => (
 								<div class="carousel-item shrink-0 w-64 md:w-70">
@@ -304,8 +308,6 @@ function getProjectCardImageUrl(projet: ProjectRecord) {
 				</div>
 			</div>
 		</section>
-
-
 
 		<section class="container mx-auto px-4 md:px-4 py-8 md:py-16 md:ml-20">
 			<SectionTitle text="Me contacter" />
