@@ -136,6 +136,47 @@ function getProjectCardImageUrl(projet: ProjectRecord) {
 			</div>
 		</section>
 
+		<!-- Mes projets: déplacé ici pour apparaître juste après le hero -->
+		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
+			<div class="flex justify-center">
+				<SectionTitle text="Mes projets" />
+			</div>
+			<div class="relative mt-8 md:mt-12 flex justify-center">
+				<div class="carousel-container w-full overflow-x-auto md:overflow-visible scrollbar-hide">
+					<div class="carousel-track flex gap-4 md:gap-12 md:transition-transform md:duration-500 md:ease-in-out md:justify-center py-4 md:py-8">
+						{
+							projets.map((projet) => (
+								<div class="carousel-item shrink-0 w-64 md:w-70">
+									<ProjectCard
+										href={`/projets/${projet.id}`}
+										project={projet}
+										imageUrl={getProjectCardImageUrl(
+											projet,
+										)}
+									/>
+								</div>
+							))
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="flex justify-center mt-8 md:mt-10">
+				<SkewButton href="/projets">
+					<div class="flex items-center gap-3">
+						<Image
+							src={arrow || "/placeholder.svg"}
+							alt=""
+							class="w-6 h-6"
+						/>
+						<span class="text-sm md:text-base"
+							>Voir tous les projets</span
+						>
+					</div>
+				</SkewButton>
+			</div>
+		</section>
+
 		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16 md:ml-20">
 			<SectionTitle text="Qui suis-je ?" />
 
@@ -264,52 +305,7 @@ function getProjectCardImageUrl(projet: ProjectRecord) {
 			</div>
 		</section>
 
-		<!-- Redesigned carousel section with project card style -->
-		<!-- Modified carousel to disable scroll on desktop and enable free horizontal scroll on mobile -->
-		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
-			<div class="md:ml-8">
-				<SectionTitle text="Mes projets" />
-			</div>
-			<div class="relative mt-8 md:mt-12 flex justify-center">
-				<!-- Mobile: enable horizontal scroll with overflow-x-auto, Desktop: hide overflow -->
-				<div
-					class="carousel-container w-full overflow-x-auto md:overflow-visible scrollbar-hide"
-				>
-					<div
-						class="carousel-track flex gap-4 md:gap-12 md:transition-transform md:duration-500 md:ease-in-out md:justify-center py-4 md:py-8"
-					>
-						{
-							projets.map((projet) => (
-								<div class="carousel-item shrink-0 w-64 md:w-70">
-									<ProjectCard
-										href={`/projets/${projet.id}`}
-										project={projet}
-										imageUrl={getProjectCardImageUrl(
-											projet,
-										)}
-									/>
-								</div>
-							))
-						}
-					</div>
-				</div>
-			</div>
 
-			<div class="flex md:ml-8 mt-8 md:mt-10">
-				<SkewButton href="/projets">
-					<div class="flex items-center gap-3">
-						<Image
-							src={arrow || "/placeholder.svg"}
-							alt=""
-							class="w-6 h-6"
-						/>
-						<span class="text-sm md:text-base"
-							>Voir tous les projets</span
-						>
-					</div>
-				</SkewButton>
-			</div>
-		</section>
 
 		<section class="container mx-auto px-4 md:px-4 py-8 md:py-16 md:ml-20">
 			<SectionTitle text="Me contacter" />
