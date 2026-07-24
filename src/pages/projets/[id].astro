@@ -21,6 +21,8 @@ import htmlLogo from "../../assets/logos/html.svg";
 import figmaLogo from "../../assets/logos/figma.svg";
 import wordpressLogo from "../../assets/logos/wordpress.svg";
 import affinityLogo from "../../assets/logos/affinity.png";
+import davinciresolveLogo from "../../assets/logos/davinci_resolve.svg";
+import canvaLogo from "../../assets/logos/canva.svg";
 
 export async function getStaticPaths() {
     const projects = await pb.collection("projets").getFullList();
@@ -60,6 +62,8 @@ const logoMap = {
     figma: figmaLogo,
     wordpress: wordpressLogo,
     affinity: affinityLogo,
+    davinci_resolve: davinciresolveLogo,
+    canva: canvaLogo
 };
 
 // Helper function to get image URL from PocketBase
