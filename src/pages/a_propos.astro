@@ -12,7 +12,6 @@ import line2 from "../assets/boutons/line2.svg";
 import bubble from "../assets/bubble.svg";
 import arrowDown from "../assets/arrow-down.svg";
 import SkewButton from "../components/SkewButton.astro";
-import arrow from "../assets/arrow.svg";
 import spike from "../assets/spike.svg";
 ---
 
@@ -257,17 +256,8 @@ import spike from "../assets/spike.svg";
                         >
                     </p>
                     <div class="md:mt-15">
-                        <SkewButton href="/contact">
-                            <div class="flex items-center gap-3">
-                                <Image
-                                    src={arrow || "/placeholder.svg"}
-                                    alt=""
-                                    class="w-6 h-6"
-                                />
-                                <span class="text-sm md:text-base"
-                                    >Accéder au formulaire</span
-                                >
-                            </div>
+                        <SkewButton href="/contact" icon="arrow" variant="primary">
+                            Accéder au formulaire
                         </SkewButton>
                     </div>
                 </div>

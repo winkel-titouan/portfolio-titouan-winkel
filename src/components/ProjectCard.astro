@@ -10,52 +10,234 @@ interface Props {
         description?: string;
         created?: string;
     };
-    imageUrl: string;
+    imageUrl?: string;
+    index?: number;
 }
 
-const { href, project, imageUrl } = Astro.props;
+const { href, project, imageUrl, index } = Astro.props;
+const number = index !== undefined ? String(index + 1).padStart(2, "0") : undefined;
 ---
 
 <a
     href={href}
-    class="project-card-link block h-full"
+    class="project-card-link group block h-full"
     data-name={(project.nom_projet || "").toLowerCase()}
     data-created={project.created}
 >
-    <article
-        class="project-card relative p-6 flex flex-col items-center text-center space-y-4 transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer h-full"
-        style="background: linear-gradient(353deg, rgba(234, 221, 255, 0.23) 10.66%, #A983E2 67.17%, rgba(234, 221, 255, 0.23) 109.64%);"
-    >
-        <img
-            src={lineTop.src || "/placeholder.svg"}
-            alt=""
-            class="absolute -top-1 -left-3 w-7 h-7"
-            aria-hidden="true"
-        />
-        <img
-            src={lineBot.src || "/placeholder.svg"}
-            alt=""
-            class="absolute -bottom-5 -right-3 w-7 h-7"
-            aria-hidden="true"
-        />
+    <article class="project-card relative h-full flex flex-col">
+        <img src={lineTop.src} alt="" aria-hidden="true" class="corner corner-tl" />
+        <img src={lineBot.src} alt="" aria-hidden="true" class="corner corner-br" />
 
-        <div class="w-full flex justify-center items-center min-h-[200px]">
-            <img
-                src={imageUrl || "/placeholder.svg"}
-                alt={project.nom_projet}
-                class="max-w-full h-auto max-h-[250px] object-contain"
-            />
+        <div class="card-media relative">
+            {number && <span class="card-number">{number}</span>}
+            {
+                imageUrl ? (
+                    <img
+                        src={imageUrl}
+                        alt={project.nom_projet}
+                        loading="lazy"
+                        decoding="async"
+                        draggable="false"
+                        class="card-image"
+                    />
+                ) : (
+                    <span class="card-placeholder" aria-hidden="true">
+                        {project.nom_projet?.charAt(0)}
+                    </span>
+                )
+            }
         </div>
 
-        <h2 class="text-black font-[Russo_One] text-2xl font-normal">
-            {project.nom_projet}
-        </h2>
+        <div class="flex flex-1 flex-col items-center text-center gap-3 px-6 pt-5 pb-6">
+            <h3 class="text-2xl leading-tight">{project.nom_projet}</h3>
+            {project.description && <p class="leading-relaxed line-clamp-3">{project.description}</p>}
+            <span class="card-cta mt-auto">
+                Voir le projet
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"></path>
+                </svg>
+            </span>
+        </div>
 
-        <p
-            class="text-black font-[Space_Grotesk] text-base leading-relaxed"
-            style="flex-grow: 1;"
-        >
-            {project.description}
-        </p>
+        <span class="card-glare" aria-hidden="true"></span>
     </article>
 </a>
+
+<style>
+    /* Permet d'animer l'angle du dégradé au survol */
+    @property --card-angle {
+        syntax: "<angle>";
+        initial-value: 353deg;
+        inherits: false;
+    }
+
+    .project-card {
+        --rx: 0deg;
+        --ry: 0deg;
+        --mx: 50%;
+        --my: 50%;
+        background: linear-gradient(
+            var(--card-angle),
+            rgba(234, 221, 255, 0.23) 10.66%,
+            #a983e2 67.17%,
+            rgba(234, 221, 255, 0.23) 109.64%
+        );
+        border: 3px solid var(--color-ink);
+        box-shadow: var(--shadow-brutal);
+        transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+        transition:
+            --card-angle 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.35s ease,
+            transform 0.35s ease;
+    }
+
+    .group:hover .project-card,
+    .group:focus-visible .project-card {
+        --card-angle: 413deg;
+        box-shadow: var(--shadow-brutal-lg);
+        transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translate(-3px, -3px);
+    }
+
+    /* Pendant le tilt, on suit la souris sans latence */
+    .project-card.is-tilting {
+        transition:
+            --card-angle 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.35s ease;
+    }
+
+    .corner {
+        position: absolute;
+        z-index: 2;
+        width: 28px;
+        height: 28px;
+        transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .corner-tl {
+        top: -12px;
+        left: -14px;
+    }
+
+    .corner-br {
+        bottom: -18px;
+        right: -14px;
+    }
+
+    .group:hover .corner-tl {
+        transform: translate(-6px, -6px);
+    }
+
+    .group:hover .corner-br {
+        transform: translate(6px, 6px);
+    }
+
+    .card-media {
+        display: grid;
+        place-items: center;
+        aspect-ratio: 4 / 3;
+        margin: 14px 14px 0;
+        overflow: hidden;
+        border: 3px solid var(--color-ink);
+        background:
+            radial-gradient(circle at 30% 20%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.45) 70%),
+            var(--color-lilac-soft);
+    }
+
+    .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 12px;
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .group:hover .card-image {
+        transform: scale(1.07);
+    }
+
+    .card-placeholder {
+        font-family: var(--font-heading);
+        font-size: 5rem;
+        color: var(--color-iris);
+    }
+
+    .card-number {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        padding: 2px 10px;
+        background: var(--color-ink);
+        color: #fff;
+        font-family: var(--font-heading);
+        font-size: 0.85rem;
+    }
+
+    .card-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border: 2px solid var(--color-ink);
+        background: #fff;
+        font-family: var(--font-heading);
+        font-size: 0.9rem;
+        transition:
+            background-color 0.3s ease,
+            color 0.3s ease;
+    }
+
+    .card-cta svg {
+        transition: transform 0.3s ease;
+    }
+
+    .group:hover .card-cta {
+        background: var(--color-ink);
+        color: #fff;
+    }
+
+    .group:hover .card-cta svg {
+        transform: translateX(4px);
+    }
+
+    .card-glare {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(circle at var(--mx) var(--my), rgb(255 255 255 / 0.35), transparent 45%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        mix-blend-mode: soft-light;
+    }
+
+    .group:hover .card-glare {
+        opacity: 1;
+    }
+</style>
+
+<script>
+    // Tilt 3D léger qui suit le pointeur (souris uniquement)
+    const canTilt =
+        matchMedia("(hover: hover) and (pointer: fine)").matches &&
+        !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (canTilt) {
+        document.querySelectorAll<HTMLElement>(".project-card").forEach((card) => {
+            card.addEventListener("pointermove", (e) => {
+                const r = card.getBoundingClientRect();
+                const x = (e.clientX - r.left) / r.width;
+                const y = (e.clientY - r.top) / r.height;
+                card.classList.add("is-tilting");
+                card.style.setProperty("--ry", `${(x - 0.5) * 10}deg`);
+                card.style.setProperty("--rx", `${(0.5 - y) * 10}deg`);
+                card.style.setProperty("--mx", `${x * 100}%`);
+                card.style.setProperty("--my", `${y * 100}%`);
+            });
+            card.addEventListener("pointerleave", () => {
+                card.classList.remove("is-tilting");
+                card.style.setProperty("--rx", "0deg");
+                card.style.setProperty("--ry", "0deg");
+            });
+        });
+    }
+</script>

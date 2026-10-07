@@ -1,21 +1,36 @@
-/* Import Google Fonts FIRST - must come before any other imports */
-@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-
-/* Import Tailwind CSS */
 @import "tailwindcss";
 
-/* Set font variables */
-:root {
-    --font-heading: 'Russo One', sans-serif;
-    --font-body: 'Space Grotesk', sans-serif;
+/* Design tokens — utilisables en classes Tailwind (bg-lilac, text-iris, font-heading…) */
+@theme {
+    --color-lilac: #d5b9ff;
+    --color-lilac-soft: #eaddff;
+    --color-iris: #a983e2;
+    --color-grape: #7c3aed;
+    --color-ink: #0b0710;
+
+    --font-heading: "Russo One", sans-serif;
+    --font-body: "Space Grotesk", sans-serif;
+
+    --shadow-brutal: 6px 6px 0 0 var(--color-ink);
+    --shadow-brutal-lg: 10px 10px 0 0 var(--color-ink);
 }
 
-/* Apply base styles */
+:root {
+    /* Hauteur du header sticky (py-4 + logo h-10 + bordure 4px) */
+    --header-h: 76px;
+}
+
+html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
 body {
     font-family: var(--font-body);
+    color: var(--color-ink);
+    background: #fff;
 }
 
-/* Apply heading font to titles and buttons */
 h1,
 h2,
 h3,
@@ -26,4 +41,58 @@ button,
 .btn,
 a.button {
     font-family: var(--font-heading);
+    font-weight: 400;
+}
+
+::selection {
+    background: var(--color-lilac);
+    color: var(--color-ink);
+}
+
+:focus-visible {
+    outline: 3px solid var(--color-grape);
+    outline-offset: 3px;
+}
+
+/* Lenis (défilement fluide) */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: clip;
+}
+
+/* Masque la scrollbar tout en gardant le défilement */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Contenu masqué via JS avant son animation d'entrée (évite le flash) */
+.js-motion [data-reveal] {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .js-motion [data-reveal] {
+        opacity: 1;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }

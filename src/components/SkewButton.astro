@@ -1,75 +1,164 @@
 ---
-const { href, text } = Astro.props;
+import type { HTMLAttributes } from "astro/types";
 
-import line1 from "../assets/boutons/line1.svg";
-import line2 from "../assets/boutons/line2.svg";
+interface Props extends HTMLAttributes<"a"> {
+    text?: string;
+    /** Icône affichée dans la case de droite */
+    icon?: "arrow" | "download";
+    /** primary = fond noir, secondary = fond blanc */
+    variant?: "primary" | "secondary";
+}
+
+// Les attributs restants (download, target, aria-*…) sont transmis au lien
+const { href, text, icon, variant = "secondary", class: className, ...attrs } = Astro.props;
 ---
 
-<div class="button-wrapper relative inline-block" style="width: fit-content;">
-    <img
-        src={line1.src || "/placeholder.svg"}
-        alt=""
-        class="absolute z-30"
-        style="width: 34.2px; top: -9px; left: -10px; "
-    />
-
-    <img
-        src={line2.src || "/placeholder.svg"}
-        alt=""
-        class="absolute z-30"
-        style="width: 34.2px; bottom: -9px; right: -10px;"
-    />
-
-    <a
-        href={href}
-        class="skew-button relative inline-block bg-white border-3 border-black font-bold text-black transition-colors"
-        style="transform: skewX(-15deg); width: fit-content; height: 53px; display: flex; align-items: center; justify-content: center; padding: 0 25px; font-family: 'Russo One', sans-serif; font-size: 20px; font-weight: 400; font-style: normal; line-height: normal; overflow: hidden;"
-    >
-        <!-- Add black background that fills from left to right on hover, z-index 1 to stay below text -->
-        <span class="fill-bg"></span>
-
-        <!-- Duplicate text for color transition effect -->
-        <span
-            class="button-text"
-            style="transform: skewX(15deg); display: inline-block; position: relative; z-index: 10;"
-        >
-            <span class="text-black transition-opacity duration-500">
-                <slot>{text}</slot>
+<a href={href} class:list={["sk-btn", `sk-btn--${variant}`, className]} {...attrs}>
+    <span class="sk-shine" aria-hidden="true"></span>
+    <span class="sk-label"><slot>{text}</slot></span>
+    {
+        icon && (
+            <span class="sk-icon" aria-hidden="true">
+                {icon === "download" ? (
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6">
+                        <path d="M12 4v11M6.5 10 12 15.5 17.5 10M5 20h14" stroke-linecap="square" />
+                    </svg>
+                ) : (
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6">
+                        <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square" />
+                    </svg>
+                )}
             </span>
-            <span
-                class="text-white absolute top-0 left-0 opacity-0 transition-opacity duration-500"
-            >
-                <slot>{text}</slot>
-            </span>
-        </span>
-    </a>
-</div>
+        )
+    }
+</a>
+
 <style>
-    .skew-button {
+    .sk-btn {
+        --sk-bg: #fff;
+        --sk-fg: var(--color-ink);
+        --sk-shadow: var(--color-ink);
+        --sk-icon-bg: var(--color-lilac);
+        --sk-icon-fg: var(--color-ink);
+
         position: relative;
+        display: inline-flex;
+        align-items: stretch;
+        width: fit-content;
+        height: 56px;
+        overflow: hidden;
+        border: 3px solid var(--color-ink);
+        background: var(--sk-bg);
+        color: var(--sk-fg);
+        font-family: var(--font-heading);
+        font-size: 1rem;
+        line-height: 1;
+        text-decoration: none;
+        white-space: nowrap;
+        transform: skewX(-12deg);
+        box-shadow: 6px 6px 0 0 var(--sk-shadow);
+        transition:
+            transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .fill-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #000;
-        transform: translateX(-100%);
-        transition: transform 0.5s ease-in-out;
+    .sk-btn--primary {
+        --sk-bg: var(--color-ink);
+        --sk-fg: #fff;
+        --sk-shadow: var(--color-iris);
+        --sk-icon-bg: var(--color-iris);
+        --sk-icon-fg: var(--color-ink);
+    }
+
+    .sk-btn:hover {
+        transform: skewX(-12deg) translate(-3px, -3px);
+        box-shadow: 9px 9px 0 0 var(--sk-shadow);
+    }
+
+    .sk-btn:active {
+        transform: skewX(-12deg) translate(6px, 6px);
+        box-shadow: 0 0 0 0 var(--sk-shadow);
+        transition-duration: 0.08s;
+    }
+
+    /* Le contenu est redressé pour rester lisible */
+    .sk-label,
+    .sk-icon > :global(*) {
+        transform: skewX(12deg);
+    }
+
+    .sk-label {
+        position: relative;
         z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 24px;
     }
 
-    .skew-button:hover .fill-bg {
-        transform: translateX(0);
+    .sk-icon {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        place-items: center;
+        width: 56px;
+        border-left: 3px solid var(--color-ink);
+        background: var(--sk-icon-bg);
+        color: var(--sk-icon-fg);
+        transition: background-color 0.25s ease;
     }
 
-    .skew-button:hover .button-text > span:first-child {
-        opacity: 0;
+    .sk-icon svg {
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .skew-button:hover .button-text > span:last-child {
-        opacity: 1;
+    .sk-btn:hover .sk-icon {
+        background: #fff;
+    }
+
+    .sk-btn:hover .sk-icon svg {
+        transform: skewX(12deg) translateX(4px);
+    }
+
+    .sk-btn[download]:hover .sk-icon svg {
+        transform: skewX(12deg) translateY(3px);
+    }
+
+    /* Reflet qui balaie le bouton au survol */
+    .sk-shine {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.45) 50%, transparent 70%);
+        transform: translateX(-120%);
+        pointer-events: none;
+    }
+
+    .sk-btn--primary .sk-shine {
+        background: linear-gradient(100deg, transparent 30%, rgb(213 185 255 / 0.35) 50%, transparent 70%);
+    }
+
+    .sk-btn:hover .sk-shine {
+        transform: translateX(120%);
+        transition: transform 0.7s ease;
+    }
+
+    /* Icônes SVG noires passées dans le slot (anciennes pages) : blanches sur fond noir */
+    .sk-btn--primary .sk-label :global(img) {
+        filter: invert(1);
+    }
+
+    @media (max-width: 480px) {
+        .sk-btn {
+            height: 52px;
+            font-size: 0.9rem;
+        }
+
+        .sk-label {
+            padding: 0 18px;
+        }
+
+        .sk-icon {
+            width: 50px;
+        }
     }
 </style>

@@ -1,0 +1,208 @@
+---
+import { skills, skillCategories } from "../data/skills";
+
+const first = skills[0];
+const categoryLabels = (cats: readonly string[]) =>
+    cats.map((c) => skillCategories[c as keyof typeof skillCategories]).join(" · ");
+---
+
+<div class="skills grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-16 items-start">
+    <div>
+        <div class="flex flex-wrap gap-3 mb-8" role="group" aria-label="Filtrer par catégorie">
+            <button class="skill-filter is-active" data-filter="all" aria-pressed="true">Tout</button>
+            {
+                Object.entries(skillCategories).map(([key, label]) => (
+                    <button class="skill-filter" data-filter={key} aria-pressed="false">
+                        {label}
+                    </button>
+                ))
+            }
+        </div>
+
+        <ul class="skill-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4">
+            {
+                skills.map((skill, i) => (
+                    <li data-categories={skill.categories.join(" ")}>
+                        <button
+                            class:list={["skill-tile", { "is-selected": i === 0 }]}
+                            aria-pressed={i === 0 ? "true" : "false"}
+                            data-name={skill.name}
+                            data-description={skill.description}
+                            data-logo={skill.logo.src}
+                            data-categories-label={categoryLabels(skill.categories)}
+                        >
+                            <img src={skill.logo.src} alt="" loading="lazy" class="h-10 w-10 md:h-12 md:w-12 object-contain" />
+                            <span class="text-[11px] md:text-xs leading-tight">{skill.name}</span>
+                        </button>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+
+    <aside class="skill-detail lg:sticky lg:top-28" aria-live="polite">
+        <div class="flex items-center gap-4 mb-5">
+            <span class="skill-detail-logo">
+                <img id="skill-logo" src={first.logo.src} alt="" class="h-12 w-12 object-contain" />
+            </span>
+            <div>
+                <h3 id="skill-name" class="text-2xl md:text-3xl">{first.name}</h3>
+                <p id="skill-categories" class="text-sm font-semibold text-grape">
+                    {categoryLabels(first.categories)}
+                </p>
+            </div>
+        </div>
+        <p id="skill-description" class="leading-relaxed md:text-lg">{first.description}</p>
+    </aside>
+</div>
+
+<style>
+    .skill-filter {
+        padding: 8px 16px;
+        border: 3px solid var(--color-ink);
+        background: #fff;
+        font-size: 0.95rem;
+        transform: skewX(-12deg);
+        transition:
+            background-color 0.25s ease,
+            color 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .skill-filter:hover {
+        box-shadow: 4px 4px 0 var(--color-iris);
+    }
+
+    .skill-filter.is-active {
+        background: var(--color-ink);
+        color: #fff;
+    }
+
+    .skill-tile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        aspect-ratio: 1;
+        padding: 8px;
+        border: 3px solid var(--color-ink);
+        background: #fff;
+        font-family: var(--font-body);
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            background-color 0.25s ease;
+    }
+
+    .skill-tile:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 5px 5px 0 var(--color-ink);
+    }
+
+    .skill-tile img {
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .skill-tile:hover img {
+        transform: scale(1.15) rotate(-6deg);
+    }
+
+    .skill-tile.is-selected {
+        background: var(--color-lilac);
+        box-shadow: 5px 5px 0 var(--color-ink);
+        transform: translate(-3px, -3px);
+    }
+
+    .skill-detail {
+        padding: 28px;
+        border: 3px solid var(--color-ink);
+        background: linear-gradient(160deg, #fff 30%, var(--color-lilac-soft));
+        box-shadow: var(--shadow-brutal-lg);
+    }
+
+    .skill-detail-logo {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 72px;
+        height: 72px;
+        border: 3px solid var(--color-ink);
+        background: #fff;
+    }
+</style>
+
+<script>
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const root = document.querySelector<HTMLElement>(".skills");
+    if (root) {
+        const tiles = root.querySelectorAll<HTMLButtonElement>(".skill-tile");
+        const filters = root.querySelectorAll<HTMLButtonElement>(".skill-filter");
+        const items = root.querySelectorAll<HTMLElement>(".skill-grid > li");
+        const detail = root.querySelector<HTMLElement>(".skill-detail")!;
+        const logo = root.querySelector<HTMLImageElement>("#skill-logo")!;
+        const name = root.querySelector<HTMLElement>("#skill-name")!;
+        const cats = root.querySelector<HTMLElement>("#skill-categories")!;
+        const desc = root.querySelector<HTMLElement>("#skill-description")!;
+
+        function select(tile: HTMLButtonElement) {
+            tiles.forEach((t) => {
+                t.classList.toggle("is-selected", t === tile);
+                t.setAttribute("aria-pressed", String(t === tile));
+            });
+            const { name: n, description, logo: src, categoriesLabel } = tile.dataset;
+            gsap.timeline()
+                .to(detail.children, { opacity: 0, y: -8, duration: 0.15, stagger: 0.03 })
+                .add(() => {
+                    logo.src = src ?? "";
+                    name.textContent = n ?? "";
+                    cats.textContent = categoriesLabel ?? "";
+                    desc.textContent = description ?? "";
+                })
+                .fromTo(detail.children, { y: 12 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.05, ease: "power3.out" });
+        }
+
+        tiles.forEach((tile) => tile.addEventListener("click", () => select(tile)));
+
+        filters.forEach((btn) =>
+            btn.addEventListener("click", () => {
+                const filter = btn.dataset.filter!;
+                filters.forEach((b) => {
+                    b.classList.toggle("is-active", b === btn);
+                    b.setAttribute("aria-pressed", String(b === btn));
+                });
+                const visible: HTMLElement[] = [];
+                items.forEach((item) => {
+                    const show = filter === "all" || item.dataset.categories!.split(" ").includes(filter);
+                    item.hidden = !show;
+                    if (show) visible.push(item);
+                });
+                gsap.fromTo(
+                    visible,
+                    { opacity: 0, scale: 0.85 },
+                    { opacity: 1, scale: 1, duration: 0.4, stagger: 0.03, ease: "back.out(1.7)" },
+                );
+            }),
+        );
+
+        // Entrée des tuiles au scroll
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            gsap.from(items, {
+                opacity: 0,
+                y: 30,
+                scale: 0.9,
+                duration: 0.6,
+                ease: "back.out(1.6)",
+                stagger: { each: 0.035, from: "start" },
+                scrollTrigger: { trigger: root, start: "top 80%", once: true },
+            });
+        }
+    }
+</script>

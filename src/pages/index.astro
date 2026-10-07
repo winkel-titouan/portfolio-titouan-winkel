@@ -1,514 +1,902 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import SectionTitle from "../components/SectionTitle.astro";
-import SkillsCloud from "../components/SkillsCloud.astro";
+import Skills from "../components/Skills.astro";
 import SkewButton from "../components/SkewButton.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import { Image } from "astro:assets";
-import heroPC from "../assets/hero-pc.svg";
 import personnage from "../assets/a_propos/personnage.svg";
 import bubble from "../assets/bubble.svg";
 import spike from "../assets/spike.svg";
-import arrow from "../assets/arrow.svg";
-import download from "../assets/boutons/download.svg";
-import { pb } from "../utils/pb";
+import laptopUrl from "../assets/3d/laptop.glb?url";
+import { pb, getCoverUrl, type Projet } from "../utils/pb";
+import { skills } from "../data/skills";
 
-interface ProjectRecord {
-	id: string;
-	nom_projet: string;
-	description?: string;
-	created?: string;
-	prod_finale?: string[];
-	inspirations?: string[];
-	logo_new?: string;
-}
-
-let projets: ProjectRecord[] = [];
+let projets: Projet[] = [];
 try {
-	const records = (await pb.collection("projets").getFullList({
+	projets = await pb.collection("projets").getFullList<Projet>({
 		filter: "caroussel = true",
-	})) as ProjectRecord[];
-	projets = records;
+	});
 } catch (error) {
 	console.error("Erreur lors de la récupération des projets:", error);
 }
 
-function getImageUrl(projet: ProjectRecord, filename: string) {
-	return `https://portfolio.titouan-winkel.fr/api/files/projets/${projet.id}/${filename}`;
-}
+const marqueeItems = [
+	"Identité visuelle",
+	"Design graphique",
+	"Web design",
+	"Illustration",
+	"Communication",
+	"Motion & vidéo",
+];
 
-function getProjectCardImageUrl(projet: ProjectRecord) {
-	if (projet.prod_finale && projet.prod_finale.length > 0) {
-		return getImageUrl(projet, projet.prod_finale[0]);
-	}
-	return "/placeholder.svg?height=400&width=300";
-}
+const facts = [
+	{ value: "BUT MMI", label: "3e année" },
+	{ value: "Print & web", label: "identités, supports, interfaces" },
+	{ value: String(skills.length), label: "outils maîtrisés" },
+];
 ---
 
 <Layout title="Titouan Winkel - Designer web">
-	<!-- Added floating animation keyframes -->
-	<style>
-		@keyframes float {
-			0%,
-			100% {
-				transform: translateY(0px);
-			}
-			50% {
-				transform: translateY(-20px);
-			}
-		}
+	<link slot="head" rel="preload" href={laptopUrl} as="fetch" type="model/gltf-binary" crossorigin />
 
-		.floating {
-			animation: float 3s ease-in-out infinite;
-		}
-	</style>
+	<main class="overflow-x-clip">
+		<!-- HERO : la scène reste collée pendant que le scroll pilote le PC 3D -->
+		<section id="hero" class="hero relative" aria-label="Introduction">
+			<div class="hero-stage sticky top-0 h-svh overflow-hidden">
+				<div class="hero-bg absolute inset-0" aria-hidden="true">
+					<div class="hero-grid absolute inset-0"></div>
+					<div class="blob blob-1"></div>
+					<div class="blob blob-2"></div>
+				</div>
 
-	<!-- Added overflow-x-hidden to prevent horizontal scrolling -->
-	<main class="overflow-x-hidden">
-		<!-- Redesigned hero section with text and two buttons -->
-		<!-- Added flex and items-center to vertically center content, reduced py padding -->
-		<!-- Added id="hero-content" and md:block to show only on desktop, hide on mobile when menu is open -->
-		<section
-			class="relative isolate overflow-hidden flex items-center min-h-[70vh]"
-		>
-			<div
-				aria-hidden="true"
-				class="absolute inset-0 -z-10"
-				style="opacity:0.8; background: linear-gradient(180deg, #D5B9FF 70.67%, #FFF 100%);"
-			>
-			</div>
-			<div
-				id="hero-content"
-				class="relative z-10 container mx-auto px-4 md:px-6 transition-opacity duration-300"
-			>
-				<div
-					class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center"
-				>
-					<div class="space-y-6 md:space-y-8">
-						<h1
-							class="text-3xl md:text-5xl lg:text-6xl"
-							style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal; line-height: 1.2; color: #000;"
-						>
-							Chaque projet est une nouvelle aventure.
+				<canvas id="laptop-canvas" class="absolute inset-0 h-full w-full opacity-0" aria-hidden="true"></canvas>
+
+				<div id="laptop-loader" class="laptop-loader" aria-hidden="true">
+					<span></span><span></span>
+				</div>
+
+
+				<div class="relative z-10 container mx-auto h-full px-4 md:px-6 flex items-start pt-[calc(var(--header-h)+6vh)] lg:items-center lg:pt-(--header-h)">
+					<div class="hero-copy max-w-xl xl:max-w-2xl space-y-6 md:space-y-8">
+						<p class="hero-eyebrow">
+							<span class="dot" aria-hidden="true"></span>
+							Titouan Winkel — Graphiste &amp; designer web
+						</p>
+
+						<h1 class="hero-title text-4xl md:text-6xl xl:text-7xl leading-[1.08]">
+							<span class="line"><span>Chaque projet</span></span>
+							<span class="line"><span>est une nouvelle</span></span>
+							<span class="line"><span class="text-white title-highlight">aventure.</span></span>
 						</h1>
 
-						<div class="flex flex-col gap-4 md:gap-6">
-							<SkewButton href="/projets">
-								<div class="flex items-center gap-3">
-									<Image
-										src={arrow || "/placeholder.svg"}
-										alt=""
-										class="w-5 h-5 md:w-6 md:h-6"
-									/>
-									<span class="text-sm md:text-base"
-										>Découvrir tous mes projets</span
-									>
-								</div>
-							</SkewButton>
-
-							<!-- Updated CV download link to point to actual file in public folder -->
-							<SkewButton href="/CV_Titouan_Winkel.pdf" download>
-								<div class="flex items-center gap-3">
-									<Image
-										src={download || "/placeholder.svg"}
-										alt=""
-										class="w-5 h-5 md:w-6 md:h-6"
-									/>
-									<span class="text-sm md:text-base"
-										>Télécharger mon CV</span
-									>
-								</div>
-							</SkewButton>
+						<div class="hero-actions flex flex-col sm:flex-row gap-5 sm:gap-8">
+							<SkewButton href="/projets" icon="arrow" variant="primary">Découvrir mes projets</SkewButton>
+							<SkewButton href="/CV_Titouan_Winkel.pdf" download icon="download">Télécharger mon CV</SkewButton>
 						</div>
 					</div>
-
-					<!-- Added floating class for animation -->
-					<div
-						class="flex items-center justify-center min-h-[200px] md:min-h-[300px]"
-					>
-						<Image
-							src={heroPC || "/placeholder.svg"}
-							alt="Hero computer illustration"
-							class="w-3/4 md:w-full h-auto max-w-full floating mt-4 md:mt-8"
-						/>
-					</div>
 				</div>
+
+				<div class="scroll-hint" aria-hidden="true">
+					<span class="mouse"><span></span></span>
+					<span>Scroll</span>
+				</div>
+
+				<div class="hero-progress" aria-hidden="true"><span></span></div>
 			</div>
 		</section>
 
-		<!-- Mes projets: déplacé ici pour apparaître juste après le hero -->
-		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16">
-			<div class="flex justify-center">
-				<SectionTitle text="Mes projets" />
+		<!-- BANDEAU DÉFILANT -->
+		<section class="marquees relative py-14 md:py-20" aria-hidden="true">
+			{
+				[
+					{ cls: "marquee-back", dir: 1 },
+					{ cls: "marquee-front", dir: -1 },
+				].map(({ cls, dir }) => (
+					<div class:list={["marquee", cls]}>
+						<div class="marquee-track" data-dir={dir}>
+							{[0, 1].map(() => (
+								<div class="marquee-group">
+									{marqueeItems.map((item) => (
+										<span class="marquee-item">
+											{item}
+											<span class="marquee-star">✦</span>
+										</span>
+									))}
+								</div>
+							))}
+						</div>
+					</div>
+				))
+			}
+		</section>
+
+		<!-- PROJETS -->
+		<section id="projets" class="container mx-auto px-4 md:px-6 py-10 md:py-20">
+			<div class="flex flex-wrap items-end justify-between gap-6">
+				<div>
+					<SectionTitle text="Mes projets" />
+					<p class="max-w-md text-lg -mt-4" data-reveal>
+						Une sélection de travaux en identité visuelle, print et web.
+					</p>
+				</div>
+				{
+					projets.length > 1 && (
+						<div class="carousel-nav flex gap-3" data-reveal>
+							<button class="carousel-btn" data-carousel-prev aria-label="Projet précédent">
+								<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="square" /></svg>
+							</button>
+							<button class="carousel-btn" data-carousel-next aria-label="Projet suivant">
+								<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square" /></svg>
+							</button>
+						</div>
+					)
+				}
 			</div>
-			<div class="relative mt-8 md:mt-1 flex justify-center">
-				<div
-					class="carousel-container w-full overflow-x-auto md:overflow-visible scrollbar-hide"
-				>
-					<div
-						class="carousel-track flex gap-4 md:gap-12 md:transition-transform md:duration-500 md:ease-in-out md:justify-center py-4 md:py-8"
-					>
-						{
-							projets.map((projet) => (
-								<div class="carousel-item shrink-0 w-64 md:w-70">
+
+			{
+				projets.length > 0 ? (
+					<div class="carousel scrollbar-hide mt-6" tabindex="0" aria-label="Carrousel des projets">
+						<ul class="carousel-track">
+							{projets.map((projet, i) => (
+								<li class="carousel-item">
 									<ProjectCard
 										href={`/projets/${projet.id}`}
 										project={projet}
-										imageUrl={getProjectCardImageUrl(
-											projet,
-										)}
+										imageUrl={getCoverUrl(projet)}
+										index={i}
 									/>
-								</div>
+								</li>
+							))}
+						</ul>
+					</div>
+				) : (
+					<p class="mt-10 text-center text-lg opacity-70">Les projets arrivent très bientôt.</p>
+				)
+			}
+
+			<div class="mt-6 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
+				<SkewButton href="/projets" icon="arrow">Voir tous les projets</SkewButton>
+				{projets.length > 1 && (
+					<div class="carousel-progress w-full md:flex-1" aria-hidden="true"><span></span></div>
+				)}
+			</div>
+		</section>
+
+		<!-- QUI SUIS-JE -->
+		<section id="about" class="container mx-auto px-4 md:px-6 py-16 md:py-24">
+			<div class="grid grid-cols-1 lg:grid-cols-[1.25fr_1fr] gap-12 lg:gap-20 items-center">
+				<div>
+					<SectionTitle text="Qui suis-je ?" />
+					<div class="about-text space-y-5 text-lg md:text-xl leading-relaxed" data-split-words>
+						<p>
+							Je m'appelle Titouan <strong class="text-grape">Winkel</strong>, actuellement étudiant en
+							troisième année de <strong class="text-grape">BUT Métiers du Multimédia et de l'Internet</strong>.
+							Passionné par la création visuelle et la communication digitale, je me spécialise en design
+							graphique. J'aime concevoir des identités visuelles, des supports de communication et des
+							interfaces alliant créativité et clarté.
+						</p>
+						<p>
+							Curieux et motivé, je cherche à enrichir mes compétences à travers des projets concrets,
+							collaboratifs et innovants. Mon objectif est de mettre le design au service <strong
+								class="text-grape">d'expériences visuelles cohérentes et impactantes</strong>.
+						</p>
+					</div>
+
+					<ul class="facts grid grid-cols-3 gap-3 md:gap-5 mt-10" data-reveal data-reveal-stagger>
+						{
+							facts.map((fact) => (
+								<li class="fact">
+									<span class="font-heading text-lg md:text-2xl leading-tight">{fact.value}</span>
+									<span class="text-xs md:text-sm">{fact.label}</span>
+								</li>
 							))
 						}
+					</ul>
+
+					<div class="mt-10" data-reveal>
+						<SkewButton href="/a_propos" icon="arrow">En savoir plus</SkewButton>
 					</div>
 				</div>
-			</div>
 
-			<div class="flex justify-center mt-8 md:mt-10">
-				<SkewButton href="/projets">
-					<div class="flex items-center gap-3">
-						<Image
-							src={arrow || "/placeholder.svg"}
-							alt=""
-							class="w-6 h-6"
-						/>
-						<span class="text-sm md:text-base"
-							>Voir tous les projets</span
-						>
-					</div>
-				</SkewButton>
-			</div>
-		</section>
-
-		<section class="container mx-auto px-4 md:px-6 py-8 md:py-16 md:ml-20">
-			<SectionTitle text="Qui suis-je ?" />
-
-			<div
-				class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start"
-			>
-				<div
-					class="space-y-4 text-base md:text-xl"
-					style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
-				>
-					<p>
-						Je m'appelle Titouan <span
-							class="text-purple-600 font-semibold">Winkel</span
-						>, actuellement étudiant en deuxième année de <span
-							class="text-purple-600 font-semibold"
-							>BUT Métiers du Multimédia et de l'Internet</span
-						>. Passionné par la création visuelle et la
-						communication digitale, je me spécialise en design
-						graphique. J'aime concevoir des identités visuelles, des
-						supports de communication et des interfaces alliant
-						créativité et clarté.
-					</p>
-
-					<p>
-						Curieux et motivé, je cherche à enrichir mes compétences
-						à travers des projets concrets, collaboratifs et
-						innovants. Mon objectif est de mettre le design au
-						service <span class="text-purple-600 font-semibold"
-							>d'expériences visuelles cohérentes et impactantes</span
-						>.
-					</p>
-				</div>
-
-				<div class="flex items-center justify-center relative">
+				<div class="about-visual relative mx-auto aspect-square w-full max-w-md">
+					<Image src={bubble} alt="" class="about-bubble absolute inset-0 m-auto w-full h-auto" />
+					<svg class="about-badge" viewBox="0 0 200 200" aria-hidden="true">
+						<defs>
+							<path id="badge-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+						</defs>
+						<circle cx="100" cy="100" r="98" fill="#fff" stroke="#0b0710" stroke-width="4" />
+						<text>
+							<textPath href="#badge-circle">GRAPHISTE ✦ DESIGNER WEB ✦ ILLUSTRATEUR ✦ </textPath>
+						</text>
+						<text x="100" y="114" text-anchor="middle" class="badge-center">TW</text>
+					</svg>
 					<Image
-						src={bubble || "/placeholder.svg"}
-						alt=""
-						class="absolute -z-10 w-64 md:w-96 h-64 md:h-96 opacity-50"
-						style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
-					/>
-					<Image
-						src={personnage || "/placeholder.svg"}
-						alt="Personnage illustration"
-						class="w-auto h-48 md:h-80 relative z-10"
+						src={personnage}
+						alt="Illustration de Titouan"
+						class="about-character relative z-10 mx-auto h-full w-auto"
 					/>
 				</div>
 			</div>
 		</section>
 
-		<!-- Redesigned competences section with category names, bars, and no SVG backgrounds -->
-		<section class="py-8 md:py-16 overflow-x-hidden">
-			<div class="container mx-auto px-4 md:px-6 md:ml-20 mb-15">
-				<SectionTitle text="Compétences" />
-			</div>
-
-			<!-- Centered category names with single purple bar underneath all categories -->
-			<div
-				class="container mx-auto px-4 md:px-6 mb-8 flex justify-center"
-			>
-				<div class="space-y-3">
-					<div
-						class="flex flex-wrap gap-6 md:gap-12 justify-center items-center"
-					>
-						<h3
-							class="text-xl opacity-75 whitespace-nowrap"
-							style="font-family: 'Russo One', sans-serif; font-weight: 400; color: #000;"
-						>
-							Design
-						</h3>
-
-						<h3
-							class="text-xl opacity-75 whitespace-nowrap"
-							style="font-family: 'Russo One', sans-serif; font-weight: 400; color: #000;"
-						>
-							Développement web
-						</h3>
-
-						<h3
-							class="text-xl opacity-75 whitespace-nowrap"
-							style="font-family: 'Russo One', sans-serif; font-weight: 400; color: #000;"
-						>
-							Communication
-						</h3>
-
-						<h3
-							class="text-xl opacity-75 whitespace-nowrap"
-							style="font-family: 'Russo One', sans-serif; font-weight: 400; color: #000;"
-						>
-							Audiovisuel
-						</h3>
-					</div>
-					<!-- Single purple bar under all categories -->
-					<div class="h-1 w-full" style="background-color: #D5B9FF;">
-					</div>
-				</div>
-			</div>
-
-			<!-- Increased gap from gap-6 lg:gap-10 to gap-12 lg:gap-24 -->
-			<div
-				class="flex flex-col lg:flex-row gap-12 lg:gap-24 items-center justify-center px-4 md:px-6 container mx-auto"
-			>
-				<div
-					class="w-full lg:w-[350px] lg:shrink-0 scale-75 md:scale-100 origin-center md:ml-40"
-				>
-					<SkillsCloud />
-				</div>
-
-				<!-- Added order-first, text-center, mx-auto, and -mt-8 for mobile to center and move description up -->
-				<div
-					class="w-full lg:w-[350px] lg:shrink-0 lg:order-0 text-center lg:text-left mx-auto -mt-8 lg:mt-0"
-				>
-					<h3
-						class="mb-4 text-xl md:text-3xl"
-						style="font-family: 'Russo One', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
-					>
-						Description :
-					</h3>
-					<p
-						id="skill-description"
-						class="text-justify leading-relaxed text-sm md:text-xl"
-						style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; color: #000;"
-					>
-						Cliquez sur une icone
-					</p>
-				</div>
-			</div>
+		<!-- COMPÉTENCES -->
+		<section id="competences" class="container mx-auto px-4 md:px-6 py-16 md:py-24">
+			<SectionTitle text="Compétences" />
+			<Skills />
 		</section>
 
-		<section class="container mx-auto px-4 md:px-4 py-8 md:py-16 md:ml-20">
+		<!-- CONTACT -->
+		<section id="contact" class="container mx-auto px-4 md:px-6 pt-16 md:pt-24">
 			<SectionTitle text="Me contacter" />
-
-			<div
-				class="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-0 mt-8"
-			>
-				<div class="space-y-6">
-					<p
-						class="text-base md:text-xl"
-						style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
-					>
-						Intéressé par mon travail, des questions, une offre
-						d'emploi... <span class="text-purple-600 font-semibold"
-							>Contactez moi !</span
-						>
+			<div class="contact-card" data-reveal>
+				<div class="relative z-10 max-w-2xl">
+					<h2 class="text-4xl md:text-6xl xl:text-7xl leading-[1.05]">
+						Un projet en tête&nbsp;?
+						<span class="block text-outline">Parlons-en.</span>
+					</h2>
+					<p class="mt-6 text-lg md:text-xl">
+						Intéressé par mon travail, des questions, une offre d'emploi...
+						<strong class="text-grape">Contactez moi !</strong>
 					</p>
-					<div class="md:mt-15">
-						<SkewButton href="/contact">
-							<div class="flex items-center gap-3">
-								<Image
-									src={arrow || "/placeholder.svg"}
-									alt=""
-									class="w-6 h-6"
-								/>
-								<span class="text-sm md:text-base"
-									>Accéder au formulaire</span
-								>
-							</div>
-						</SkewButton>
+					<div class="mt-10">
+						<SkewButton href="/contact" icon="arrow" variant="primary">Accéder au formulaire</SkewButton>
 					</div>
 				</div>
-
-				<div class="hidden md:block md:-mt-16 md:mr-25">
-					<Image
-						src={spike || "/placeholder.svg"}
-						alt=""
-						class="w-auto h-auto"
-					/>
-				</div>
+				<Image src={spike} alt="" class="contact-spike" />
 			</div>
 		</section>
 	</main>
 </Layout>
 
-<script>
-	const skillDescriptions: Record<string, string> = {
-		illustrator:
-			"Adobe Illustrator est un logiciel de création graphique vectorielle professionnel, idéal pour la conception de logos, illustrations et designs complexes.",
-		figma: "Figma est un outil de design d'interface collaboratif en ligne, parfait pour créer des maquettes web et mobile avec une approche en équipe.",
-		css: "CSS (Cascading Style Sheets) est le langage de style qui donne vie aux pages web en définissant leur apparence visuelle et leur mise en page.",
-		wordpress:
-			"WordPress est un système de gestion de contenu puissant qui permet de créer et gérer facilement des sites web dynamiques sans connaissances techniques approfondies.",
-		daisyui:
-			"DaisyUI est une bibliothèque de composants pour Tailwind CSS qui propose des éléments d'interface prêts à l'emploi avec un design moderne et cohérent.",
-		astro: "Astro est un framework web moderne qui permet de créer des sites ultra-rapides en générant du HTML statique et en chargeant le JavaScript uniquement quand nécessaire.",
-		html: "HTML (HyperText Markup Language) est le langage de balisage fondamental qui structure le contenu des pages web et définit leur architecture.",
-		javascript:
-			"JavaScript est le langage de programmation qui rend les pages web interactives et dynamiques, permettant de créer des expériences utilisateur riches.",
-		sql: "SQL (Structured Query Language) est le langage standard pour gérer et interroger les bases de données relationnelles de manière efficace.",
-		davinci:
-			"DaVinci Resolve est un logiciel de montage vidéo professionnel qui combine édition, étalonnage colorimétrique et effets visuels dans une seule application.",
-		capcut: "CapCut est une application de montage vidéo intuitive et accessible, parfaite pour créer du contenu créatif pour les réseaux sociaux rapidement.",
-		sketchbook:
-			"Sketchbook est une application de dessin numérique intuitive offrant des outils professionnels pour l'illustration et le croquis artistique.",
-		notion: "Notion est un espace de travail tout-en-un qui combine prise de notes, gestion de projets et bases de données pour organiser efficacement toutes vos informations.",
-		canva: "Canva est une plateforme de design graphique accessible qui permet de créer facilement des visuels professionnels pour les réseaux sociaux et la communication.",
-		pocketbase:
-			"Pocketbase est une base de données backend légère et open-source qui fournit une API REST automatique et une interface d'administration intégrée.",
-		tailwind:
-			"Tailwind CSS est un framework CSS utility-first qui permet de construire rapidement des interfaces modernes en composant des classes utilitaires.",
-		affinity:
-			"Affinity Designer est un logiciel de design graphique vectoriel professionnel, offrant des outils puissants pour la création d'illustrations, de logos et de mises en page.",
-	};
-
-	const descriptionElement = document.getElementById("skill-description");
-
-	document.querySelectorAll("[data-skill]").forEach((button) => {
-		button.addEventListener("click", (e) => {
-			const skillName = (e.currentTarget as HTMLElement).getAttribute(
-				"data-skill",
-			);
-			if (skillName && descriptionElement) {
-				descriptionElement.textContent =
-					skillDescriptions[skillName] ||
-					"Description non disponible";
-			}
-		});
-	});
-
-	const carouselTrack = document.querySelector(
-		".carousel-track",
-	) as HTMLElement;
-	const carouselContainer = document.querySelector(
-		".carousel-container",
-	) as HTMLElement;
-	const carouselItems = document.querySelectorAll(".carousel-item");
-
-	const isDesktop = window.innerWidth >= 768;
-
-	if (isDesktop) {
-		let currentIndex = 0;
-		const itemsToShow = 3;
-		const itemWidth = 320 + 48; // item width + gap
-		const maxIndex = Math.max(0, carouselItems.length - itemsToShow);
-
-		// Drag functionality for desktop only
-		let isDragging = false;
-		let startPos = 0;
-		let currentTranslate = 0;
-		let prevTranslate = 0;
-
-		function setPositionByIndex() {
-			currentTranslate = -currentIndex * itemWidth;
-			prevTranslate = currentTranslate;
-			if (carouselTrack) {
-				carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
-			}
-		}
-
-		// Mouse events for desktop
-		carouselContainer?.addEventListener("mousedown", (e) => {
-			isDragging = true;
-			startPos = e.clientX;
-			if (carouselContainer) {
-				carouselContainer.style.cursor = "grabbing";
-			}
-			if (carouselTrack) {
-				carouselTrack.style.transition = "none";
-			}
-		});
-
-		carouselContainer?.addEventListener("mousemove", (e) => {
-			if (!isDragging) return;
-			const currentPosition = e.clientX;
-			const diff = currentPosition - startPos;
-			currentTranslate = prevTranslate + diff;
-			if (carouselTrack) {
-				carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
-			}
-		});
-
-		carouselContainer?.addEventListener("mouseup", (e) => {
-			if (!isDragging) return;
-			isDragging = false;
-			if (carouselContainer) {
-				carouselContainer.style.cursor = "grab";
-			}
-			if (carouselTrack) {
-				carouselTrack.style.transition = "transform 0.5s ease-in-out";
-			}
-
-			const movedBy = currentTranslate - prevTranslate;
-			if (movedBy < -50 && currentIndex < maxIndex) {
-				currentIndex += 1;
-			} else if (movedBy > 50 && currentIndex > 0) {
-				currentIndex -= 1;
-			}
-			setPositionByIndex();
-		});
-
-		carouselContainer?.addEventListener("mouseleave", () => {
-			if (isDragging) {
-				isDragging = false;
-				if (carouselContainer) {
-					carouselContainer.style.cursor = "grab";
-				}
-				if (carouselTrack) {
-					carouselTrack.style.transition =
-						"transform 0.5s ease-in-out";
-				}
-				setPositionByIndex();
-			}
-		});
-	}
-	// Mobile uses native horizontal scroll, no custom JavaScript needed
-
-	// Hide hero content when mobile menu is open
-	window.addEventListener("mobileMenuToggle", ((e: Event) => {
-		const customEvent = e as CustomEvent<{ isOpen: boolean }>;
-		const heroContent = document.getElementById("hero-content");
-		if (heroContent) {
-			if (customEvent.detail.isOpen) {
-				heroContent.style.opacity = "0";
-				heroContent.style.pointerEvents = "none";
-			} else {
-				heroContent.style.opacity = "1";
-				heroContent.style.pointerEvents = "auto";
-			}
-		}
-	}) as EventListener);
-</script>
-
 <style>
-	/* Hide scrollbar on mobile while keeping scroll functionality */
-	.scrollbar-hide {
-		-ms-overflow-style: none;
-		scrollbar-width: none;
+	/* ---------- HERO ---------- */
+	.hero {
+		height: 280vh;
+		margin-top: calc(-1 * var(--header-h));
 	}
 
-	.scrollbar-hide::-webkit-scrollbar {
-		display: none;
+	.hero-bg {
+		background: linear-gradient(180deg, #d5b9ff 0%, #e6d5ff 65%, #fff 100%);
+	}
+
+	.hero-grid {
+		background-image:
+			linear-gradient(rgb(11 7 16 / 0.07) 1px, transparent 1px),
+			linear-gradient(90deg, rgb(11 7 16 / 0.07) 1px, transparent 1px);
+		background-size: 56px 56px;
+		mask-image: radial-gradient(ellipse at 65% 45%, #000 20%, transparent 75%);
+	}
+
+	.blob {
+		position: absolute;
+		border-radius: 9999px;
+		filter: blur(70px);
+		opacity: 0.6;
+		animation: drift 14s ease-in-out infinite alternate;
+	}
+
+	.blob-1 {
+		width: 42vw;
+		height: 42vw;
+		right: 5%;
+		top: 10%;
+		background: #a983e2;
+	}
+
+	.blob-2 {
+		width: 30vw;
+		height: 30vw;
+		left: -5%;
+		bottom: 5%;
+		background: #fff;
+		animation-delay: -6s;
+	}
+
+	@keyframes drift {
+		to {
+			transform: translate(-4vw, 5vh) scale(1.1);
+		}
+	}
+
+	.hero-eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		padding: 6px 14px;
+		border: 2px solid var(--color-ink);
+		background: rgb(255 255 255 / 0.7);
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+
+	.hero-eyebrow .dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 9999px;
+		background: var(--color-grape);
+		box-shadow: 0 0 0 0 rgb(124 58 237 / 0.6);
+		animation: pulse 2s infinite;
+	}
+
+	@keyframes pulse {
+		70% {
+			box-shadow: 0 0 0 10px rgb(124 58 237 / 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgb(124 58 237 / 0);
+		}
+	}
+
+	.hero-title .line {
+		display: block;
+		overflow: hidden;
+		padding-bottom: 0.08em;
+	}
+
+	.hero-title .line > span {
+		display: inline-block;
+	}
+
+	/* Surlignage incliné façon bouton du site */
+	.title-highlight {
+		position: relative;
+		padding: 0 0.15em;
+		margin-left: -0.05em;
+	}
+
+	.title-highlight::before {
+		content: "";
+		position: absolute;
+		inset: 0.1em 0 0.02em;
+		z-index: -1;
+		background: var(--color-ink);
+		transform: skewX(-15deg);
+	}
+
+	.laptop-loader {
+		position: absolute;
+		right: 24%;
+		top: 50%;
+		width: 48px;
+		height: 48px;
+		animation: spin 1.2s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+		transition: opacity 0.4s ease;
+	}
+
+	.laptop-loader span {
+		position: absolute;
+		width: 20px;
+		height: 20px;
+		border: 5px solid var(--color-ink);
+	}
+
+	.laptop-loader span:first-child {
+		top: 0;
+		left: 0;
+		border-right: 0;
+		border-bottom: 0;
+	}
+
+	.laptop-loader span:last-child {
+		bottom: 0;
+		right: 0;
+		border-left: 0;
+		border-top: 0;
+	}
+
+	@media (max-width: 1023px) {
+		.laptop-loader {
+			right: calc(50% - 24px);
+			top: 70%;
+		}
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.scroll-hint {
+		position: absolute;
+		left: 50%;
+		bottom: 22px;
+		transform: translateX(-50%);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		font-family: var(--font-heading);
+		font-size: 0.75rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+	}
+
+	.mouse {
+		position: relative;
+		width: 24px;
+		height: 38px;
+		border: 3px solid var(--color-ink);
+		border-radius: 14px;
+	}
+
+	.mouse span {
+		position: absolute;
+		left: 50%;
+		top: 6px;
+		width: 4px;
+		height: 8px;
+		margin-left: -2px;
+		border-radius: 2px;
+		background: var(--color-ink);
+		animation: wheel 1.6s ease-in-out infinite;
+	}
+
+	@keyframes wheel {
+		0% {
+			transform: translateY(0);
+			opacity: 1;
+		}
+		100% {
+			transform: translateY(12px);
+			opacity: 0;
+		}
+	}
+
+	.hero-progress {
+		position: absolute;
+		right: 20px;
+		top: 50%;
+		width: 4px;
+		height: 120px;
+		transform: translateY(-50%);
+		background: rgb(11 7 16 / 0.15);
+	}
+
+	.hero-progress span {
+		display: block;
+		height: 100%;
+		background: var(--color-ink);
+		transform: scaleY(0);
+		transform-origin: top;
+	}
+
+	/* Sans animation : hero classique, PC ouvert et immobile */
+	@media (prefers-reduced-motion: reduce) {
+		.hero {
+			height: auto;
+		}
+
+		.scroll-hint,
+		.hero-progress {
+			display: none;
+		}
+	}
+
+	/* ---------- BANDEAU ---------- */
+	.marquee {
+		overflow: hidden;
+		border-block: 4px solid var(--color-ink);
+		white-space: nowrap;
+	}
+
+	.marquee-back {
+		background: var(--color-lilac);
+		transform: rotate(2deg) scale(1.05);
+	}
+
+	.marquee-front {
+		margin-top: -3.2rem;
+		background: var(--color-ink);
+		color: #fff;
+		transform: rotate(-2deg) scale(1.05);
+	}
+
+	.marquee-track {
+		display: flex;
+		width: max-content;
+	}
+
+	.marquee-group {
+		display: flex;
+		flex-shrink: 0;
+	}
+
+	.marquee-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 2rem;
+		padding: 0.9rem 1rem 0.9rem 2rem;
+		font-family: var(--font-heading);
+		font-size: clamp(1.25rem, 3vw, 2.25rem);
+		text-transform: uppercase;
+	}
+
+	.marquee-star {
+		color: var(--color-iris);
+	}
+
+	.marquee-back .marquee-star {
+		color: var(--color-ink);
+	}
+
+	/* ---------- CARROUSEL ---------- */
+	/* Déborde jusqu'au bord droit de l'écran */
+	.carousel {
+		margin-left: -1rem;
+		margin-right: calc(50% - 50vw);
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scroll-padding-inline: 1.5rem;
+		cursor: grab;
+		outline-offset: -3px;
+	}
+
+	@media (min-width: 768px) {
+		.carousel {
+			margin-left: -1.5rem;
+		}
+	}
+
+	.carousel.is-dragging {
+		cursor: grabbing;
+		scroll-snap-type: none;
+	}
+
+	.carousel.is-dragging a {
+		pointer-events: none;
+	}
+
+	.carousel-track {
+		display: flex;
+		gap: 2.5rem;
+		width: max-content;
+		padding: 2rem 1.5rem 2.5rem;
+	}
+
+	.carousel-item {
+		width: min(78vw, 320px);
+		scroll-snap-align: start;
+	}
+
+	.carousel-btn {
+		display: grid;
+		place-items: center;
+		width: 52px;
+		height: 52px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		transform: skewX(-12deg);
+		transition:
+			background-color 0.25s ease,
+			color 0.25s ease,
+			box-shadow 0.25s ease,
+			opacity 0.25s ease;
+	}
+
+	.carousel-btn:hover:not(:disabled) {
+		background: var(--color-ink);
+		color: #fff;
+		box-shadow: 4px 4px 0 var(--color-iris);
+	}
+
+	.carousel-btn:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+
+	.carousel-progress {
+		height: 6px;
+		background: rgb(11 7 16 / 0.1);
+	}
+
+	.carousel-progress span {
+		display: block;
+		height: 100%;
+		background: linear-gradient(90deg, var(--color-iris), var(--color-ink));
+		transform-origin: left;
+		transform: scaleX(0);
+	}
+
+	/* ---------- QUI SUIS-JE ---------- */
+	.about-text :global(.word) {
+		display: inline;
+	}
+
+	.fact {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: 14px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		box-shadow: var(--shadow-brutal);
+	}
+
+	.fact:nth-child(2) {
+		background: var(--color-lilac);
+	}
+
+	.about-badge {
+		position: absolute;
+		top: 2%;
+		right: 2%;
+		z-index: 20;
+		width: 30%;
+		max-width: 130px;
+		font-family: var(--font-heading);
+		font-size: 15.5px;
+		letter-spacing: 0.08em;
+	}
+
+	.about-badge .badge-center {
+		font-size: 40px;
+		fill: var(--color-grape);
+	}
+
+	/* ---------- CONTACT ---------- */
+	.contact-card {
+		position: relative;
+		overflow: hidden;
+		padding: 2.5rem 1.75rem;
+		border: 4px solid var(--color-ink);
+		background:
+			radial-gradient(circle at 85% 20%, rgb(255 255 255 / 0.7), transparent 40%),
+			linear-gradient(135deg, var(--color-lilac) 0%, var(--color-iris) 100%);
+		box-shadow: var(--shadow-brutal-lg);
+	}
+
+	@media (min-width: 768px) {
+		.contact-card {
+			padding: 4.5rem;
+		}
+	}
+
+	.text-outline {
+		color: transparent;
+		-webkit-text-stroke: 2px var(--color-ink);
+	}
+
+	.contact-spike {
+		position: absolute;
+		right: -40px;
+		bottom: -30px;
+		width: min(45vw, 420px);
+		height: auto;
+		opacity: 0.9;
+	}
+
+	@media (max-width: 767px) {
+		.contact-spike {
+			opacity: 0.25;
+		}
 	}
 </style>
+
+<script>
+	import { gsap } from "gsap";
+	import { ScrollTrigger } from "gsap/ScrollTrigger";
+	import laptopUrl from "../assets/3d/laptop.glb?url";
+	import type { LaptopState } from "../scripts/laptop-scene";
+
+	gsap.registerPlugin(ScrollTrigger);
+
+	const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+	/* ---------- HERO 3D ---------- */
+	const hero = document.getElementById("hero")!;
+	const stage = hero.querySelector<HTMLElement>(".hero-stage")!;
+	const canvas = document.getElementById("laptop-canvas") as HTMLCanvasElement;
+	const loader = document.getElementById("laptop-loader")!;
+
+	const state: LaptopState = reducedMotion
+		? { open: 1, rotY: -0.45, rotX: 0.05, offset: 1, screen: 1, zoom: 0, spin: 0 }
+		: { open: 0, rotY: -0.6, rotX: 0.12, offset: 1, screen: 0, zoom: 0, spin: 1 };
+
+	import("../scripts/laptop-scene")
+		.then(({ createLaptopScene }) => createLaptopScene(canvas, laptopUrl, state))
+		.then((scene) => {
+			// On ne dessine que lorsque le hero est à l'écran
+			new IntersectionObserver(([entry]) => (entry.isIntersecting ? scene.start() : scene.stop())).observe(stage);
+			loader.style.opacity = "0";
+			setTimeout(() => loader.remove(), 400);
+			gsap.to(canvas, { opacity: 1, duration: 1.2, ease: "power2.out" });
+			gsap.to(state, { spin: 0, duration: 2, ease: "expo.out" });
+		})
+		.catch((err) => {
+			console.error("Scène 3D indisponible :", err);
+			loader.remove();
+		});
+
+	if (!reducedMotion) {
+		// Intro du texte
+		gsap.from(".hero-eyebrow", { y: 20, opacity: 0, duration: 0.8, ease: "power3.out", delay: 0.1 });
+		gsap.from(".hero-title .line > span", {
+			yPercent: 110,
+			duration: 1.1,
+			ease: "power4.out",
+			stagger: 0.12,
+			delay: 0.2,
+		});
+		gsap.from(".hero-actions > *", { y: 30, opacity: 0, duration: 0.8, stagger: 0.12, delay: 0.7, ease: "power3.out" });
+		gsap.from(".scroll-hint", { opacity: 0, duration: 1, delay: 1.4 });
+
+		// Scroll : le texte s'efface, le PC pivote, s'ouvre, s'allume puis la caméra plonge dans l'écran
+		gsap.timeline({
+			defaults: { ease: "none" },
+			scrollTrigger: { trigger: hero, start: "top top", end: "bottom bottom", scrub: 1 },
+		})
+			.to(".hero-copy", { y: -120, opacity: 0, duration: 0.2, ease: "power2.in" }, 0)
+			.to(".scroll-hint", { opacity: 0, duration: 0.06 }, 0)
+			.to(state, { offset: 0, duration: 0.42, ease: "power2.inOut" }, 0.04)
+			.to(state, { rotY: 0, rotX: 0, duration: 0.45, ease: "power2.inOut" }, 0.04)
+			.to(state, { open: 1, duration: 0.4, ease: "power1.inOut" }, 0.12)
+			.to(state, { screen: 1, duration: 0.14 }, 0.4)
+			.to(state, { zoom: 1, duration: 0.36, ease: "power2.inOut" }, 0.56)
+			.to(".hero-progress span", { scaleY: 1, duration: 1 }, 0);
+	}
+
+	/* ---------- BANDEAU : vitesse et sens liés au scroll ---------- */
+	if (!reducedMotion) {
+		const loops = gsap.utils.toArray<HTMLElement>(".marquee-track").map((track) => {
+			const dir = Number(track.dataset.dir);
+			return gsap.fromTo(
+				track,
+				{ xPercent: dir > 0 ? -50 : 0 },
+				{ xPercent: dir > 0 ? 0 : -50, duration: 28, ease: "none", repeat: -1 },
+			);
+		});
+		ScrollTrigger.create({
+			trigger: ".marquees",
+			start: "top bottom",
+			end: "bottom top",
+			onUpdate(self) {
+				const boost = 1 + Math.min(Math.abs(self.getVelocity()) / 300, 4);
+				loops.forEach((loop) => {
+					loop.timeScale(boost);
+					gsap.to(loop, { timeScale: 1, duration: 1, ease: "power2.out", overwrite: true });
+				});
+			},
+		});
+	}
+
+	/* ---------- CARROUSEL DES PROJETS ---------- */
+	const carousel = document.querySelector<HTMLElement>(".carousel");
+	if (carousel) {
+		const items = carousel.querySelectorAll<HTMLElement>(".carousel-item");
+		const prev = document.querySelector<HTMLButtonElement>("[data-carousel-prev]");
+		const next = document.querySelector<HTMLButtonElement>("[data-carousel-next]");
+		const bar = document.querySelector<HTMLElement>(".carousel-progress span");
+
+		const step = () => (items[1] ? items[1].offsetLeft - items[0].offsetLeft : carousel.clientWidth);
+		prev?.addEventListener("click", () => carousel.scrollBy({ left: -step(), behavior: "smooth" }));
+		next?.addEventListener("click", () => carousel.scrollBy({ left: step(), behavior: "smooth" }));
+
+		function updateCarousel() {
+			const max = carousel!.scrollWidth - carousel!.clientWidth;
+			const ratio = max > 0 ? carousel!.scrollLeft / max : 1;
+			if (bar) bar.style.transform = `scaleX(${Math.max(ratio, 0.04)})`;
+			if (prev) prev.disabled = carousel!.scrollLeft < 4;
+			if (next) next.disabled = carousel!.scrollLeft > max - 4;
+		}
+		carousel.addEventListener("scroll", updateCarousel, { passive: true });
+		window.addEventListener("resize", updateCarousel);
+		updateCarousel();
+
+		// Glisser-déposer à la souris (le tactile utilise le défilement natif)
+		let startX = 0;
+		let startScroll = 0;
+		let pointerId: number | null = null;
+		carousel.addEventListener("pointerdown", (e) => {
+			if (e.pointerType !== "mouse" || e.button !== 0) return;
+			pointerId = e.pointerId;
+			startX = e.clientX;
+			startScroll = carousel.scrollLeft;
+		});
+		carousel.addEventListener("pointermove", (e) => {
+			if (e.pointerId !== pointerId) return;
+			const dx = e.clientX - startX;
+			if (!carousel.classList.contains("is-dragging") && Math.abs(dx) > 6) {
+				carousel.classList.add("is-dragging");
+				carousel.setPointerCapture(e.pointerId);
+			}
+			if (carousel.classList.contains("is-dragging")) carousel.scrollLeft = startScroll - dx;
+		});
+		const endDrag = () => {
+			if (pointerId === null) return;
+			pointerId = null;
+			if (!carousel.classList.contains("is-dragging")) return;
+			// Laisse le scroll-snap reprendre la main en douceur
+			const target = carousel.scrollLeft;
+			carousel.classList.remove("is-dragging");
+			carousel.scrollLeft = target;
+		};
+		carousel.addEventListener("pointerup", endDrag);
+		carousel.addEventListener("pointercancel", endDrag);
+
+		carousel.addEventListener("keydown", (e) => {
+			if (e.key === "ArrowRight") next?.click();
+			if (e.key === "ArrowLeft") prev?.click();
+		});
+
+		if (!reducedMotion) {
+			gsap.from(items, {
+				x: 120,
+				opacity: 0,
+				rotate: 4,
+				duration: 1,
+				ease: "power3.out",
+				stagger: 0.1,
+				scrollTrigger: { trigger: carousel, start: "top 85%", once: true },
+			});
+		}
+	}
+
+	/* ---------- QUI SUIS-JE ---------- */
+	if (!reducedMotion) {
+		// Découpe le texte en mots (en conservant les <strong>) pour une révélation au scroll
+		const textRoot = document.querySelector<HTMLElement>("[data-split-words]");
+		if (textRoot) {
+			const walker = document.createTreeWalker(textRoot, NodeFilter.SHOW_TEXT);
+			const nodes: Text[] = [];
+			while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+			nodes.forEach((node) => {
+				const frag = document.createDocumentFragment();
+				node.textContent!.split(/(\s+)/).forEach((part) => {
+					if (!part) return;
+					if (/^\s+$/.test(part)) frag.append(part);
+					else {
+						const span = document.createElement("span");
+						span.className = "word";
+						span.textContent = part;
+						frag.append(span);
+					}
+				});
+				node.replaceWith(frag);
+			});
+			gsap.fromTo(
+				textRoot.querySelectorAll(".word"),
+				{ opacity: 0.15 },
+				{
+					opacity: 1,
+					stagger: 0.05,
+					ease: "none",
+					scrollTrigger: { trigger: textRoot, start: "top 80%", end: "bottom 50%", scrub: true },
+				},
+			);
+		}
+
+		gsap.to(".about-badge", {
+			rotate: 360,
+			ease: "none",
+			scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: true },
+		});
+		gsap.fromTo(
+			".about-bubble",
+			{ yPercent: 15, scale: 0.8 },
+			{ yPercent: -10, scale: 1.1, ease: "none", scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: true } },
+		);
+		gsap.from(".about-character", {
+			y: 80,
+			opacity: 0,
+			duration: 1.1,
+			ease: "power3.out",
+			scrollTrigger: { trigger: ".about-visual", start: "top 80%", once: true },
+		});
+
+		/* ---------- CONTACT ---------- */
+		gsap.fromTo(
+			".contact-spike",
+			{ rotate: -25, xPercent: 20 },
+			{ rotate: 8, xPercent: 0, ease: "none", scrollTrigger: { trigger: "#contact", start: "top bottom", end: "bottom 60%", scrub: true } },
+		);
+		gsap.from(".contact-card .text-outline", {
+			xPercent: -25,
+			opacity: 0,
+			duration: 1.1,
+			ease: "power4.out",
+			scrollTrigger: { trigger: ".contact-card", start: "top 70%", once: true },
+		});
+	}
+</script>
