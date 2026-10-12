@@ -1,84 +1,189 @@
 ---
-import { skills, skillCategories } from "../data/skills";
+import { skills, skillCategories, type SkillCategory } from "../data/skills";
 
-const first = skills[0];
-const categoryLabels = (cats: readonly string[]) =>
-    cats.map((c) => skillCategories[c as keyof typeof skillCategories]).join(" · ");
+const intros: Record<SkillCategory, string> = {
+    design: "Logos, affiches, identités visuelles : la création graphique, c'est mon point de départ.",
+    web: "Des maquettes jusqu'au site en ligne, je conçois et j'intègre des interfaces soignées.",
+    communication: "Réseaux sociaux, supports imprimés, contenus : faire passer le bon message.",
+    audiovisuel: "Montage, rythme et habillage pour raconter une histoire en vidéo.",
+};
+
+// Un outil peut apparaître dans plusieurs catégories
+const groups = (Object.keys(skillCategories) as SkillCategory[]).map((key) => ({
+    key,
+    label: skillCategories[key],
+    intro: intros[key],
+    tools: skills.filter((s) => s.categories.includes(key)),
+}));
 ---
 
-<div class="skills grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-16 items-start">
-    <div>
-        <div class="flex flex-wrap gap-3 mb-8" role="group" aria-label="Filtrer par catégorie">
-            <button class="skill-filter is-active" data-filter="all" aria-pressed="true">Tout</button>
-            {
-                Object.entries(skillCategories).map(([key, label]) => (
-                    <button class="skill-filter" data-filter={key} aria-pressed="false">
-                        {label}
-                    </button>
-                ))
-            }
-        </div>
+<div class="skill-stack">
+    {
+        groups.map((group, i) => (
+            <article class:list={["skill-card", `skill-card--${group.key}`]} style={`--i: ${i}`}>
+                <span class="skill-card-tab" aria-hidden="true">{group.label}</span>
+                <header class="skill-card-head">
+                    <span class="skill-count">{group.tools.length} outils</span>
+                    <h3 class="skill-card-title text-3xl md:text-5xl leading-[1.05]">{group.label}</h3>
+                    <p class="skill-card-intro md:text-lg">{group.intro}</p>
+                </header>
 
-        <ul class="skill-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4">
-            {
-                skills.map((skill, i) => (
-                    <li data-categories={skill.categories.join(" ")}>
-                        <button
-                            class:list={["skill-tile", { "is-selected": i === 0 }]}
-                            aria-pressed={i === 0 ? "true" : "false"}
-                            data-name={skill.name}
-                            data-description={skill.description}
-                            data-logo={skill.logo.src}
-                            data-categories-label={categoryLabels(skill.categories)}
-                        >
-                            <img src={skill.logo.src} alt="" loading="lazy" class="h-10 w-10 md:h-12 md:w-12 object-contain" />
-                            <span class="text-[11px] md:text-xs leading-tight">{skill.name}</span>
-                        </button>
-                    </li>
-                ))
-            }
-        </ul>
-    </div>
-
-    <aside class="skill-detail lg:sticky lg:top-28" aria-live="polite">
-        <div class="flex items-center gap-4 mb-5">
-            <span class="skill-detail-logo">
-                <img id="skill-logo" src={first.logo.src} alt="" class="h-12 w-12 object-contain" />
-            </span>
-            <div>
-                <h3 id="skill-name" class="text-2xl md:text-3xl">{first.name}</h3>
-                <p id="skill-categories" class="text-sm font-semibold text-grape">
-                    {categoryLabels(first.categories)}
-                </p>
-            </div>
-        </div>
-        <p id="skill-description" class="leading-relaxed md:text-lg">{first.description}</p>
-    </aside>
+                <div class="skill-card-body">
+                    <ul class="skill-tools" aria-label={`Outils : ${group.label}`}>
+                        {group.tools.map((tool, j) => (
+                            <li>
+                                <button
+                                    class:list={["skill-tool", { "is-selected": j === 0 }]}
+                                    aria-pressed={j === 0 ? "true" : "false"}
+                                    data-name={tool.name}
+                                    data-description={tool.description}
+                                >
+                                    <img src={tool.logo.src} alt="" loading="lazy" class="h-9 w-9 md:h-11 md:w-11 object-contain" />
+                                    <span>{tool.name}</span>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                    <p class="skill-info" aria-live="polite">
+                        <strong class="skill-info-name">{group.tools[0].name}</strong>
+                        <span class="skill-info-text">{group.tools[0].description}</span>
+                    </p>
+                </div>
+            </article>
+        ))
+    }
 </div>
 
 <style>
-    .skill-filter {
-        padding: 8px 16px;
-        border: 3px solid var(--color-ink);
+    .skill-stack {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .skill-card {
+        display: grid;
+        gap: 2rem;
+        padding: 1.75rem;
+        border: 4px solid var(--color-ink);
         background: #fff;
-        font-size: 0.95rem;
-        transform: skewX(-12deg);
-        transition:
-            background-color 0.25s ease,
-            color 0.25s ease,
-            box-shadow 0.25s ease;
+        box-shadow: var(--shadow-brutal-lg);
+        transform-origin: 50% 0;
     }
 
-    .skill-filter:hover {
-        box-shadow: 4px 4px 0 var(--color-iris);
+    /* Sur grand écran, les cartes se collent et s'empilent les unes sur les autres */
+    @media (min-width: 768px) {
+        .skill-stack {
+            gap: 18vh;
+        }
+
+        /* Chaque carte se colle 3rem plus bas que la précédente : la bande visible
+           des cartes recouvertes sert d'onglet de classeur.
+           --stack-h (calculé en JS) raccourcit chaque carte de 3rem : tous les bas de carte
+           s'alignent, la pile se décroche donc d'un bloc au lieu de s'écraser */
+        .skill-card {
+            position: sticky;
+            top: calc(var(--header-h) + 1rem + var(--i) * 3rem);
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+            gap: 3rem;
+            padding: 3rem;
+            height: calc(var(--stack-h, auto) - var(--i) * 3rem);
+        }
+
+        /* Un élément vide après la dernière carte (et non un padding ou une marge, ignorés par
+           sticky) agrandit la zone où les cartes restent collées : le temps de voir la pile
+           complète avant qu'elle ne parte. 18vh d'écart de grille + 2vh = 20vh */
+        .skill-stack::after {
+            content: "";
+            height: 2vh;
+        }
     }
 
-    .skill-filter.is-active {
+    .skill-card--web {
+        background: var(--color-lilac);
+    }
+
+    .skill-card--communication {
         background: var(--color-ink);
         color: #fff;
+        box-shadow: 10px 10px 0 var(--color-iris);
     }
 
-    .skill-tile {
+    .skill-card--audiovisuel {
+        background:
+            radial-gradient(circle at 85% 15%, rgb(255 255 255 / 0.6), transparent 45%),
+            linear-gradient(135deg, var(--color-lilac) 0%, var(--color-iris) 100%);
+    }
+
+    /* Onglet révélé quand la carte passe sous la suivante */
+    .skill-card-tab {
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        .skill-card-tab {
+            position: absolute;
+            top: 0;
+            left: 3rem;
+            right: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: calc(3rem - 4px);
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .skill-card-tab::after {
+            content: "✦";
+            color: var(--color-iris);
+        }
+    }
+
+    .skill-card-head {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .skill-count {
+        padding: 3px 12px;
+        background: var(--color-ink);
+        color: #fff;
+        font-family: var(--font-heading);
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        transform: skewX(-12deg);
+    }
+
+    .skill-card--communication .skill-count {
+        background: var(--color-lilac);
+        color: var(--color-ink);
+    }
+
+    .skill-card-intro {
+        max-width: 32ch;
+        opacity: 0.85;
+    }
+
+    .skill-card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .skill-tools {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+        gap: 12px;
+    }
+
+    .skill-tool {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -89,8 +194,10 @@ const categoryLabels = (cats: readonly string[]) =>
         padding: 8px;
         border: 3px solid var(--color-ink);
         background: #fff;
-        font-family: var(--font-body);
+        color: var(--color-ink);
+        font-size: 0.75rem;
         font-weight: 600;
+        line-height: 1.15;
         cursor: pointer;
         transition:
             transform 0.25s ease,
@@ -98,40 +205,42 @@ const categoryLabels = (cats: readonly string[]) =>
             background-color 0.25s ease;
     }
 
-    .skill-tile:hover {
-        transform: translate(-3px, -3px);
-        box-shadow: 5px 5px 0 var(--color-ink);
-    }
-
-    .skill-tile img {
+    .skill-tool img {
         transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .skill-tile:hover img {
+    .skill-tool:hover,
+    .skill-tool.is-selected {
+        transform: translate(-3px, -3px);
+        box-shadow: 5px 5px 0 var(--color-ink);
+    }
+
+    .skill-tool:hover img {
         transform: scale(1.15) rotate(-6deg);
     }
 
-    .skill-tile.is-selected {
-        background: var(--color-lilac);
-        box-shadow: 5px 5px 0 var(--color-ink);
-        transform: translate(-3px, -3px);
+    .skill-tool.is-selected {
+        background: var(--color-lilac-soft);
     }
 
-    .skill-detail {
-        padding: 28px;
-        border: 3px solid var(--color-ink);
-        background: linear-gradient(160deg, #fff 30%, var(--color-lilac-soft));
-        box-shadow: var(--shadow-brutal-lg);
+    .skill-card--communication .skill-tool:hover,
+    .skill-card--communication .skill-tool.is-selected {
+        box-shadow: 5px 5px 0 var(--color-iris);
     }
 
-    .skill-detail-logo {
+    .skill-info {
         display: grid;
-        place-items: center;
-        flex-shrink: 0;
-        width: 72px;
-        height: 72px;
-        border: 3px solid var(--color-ink);
-        background: #fff;
+        gap: 6px;
+        min-height: 7.5em;
+        padding-top: 1.25rem;
+        border-top: 3px dashed currentColor;
+        line-height: 1.55;
+    }
+
+    .skill-info-name {
+        font-family: var(--font-heading);
+        font-weight: 400;
+        font-size: 1.25rem;
     }
 </style>
 
@@ -141,68 +250,76 @@ const categoryLabels = (cats: readonly string[]) =>
 
     gsap.registerPlugin(ScrollTrigger);
 
-    const root = document.querySelector<HTMLElement>(".skills");
-    if (root) {
-        const tiles = root.querySelectorAll<HTMLButtonElement>(".skill-tile");
-        const filters = root.querySelectorAll<HTMLButtonElement>(".skill-filter");
-        const items = root.querySelectorAll<HTMLElement>(".skill-grid > li");
-        const detail = root.querySelector<HTMLElement>(".skill-detail")!;
-        const logo = root.querySelector<HTMLImageElement>("#skill-logo")!;
-        const name = root.querySelector<HTMLElement>("#skill-name")!;
-        const cats = root.querySelector<HTMLElement>("#skill-categories")!;
-        const desc = root.querySelector<HTMLElement>("#skill-description")!;
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const cards = gsap.utils.toArray<HTMLElement>(".skill-card");
 
-        function select(tile: HTMLButtonElement) {
-            tiles.forEach((t) => {
-                t.classList.toggle("is-selected", t === tile);
-                t.setAttribute("aria-pressed", String(t === tile));
+    cards.forEach((card) => {
+        const tools = card.querySelectorAll<HTMLButtonElement>(".skill-tool");
+        const name = card.querySelector<HTMLElement>(".skill-info-name")!;
+        const text = card.querySelector<HTMLElement>(".skill-info-text")!;
+
+        function select(tool: HTMLButtonElement) {
+            if (tool.classList.contains("is-selected")) return;
+            tools.forEach((t) => {
+                t.classList.toggle("is-selected", t === tool);
+                t.setAttribute("aria-pressed", String(t === tool));
             });
-            const { name: n, description, logo: src, categoriesLabel } = tile.dataset;
-            gsap.timeline()
-                .to(detail.children, { opacity: 0, y: -8, duration: 0.15, stagger: 0.03 })
-                .add(() => {
-                    logo.src = src ?? "";
-                    name.textContent = n ?? "";
-                    cats.textContent = categoriesLabel ?? "";
-                    desc.textContent = description ?? "";
+            name.textContent = tool.dataset.name ?? "";
+            text.textContent = tool.dataset.description ?? "";
+            if (!reducedMotion) gsap.fromTo([name, text], { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, stagger: 0.05, ease: "power3.out" });
+        }
+
+        tools.forEach((tool) => {
+            tool.addEventListener("click", () => select(tool));
+            tool.addEventListener("pointerenter", (e) => e.pointerType === "mouse" && select(tool));
+            tool.addEventListener("focus", () => select(tool));
+        });
+    });
+
+    // Hauteur commune de la pile : la carte la plus haute (plus son décalage d'onglet) fixe la référence
+    const stack = document.querySelector<HTMLElement>(".skill-stack")!;
+    const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const setStackHeight = () => {
+        stack.style.removeProperty("--stack-h");
+        const h = Math.max(...cards.map((card, i) => card.offsetHeight + i * 3 * rem()));
+        stack.style.setProperty("--stack-h", `${h}px`);
+    };
+    gsap.matchMedia().add("(min-width: 768px)", () => {
+        setStackHeight();
+        ScrollTrigger.addEventListener("refreshInit", setStackHeight);
+        return () => {
+            ScrollTrigger.removeEventListener("refreshInit", setStackHeight);
+            stack.style.removeProperty("--stack-h");
+        };
+    });
+
+    if (!reducedMotion) {
+        cards.forEach((card, i) => {
+            // Entrée : la carte se redresse et ses outils apparaissent en cascade
+            gsap.timeline({ scrollTrigger: { trigger: card, start: "top 80%", once: true } })
+                .from(card, { y: 80, rotate: i % 2 ? 3 : -3, opacity: 0, duration: 0.9, ease: "power3.out" })
+                .from(card.querySelectorAll(".skill-tools > li"), { scale: 0.6, opacity: 0, duration: 0.45, stagger: 0.04, ease: "back.out(1.8)" }, "-=0.45");
+
+            const next = cards[i + 1];
+            if (!next) return;
+            const last = cards[cards.length - 1];
+
+            gsap.matchMedia().add("(min-width: 768px)", () => {
+                // Recouverte par la suivante, la carte efface son contenu et ne montre plus que son onglet
+                gsap.timeline({
+                    defaults: { ease: "none" },
+                    scrollTrigger: { trigger: next, start: "top 85%", end: "top 45%", scrub: true },
                 })
-                .fromTo(detail.children, { y: 12 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.05, ease: "power3.out" });
-        }
+                    .to(card.querySelectorAll(".skill-card-head, .skill-card-body"), { opacity: 0, y: -20, duration: 0.6 }, 0)
+                    .to(card.querySelector(".skill-card-tab"), { opacity: 1, duration: 0.4 }, 0.6);
 
-        tiles.forEach((tile) => tile.addEventListener("click", () => select(tile)));
-
-        filters.forEach((btn) =>
-            btn.addEventListener("click", () => {
-                const filter = btn.dataset.filter!;
-                filters.forEach((b) => {
-                    b.classList.toggle("is-active", b === btn);
-                    b.setAttribute("aria-pressed", String(b === btn));
+                // Plus la carte est loin dans la pile, plus elle recule : effet de profondeur régulier
+                gsap.to(card, {
+                    scale: 1 - (cards.length - 1 - i) * 0.035,
+                    ease: "none",
+                    scrollTrigger: { trigger: next, start: "top bottom", endTrigger: last, end: "top 40%", scrub: true },
                 });
-                const visible: HTMLElement[] = [];
-                items.forEach((item) => {
-                    const show = filter === "all" || item.dataset.categories!.split(" ").includes(filter);
-                    item.hidden = !show;
-                    if (show) visible.push(item);
-                });
-                gsap.fromTo(
-                    visible,
-                    { opacity: 0, scale: 0.85 },
-                    { opacity: 1, scale: 1, duration: 0.4, stagger: 0.03, ease: "back.out(1.7)" },
-                );
-            }),
-        );
-
-        // Entrée des tuiles au scroll
-        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            gsap.from(items, {
-                opacity: 0,
-                y: 30,
-                scale: 0.9,
-                duration: 0.6,
-                ease: "back.out(1.6)",
-                stagger: { each: 0.035, from: "start" },
-                scrollTrigger: { trigger: root, start: "top 80%", once: true },
             });
-        }
+        });
     }
 </script>

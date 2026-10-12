@@ -26,6 +26,28 @@ const marqueeItems = [
 	"Motion & vidéo",
 ];
 
+const steps = [
+	{
+		title: "Comprendre",
+		text: "J'écoute, je questionne, j'analyse : le public, le message, les contraintes. Un bon design commence par un bon brief.",
+		tags: ["Brief", "Recherche", "Benchmark"],
+	},
+	{
+		title: "Imaginer",
+		text: "Moodboards, croquis, pistes graphiques. J'explore plusieurs directions avant d'en retenir une.",
+		tags: ["Moodboard", "Croquis", "Concepts"],
+	},
+	{
+		title: "Concevoir",
+		text: "Identité, maquettes, intégration : la piste choisie prend forme sur Figma, Illustrator ou directement en code.",
+		tags: ["Figma", "Illustrator", "Astro"],
+	},
+	{
+		title: "Livrer",
+		text: "Fichiers propres, site en ligne, supports imprimés : le projet est prêt à vivre, et à être raconté.",
+		tags: ["Export", "Mise en ligne", "Suivi"],
+	},
+];
 ---
 
 <Layout title="Titouan Winkel - Designer web">
@@ -102,60 +124,100 @@ const marqueeItems = [
 			}
 		</section>
 
-		<!-- PROJETS -->
-		<section id="projets" class="container mx-auto px-4 md:px-6 py-10 md:py-20">
-			<div class="flex flex-wrap items-end justify-between gap-6">
-				<div>
-					<SectionTitle text="Mes projets" />
-					<p class="max-w-md text-lg -mt-4" data-reveal>
-						Une sélection de travaux en identité visuelle, print et web.
-					</p>
-				</div>
-				{
-					projets.length > 1 && (
-						<div class="carousel-nav flex gap-3" data-reveal>
-							<button class="carousel-btn" data-carousel-prev aria-label="Projet précédent">
-								<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="square" /></svg>
-							</button>
-							<button class="carousel-btn" data-carousel-next aria-label="Projet suivant">
-								<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square" /></svg>
-							</button>
+		<!-- MA MÉTHODE : défilement horizontal piloté par le scroll -->
+		<section id="methode" class="method">
+			<div class="method-stage">
+				<div class="method-inner">
+					<div class="method-track">
+						<div class="method-intro">
+							<SectionTitle text="Ma méthode" />
+							<p class="method-lead text-3xl md:text-4xl leading-tight">
+								De l'idée au projet,<br />en <span class="method-hl">quatre étapes.</span>
+							</p>
 						</div>
-					)
-				}
-			</div>
-
-			{
-				projets.length > 0 ? (
-					<div class="carousel scrollbar-hide mt-6" tabindex="0" aria-label="Carrousel des projets">
-						<ul class="carousel-track">
-							{projets.map((projet) => (
-								<li class="carousel-item">
-									<ProjectCard
-										href={`/projets/${projet.id}`}
-										project={projet}
-										imageUrl={getCoverUrl(projet)}
-									/>
+						<ol class="method-steps">
+							{steps.map((step) => (
+								<li class="step">
+									<h3 class="step-title text-3xl md:text-4xl">{step.title}</h3>
+									<p class="step-text md:text-lg leading-relaxed">{step.text}</p>
+									<ul class="step-tags">
+										{step.tags.map((tag) => <li>{tag}</li>)}
+									</ul>
 								</li>
 							))}
-						</ul>
+						</ol>
 					</div>
-				) : (
-					<p class="mt-10 text-center text-lg opacity-70">Les projets arrivent très bientôt.</p>
-				)
-			}
 
-			<div class="mt-6 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
-				<SkewButton href="/projets" icon="arrow">Voir tous les projets</SkewButton>
-				{projets.length > 1 && (
-					<div class="carousel-progress w-full md:flex-1" aria-hidden="true"><span></span></div>
-				)}
+					<div class="method-progress" aria-hidden="true"><span></span></div>
+				</div>
 			</div>
 		</section>
 
-		<!-- COMPÉTENCES -->
+		<!-- MES PROJETS : le scroll ouvre le booster et distribue les cartes -->
+		<section id="projets" class="projects">
+			<div class="projects-stage container mx-auto px-4 md:px-6">
+				<div class="flex flex-wrap items-end justify-between gap-6">
+					<SectionTitle text="Mes projets" />
+					{
+						projets.length > 1 && (
+							<div class="carousel-nav flex gap-3 mb-8">
+								<button class="carousel-btn" data-carousel-prev aria-label="Projet précédent">
+									<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="square" /></svg>
+								</button>
+								<button class="carousel-btn" data-carousel-next aria-label="Projet suivant">
+									<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square" /></svg>
+								</button>
+							</div>
+						)
+					}
+				</div>
+
+				{
+					projets.length > 0 ? (
+						<div class="carousel-stage relative">
+							<div class="carousel scrollbar-hide" tabindex="0" aria-label="Carrousel des projets">
+								<ul class="carousel-track">
+									{projets.map((projet) => (
+										<li class="carousel-item">
+											<ProjectCard
+												href={`/projets/${projet.id}`}
+												project={projet}
+												imageUrl={getCoverUrl(projet)}
+											/>
+										</li>
+									))}
+								</ul>
+							</div>
+
+							<!-- Booster d'où sortent les cartes au fil du scroll -->
+							<div class="booster" aria-hidden="true">
+								<span class="booster-flash"></span>
+								<div class="booster-top"><span class="booster-crimp"></span></div>
+								<div class="booster-body">
+									<img src="/logo_perso.svg" alt="" class="booster-logo" draggable="false" />
+									<span class="booster-title">Mes projets</span>
+									<span class="booster-count">{projets.length} cartes</span>
+								</div>
+								<span class="booster-crimp booster-crimp-bottom"></span>
+							</div>
+						</div>
+					) : (
+						<p class="mt-10 text-center text-lg opacity-70">Les projets arrivent très bientôt.</p>
+					)
+				}
+
+				<div class="projects-footer mt-6 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
+					<SkewButton href="/projets" icon="arrow">Voir tous les projets</SkewButton>
+					{projets.length > 1 && (
+						<div class="carousel-progress w-full md:flex-1" aria-hidden="true"><span></span></div>
+					)}
+				</div>
+			</div>
+		</section>
+
+		<!-- MES COMPÉTENCES -->
 		<section id="competences" class="container mx-auto px-4 md:px-6 py-16 md:py-24">
-			<SectionTitle text="Compétences" />
+			<SectionTitle text="Mes compétences" />
 			<Skills />
 		</section>
 
@@ -435,6 +497,182 @@ const marqueeItems = [
 		color: var(--color-ink);
 	}
 
+	/* ---------- MA MÉTHODE ---------- */
+	.method-inner {
+		padding: 5rem 0 4rem;
+		overflow: hidden;
+		background: var(--color-ink);
+		color: #fff;
+	}
+
+	/* Le crochet du titre est noir : on l'inverse sur fond sombre */
+	.method :global([data-bracket]) {
+		filter: invert(1);
+	}
+
+	.method-lead {
+		font-family: var(--font-heading);
+	}
+
+	.method-hl {
+		position: relative;
+		display: inline-block;
+		padding: 0 0.15em;
+		color: var(--color-ink);
+		isolation: isolate;
+	}
+
+	.method-hl::before {
+		content: "";
+		position: absolute;
+		inset: 0.08em 0 0.02em;
+		z-index: -1;
+		background: var(--color-lilac);
+		transform: skewX(-15deg);
+	}
+
+	.method-track {
+		display: grid;
+		gap: 2.5rem;
+		max-width: 1280px;
+		margin: 0 auto;
+		padding: 0 1rem;
+	}
+
+	.method-steps {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	@media (min-width: 768px) {
+		.method-track {
+			padding: 0 1.5rem;
+		}
+
+		.method-steps {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		/* Avec animations : la frise défile horizontalement, scène collée à l'écran */
+		:global(.js-motion) .method {
+			height: 400vh;
+		}
+
+		:global(.js-motion) .method-stage {
+			position: sticky;
+			top: 0;
+			height: 100svh;
+		}
+
+		:global(.js-motion) .method-inner {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			height: 100%;
+			padding: var(--header-h) 0 3rem;
+		}
+
+		:global(.js-motion) .method-track {
+			display: flex;
+			align-items: center;
+			gap: 4rem;
+			width: max-content;
+			max-width: none;
+			margin: 0;
+			padding-inline: max(1.5rem, calc(50vw - 616px)) 12vw;
+		}
+
+		:global(.js-motion) .method-intro {
+			width: max(360px, 34vw);
+		}
+
+		:global(.js-motion) .method-steps {
+			display: flex;
+			gap: 2rem;
+		}
+
+		:global(.js-motion) .step {
+			width: 380px;
+			min-height: min(400px, 56svh);
+		}
+	}
+
+	.step {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 2rem;
+		border: 3px solid #fff;
+		background: rgb(255 255 255 / 0.04);
+		box-shadow: 8px 8px 0 var(--color-iris);
+	}
+
+	.step-title {
+		color: var(--color-lilac);
+	}
+
+	.step-text {
+		color: rgb(255 255 255 / 0.8);
+	}
+
+	.step-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: auto;
+		padding-top: 1rem;
+	}
+
+	.step-tags li {
+		padding: 2px 10px;
+		border: 2px solid var(--color-lilac);
+		font-size: 0.85rem;
+		font-weight: 600;
+		transform: skewX(-12deg);
+	}
+
+	.method-progress {
+		display: none;
+	}
+
+	@media (min-width: 768px) {
+		:global(.js-motion) .method-progress {
+			display: block;
+			width: min(1232px, calc(100% - 3rem));
+			height: 4px;
+			margin: 3rem auto 0;
+			background: rgb(255 255 255 / 0.15);
+		}
+	}
+
+	.method-progress span {
+		display: block;
+		height: 100%;
+		background: var(--color-lilac);
+		transform: scaleX(0);
+		transform-origin: left;
+	}
+
+	/* ---------- MES PROJETS ---------- */
+	.projects-stage {
+		padding-block: 4rem 5rem;
+	}
+
+	/* Avec animations : la scène reste collée le temps que le scroll ouvre le booster */
+	:global(.js-motion) .projects {
+		height: 340vh;
+	}
+
+	:global(.js-motion) .projects-stage {
+		position: sticky;
+		top: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		height: 100svh;
+		padding-block: var(--header-h) 1.5rem;
+	}
+
 	/* ---------- CARROUSEL ---------- */
 	/* Déborde jusqu'au bord droit de l'écran */
 	.carousel {
@@ -472,8 +710,154 @@ const marqueeItems = [
 	}
 
 	.carousel-item {
+		position: relative;
 		width: min(78vw, 320px);
 		scroll-snap-align: start;
+	}
+
+	/* Pendant l'ouverture, les cartes doivent pouvoir sortir du cadre du carrousel */
+	.carousel-stage.is-opening .carousel {
+		overflow: visible;
+		pointer-events: none;
+	}
+
+	/* Reflet holographique quand une carte atterrit */
+	.carousel-item.is-foil::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		pointer-events: none;
+		background: linear-gradient(
+			115deg,
+			transparent 35%,
+			rgb(255 255 255 / 0.85) 46%,
+			rgb(213 185 255 / 0.7) 50%,
+			rgb(169 131 226 / 0.5) 54%,
+			transparent 65%
+		);
+		background-size: 300% 100%;
+		mix-blend-mode: soft-light;
+		animation: foil 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+	}
+
+	@keyframes foil {
+		from {
+			background-position: 100% 0;
+		}
+		to {
+			background-position: 0 0;
+			opacity: 0;
+		}
+	}
+
+	/* ---------- BOOSTER ---------- */
+	.booster {
+		display: none;
+		position: absolute;
+		left: 50%;
+		top: 45%;
+		z-index: 10;
+		width: 220px;
+		height: 330px;
+		pointer-events: none;
+		filter: drop-shadow(10px 10px 0 var(--color-ink));
+	}
+
+	.carousel-stage.has-booster .booster {
+		display: block;
+	}
+
+	.booster-top,
+	.booster-body,
+	.booster-crimp-bottom {
+		position: absolute;
+		left: 0;
+		right: 0;
+		border: 3px solid var(--color-ink);
+	}
+
+	.booster-top {
+		top: 0;
+		height: 46px;
+		border-bottom-style: dashed;
+		background: linear-gradient(90deg, var(--color-iris), var(--color-lilac), var(--color-iris));
+	}
+
+	.booster-body {
+		top: 43px;
+		bottom: 22px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 14px;
+		padding: 20px 16px;
+		overflow: hidden;
+		background:
+			linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.7) 45%, transparent 60%) 0 0 / 300% 100%,
+			linear-gradient(160deg, var(--color-lilac-soft) 0%, #fff 25%, var(--color-iris) 55%, var(--color-lilac) 75%, var(--color-grape) 100%);
+		border-top: 0;
+		animation: booster-shine 2.4s linear infinite;
+	}
+
+	@keyframes booster-shine {
+		from {
+			background-position: 100% 0, 0 0;
+		}
+		to {
+			background-position: -200% 0, 0 0;
+		}
+	}
+
+	/* Bords sertis du sachet */
+	.booster-crimp {
+		position: absolute;
+		inset: 6px 0 auto;
+		height: 18px;
+		background: repeating-linear-gradient(90deg, rgb(11 7 16 / 0.35) 0 2px, transparent 2px 7px);
+	}
+
+	.booster-crimp-bottom {
+		inset: auto 0 0;
+		height: 25px;
+		background:
+			repeating-linear-gradient(90deg, rgb(11 7 16 / 0.35) 0 2px, transparent 2px 7px) center / 100% 14px no-repeat,
+			linear-gradient(90deg, var(--color-iris), var(--color-lilac), var(--color-iris));
+	}
+
+	.booster-logo {
+		width: 80%;
+	}
+
+	.booster-title {
+		font-family: var(--font-heading);
+		font-size: 1.6rem;
+		line-height: 1.05;
+		text-align: center;
+		text-transform: uppercase;
+	}
+
+	.booster-count {
+		padding: 4px 12px;
+		background: var(--color-ink);
+		color: #fff;
+		font-family: var(--font-heading);
+		font-size: 0.8rem;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+	}
+
+	.booster-flash {
+		position: absolute;
+		left: 50%;
+		top: 46px;
+		width: 260px;
+		height: 260px;
+		margin: -130px 0 0 -130px;
+		border-radius: 9999px;
+		background: radial-gradient(circle, #fff 0%, rgb(213 185 255 / 0.8) 35%, transparent 70%);
+		opacity: 0;
 	}
 
 	.carousel-btn {
@@ -662,16 +1046,150 @@ const marqueeItems = [
 			if (e.key === "ArrowLeft") prev?.click();
 		});
 
-		if (!reducedMotion) {
-			gsap.from(items, {
-				x: 120,
-				opacity: 0,
-				rotate: 4,
-				duration: 1,
-				ease: "power3.out",
-				stagger: 0.1,
-				scrollTrigger: { trigger: carousel, start: "top 85%", once: true },
+		/* Booster piloté par le scroll : il arrive, tremble, se déchire puis distribue les cartes.
+		   La scène reste collée à l'écran ; remonter la page range les cartes dans le sachet. */
+		const section = document.querySelector<HTMLElement>(".projects");
+		const stage = carousel.closest<HTMLElement>(".carousel-stage");
+		const booster = stage?.querySelector<HTMLElement>(".booster");
+		if (!reducedMotion && section && stage && booster && items.length) {
+			const top = booster.querySelector(".booster-top")!;
+			const flash = booster.querySelector(".booster-flash")!;
+			const footer = section.querySelector(".projects-footer")!;
+
+			stage.classList.add("has-booster", "is-opening");
+			carousel.scrollLeft = 0;
+			gsap.set(booster, { xPercent: -50, yPercent: -50 });
+
+			// Écart entre le centre du sachet et la place finale d'une carte (mesures de mise en page, sans transformations)
+			const dx = (item: HTMLElement) => booster.offsetLeft - (item.offsetLeft + item.offsetWidth / 2);
+			const dy = (item: HTMLElement) => booster.offsetTop - (item.offsetTop + item.offsetHeight / 2);
+			const rise = () => booster.offsetHeight * 0.85;
+
+			// Le carrousel ne redevient manipulable qu'une fois toutes les cartes posées
+			let dealt = false;
+			const setDealt = (value: boolean) => {
+				if (value === dealt) return;
+				dealt = value;
+				stage.classList.toggle("is-opening", !value);
+				if (!value) carousel.scrollLeft = 0;
+				updateCarousel();
+			};
+
+			const tl = gsap.timeline({
+				defaults: { ease: "none" },
+				onUpdate: () => setDealt(tl.progress() === 1),
+				scrollTrigger: { trigger: section, start: "top top", end: "bottom bottom", scrub: 0.8, invalidateOnRefresh: true },
 			});
+
+			tl.fromTo(
+				booster,
+				{ autoAlpha: 0, y: 260, scale: 0.6, rotate: -18 },
+				{ autoAlpha: 1, y: 0, scale: 1, rotate: 0, duration: 1, ease: "power2.out" },
+			)
+				.to(booster, { keyframes: { rotate: [0, -5, 5, -5, 5, -3, 0], scale: [1, 1.02, 1.03, 1.05, 1.06, 1.07, 1.08] }, duration: 0.8 })
+				.addLabel("tear")
+				.to(top, { x: 150, y: -110, rotate: 32, autoAlpha: 0, duration: 0.8, ease: "power2.out" }, "tear")
+				.fromTo(flash, { scale: 0.2, autoAlpha: 1 }, { scale: 2.2, autoAlpha: 0, duration: 0.8, ease: "power2.out" }, "tear")
+				.to(booster, { scale: 1, duration: 0.4 }, "tear")
+				.addLabel("deal", "tear+=0.3");
+
+			items.forEach((item, i) => {
+				const at = `deal+=${i * 0.45}`;
+				// La carte sort du sachet par le haut, puis file vers sa place avec un reflet holographique
+				tl.fromTo(
+					item,
+					{ x: () => dx(item), y: () => dy(item) + 30, scale: 0.42, rotate: gsap.utils.random(-12, 12), autoAlpha: 0 },
+					{ y: () => dy(item) - rise(), rotate: gsap.utils.random(-6, 6), autoAlpha: 1, duration: 0.5, ease: "power2.out" },
+					at,
+				).to(
+					item,
+					{
+						x: 0,
+						y: 0,
+						scale: 1,
+						rotate: 0,
+						duration: 1,
+						ease: "power3.inOut",
+						onStart: () => item.classList.remove("is-foil"),
+						onComplete: () => item.classList.add("is-foil"),
+						onReverseComplete: () => item.classList.remove("is-foil"),
+					},
+					`${at}+0.5`,
+				);
+			});
+
+			// Le sachet vide tombe une fois la dernière carte sortie, puis le bas de section apparaît
+			tl.to(
+				booster,
+				{ y: 220, rotate: -14, scale: 0.8, autoAlpha: 0, duration: 0.8, ease: "power2.in" },
+				`deal+=${(items.length - 1) * 0.45 + 0.5}`,
+			)
+				.fromTo(footer, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, ">-0.2")
+				.to({}, { duration: 0.6 }); // temps de pause avant de quitter la section
 		}
+	}
+
+	/* ---------- MA MÉTHODE : la frise défile à l'horizontale ---------- */
+	if (!reducedMotion) {
+		const method = document.querySelector<HTMLElement>(".method")!;
+		const methodTrack = method.querySelector<HTMLElement>(".method-track")!;
+
+		// La scène sombre s'ouvre en grandissant jusqu'aux bords de l'écran
+		gsap.fromTo(
+			".method-inner",
+			{ clipPath: "inset(12% 8% 0% 8%)" },
+			{ clipPath: "inset(0% 0% 0% 0%)", ease: "none", scrollTrigger: { trigger: method, start: "top bottom", end: "top top", scrub: true } },
+		);
+
+		const mm = gsap.matchMedia();
+		mm.add("(min-width: 768px)", () => {
+			const distance = () => Math.max(methodTrack.scrollWidth - window.innerWidth, 0);
+			// La hauteur de la section correspond à la longueur de la frise à parcourir
+			const setHeight = () => (method.style.height = `${window.innerHeight + distance()}px`);
+			setHeight();
+			ScrollTrigger.addEventListener("refreshInit", setHeight);
+
+			const scroll = gsap.to(methodTrack, {
+				x: () => -distance(),
+				ease: "none",
+				scrollTrigger: { trigger: method, start: "top top", end: "bottom bottom", scrub: 0.8, invalidateOnRefresh: true },
+			});
+			gsap.to(".method-progress span", {
+				scaleX: 1,
+				ease: "none",
+				scrollTrigger: { trigger: method, start: "top top", end: "bottom bottom", scrub: 0.8 },
+			});
+
+			// Les étapes hors écran arrivent inclinées puis se redressent
+			method.querySelectorAll<HTMLElement>(".step").forEach((step) => {
+				if (step.getBoundingClientRect().left < window.innerWidth) return;
+				gsap.from(step, {
+					rotate: 8,
+					yPercent: 18,
+					scale: 0.85,
+					opacity: 0.2,
+					ease: "power2.out",
+					scrollTrigger: { trigger: step, containerAnimation: scroll, start: "left right", end: "left 55%", scrub: true },
+				});
+			});
+
+			return () => {
+				ScrollTrigger.removeEventListener("refreshInit", setHeight);
+				method.style.height = "";
+			};
+		});
+
+		mm.add("(max-width: 767px)", () => {
+			method.querySelectorAll<HTMLElement>(".step").forEach((step) => {
+				gsap.from(step, {
+					y: 60,
+					rotate: 3,
+					opacity: 0,
+					duration: 0.8,
+					ease: "power3.out",
+					scrollTrigger: { trigger: step, start: "top 88%", once: true },
+				});
+			});
+		});
 	}
 </script>
