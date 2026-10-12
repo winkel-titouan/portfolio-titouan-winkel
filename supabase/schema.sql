@@ -7,17 +7,12 @@ create table if not exists public.projets (
     nom text not null,
     couleur text,                                       -- couleur hexadécimale du projet, ex. #6BD5D5
     description text,                                   -- résumé court (cartes, balise meta)
-    introduction text,
     competences text[] not null default '{}',           -- ids des outils, voir src/data/skills.ts
     visuels text[] not null default '{}',               -- visuels finaux ; le premier sert de couverture
     lien_site text,                                     -- lien vers le site ou l'application en ligne
     a_la_une boolean not null default false,            -- affiché dans le carrousel de l'accueil
-    inspirations_texte text,
-    inspirations_images text[] not null default '{}',
-    logo_avant text,
-    logo_avant_texte text,
-    logo_apres text,                                    -- logo affiché en tête de la page projet
-    logo_apres_texte text,
+    inspirations text[] not null default '{}',          -- images de la section inspirations
+    logo text,                                          -- logo affiché en tête de la page projet
     created_at timestamptz not null default now(),      -- sert aussi à l'ordre et à l'année affichée
     updated_at timestamptz not null default now()
 );

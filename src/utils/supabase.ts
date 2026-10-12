@@ -14,17 +14,12 @@ export interface Projet {
     nom: string;
     couleur: string | null;
     description: string | null;
-    introduction?: string | null;
     competences?: string[];
     visuels: string[];
     lien_site?: string | null;
     a_la_une?: boolean;
-    inspirations_texte?: string | null;
-    inspirations_images?: string[];
-    logo_avant?: string | null;
-    logo_avant_texte?: string | null;
-    logo_apres?: string | null;
-    logo_apres_texte?: string | null;
+    inspirations?: string[];
+    logo?: string | null;
     created_at?: string;
     updated_at?: string;
 }

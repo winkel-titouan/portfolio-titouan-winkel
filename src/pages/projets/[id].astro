@@ -40,8 +40,8 @@ const year = project.created_at ? new Date(project.created_at).getFullYear() : u
 
 const file = (name: string) => getFileUrl(project.id, name);
 const finals = (project.visuels ?? []).map(file);
-const inspirations = (project.inspirations_images ?? []).map(file);
-const logoUrl = project.logo_apres ? file(project.logo_apres) : undefined;
+const inspirations = (project.inspirations ?? []).map(file);
+const logoUrl = project.logo ? file(project.logo) : undefined;
 const siteUrl = project.lien_site;
 
 // Taille de départ du titre (la police fait environ 1em par lettre), affinée ensuite en JS pour tenir dans le hero
