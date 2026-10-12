@@ -2,22 +2,22 @@
 import Layout from "../../layouts/Layout.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import ContactCta from "../../components/ContactCta.astro";
-import { pb, getCoverUrl, getFileUrl, type Projet } from "../../utils/pb";
+import { supabase, getCoverUrl, getFileUrl, type Projet } from "../../utils/supabase";
 
 let projets: Projet[] = [];
 let errorMessage = "";
 
 try {
-	projets = await pb.collection("projets").getFullList<Projet>({
-		sort: "-created",
-	});
+	const { data, error } = await supabase.from("projets").select("*").order("created_at", { ascending: false });
+	if (error) throw error;
+	projets = data;
 } catch (error: unknown) {
 	errorMessage = "Les projets n'ont pas pu être chargés. Réessayez dans quelques instants.";
 	console.error("Erreur lors de la récupération des projets:", error);
 }
 
 // Visuels de production finale de chaque projet, pour le panneau d'aperçu
-const visualsOf = (projet: Projet) => (projet.prod_finale ?? []).map((file) => getFileUrl(projet.id, file));
+const visualsOf = (projet: Projet) => (projet.visuels ?? []).map((file) => getFileUrl(projet.id, file));
 const first = projets[0];
 const firstVisuals = first ? visualsOf(first) : [];
 ---
@@ -76,7 +76,7 @@ const firstVisuals = first ? visualsOf(first) : [];
 
 								<a id="preview-stage" href={`/projets/${first.id}`} class="preview-stage" tabindex="-1">
 									{firstVisuals.length > 0 ? (
-										<img id="preview-img" src={firstVisuals[0]} alt={`${first.nom_projet}, visuel 1`} />
+										<img id="preview-img" src={firstVisuals[0]} alt={`${first.nom}, visuel 1`} />
 									) : (
 										<img id="preview-img" alt="" hidden />
 									)}
@@ -94,7 +94,7 @@ const firstVisuals = first ? visualsOf(first) : [];
 								</div>
 
 								<div class="preview-foot">
-									<h2 id="preview-title" class="text-2xl xl:text-3xl leading-tight">{first.nom_projet}</h2>
+									<h2 id="preview-title" class="text-2xl xl:text-3xl leading-tight">{first.nom}</h2>
 									<a id="preview-link" href={`/projets/${first.id}`} class="preview-cta">
 										Voir le projet
 										<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
@@ -122,9 +122,9 @@ const firstVisuals = first ? visualsOf(first) : [];
 							projets.map((projet, i) => (
 								<li
 									class:list={["project-item", { "is-previewed": i === 0 }]}
-									data-created={projet.created}
+									data-created={projet.created_at}
 									data-id={projet.id}
-									data-name={projet.nom_projet}
+									data-name={projet.nom}
 									data-visuals={JSON.stringify(visualsOf(projet))}
 								>
 									<ProjectCard href={`/projets/${projet.id}`} project={projet} imageUrl={getCoverUrl(projet)} showCta={false} />

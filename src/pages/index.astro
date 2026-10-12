@@ -6,13 +6,13 @@ import SkewButton from "../components/SkewButton.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import ContactCta from "../components/ContactCta.astro";
 import laptopUrl from "../assets/3d/laptop.glb?url";
-import { pb, getCoverUrl, type Projet } from "../utils/pb";
+import { supabase, getCoverUrl, type Projet } from "../utils/supabase";
 
 let projets: Projet[] = [];
 try {
-	projets = await pb.collection("projets").getFullList<Projet>({
-		filter: "caroussel = true",
-	});
+	const { data, error } = await supabase.from("projets").select("*").eq("a_la_une", true).order("created_at");
+	if (error) throw error;
+	projets = data;
 } catch (error) {
 	console.error("Erreur lors de la récupération des projets:", error);
 }

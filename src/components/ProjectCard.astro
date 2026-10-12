@@ -3,9 +3,9 @@ interface Props {
     href: string;
     project: {
         id: string;
-        nom_projet: string;
+        nom: string;
         description?: string;
-        created?: string;
+        created_at?: string;
     };
     imageUrl?: string;
     /** Affiche le bouton « Voir le projet » en bas de la carte */
@@ -18,8 +18,8 @@ const { href, project, imageUrl, showCta = true } = Astro.props;
 <a
     href={href}
     class="project-card-link group block h-full"
-    data-name={(project.nom_projet || "").toLowerCase()}
-    data-created={project.created}
+    data-name={(project.nom || "").toLowerCase()}
+    data-created={project.created_at}
 >
     <article class="project-card relative h-full flex flex-col">
         <span class="corner corner-tl" aria-hidden="true"></span>
@@ -30,7 +30,7 @@ const { href, project, imageUrl, showCta = true } = Astro.props;
                 imageUrl ? (
                     <img
                         src={imageUrl}
-                        alt={project.nom_projet}
+                        alt={project.nom}
                         loading="lazy"
                         decoding="async"
                         draggable="false"
@@ -38,14 +38,14 @@ const { href, project, imageUrl, showCta = true } = Astro.props;
                     />
                 ) : (
                     <span class="card-placeholder" aria-hidden="true">
-                        {project.nom_projet?.charAt(0)}
+                        {project.nom?.charAt(0)}
                     </span>
                 )
             }
         </div>
 
         <div class="flex flex-1 flex-col items-center text-center gap-3 px-6 pt-5 pb-6">
-            <h3 class="text-2xl leading-tight">{project.nom_projet}</h3>
+            <h3 class="text-2xl leading-tight">{project.nom}</h3>
             {project.description && <p class="leading-relaxed line-clamp-3">{project.description}</p>}
             {
                 showCta && (

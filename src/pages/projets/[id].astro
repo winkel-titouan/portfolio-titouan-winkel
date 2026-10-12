@@ -4,17 +4,20 @@ export const prerender = false;
 import Layout from "../../layouts/Layout.astro";
 import SkewButton from "../../components/SkewButton.astro";
 import ContactCta from "../../components/ContactCta.astro";
-import { pb, getFileUrl, type Projet } from "../../utils/pb";
+import { supabase, getFileUrl, type Projet } from "../../utils/supabase";
 
 const { id = "" } = Astro.params;
 
 let project: Projet;
-let allProjects: Pick<Projet, "id" | "nom_projet" | "created">[] = [];
+let allProjects: Pick<Projet, "id" | "nom" | "created_at">[] = [];
 try {
-	[project, allProjects] = await Promise.all([
-		pb.collection("projets").getOne<Projet>(id),
-		pb.collection("projets").getFullList<Projet>({ sort: "created", fields: "id,nom_projet,created" }),
+	const [one, all] = await Promise.all([
+		supabase.from("projets").select("*").eq("id", id).single(),
+		supabase.from("projets").select("id, nom, created_at").order("created_at"),
 	]);
+	if (one.error) throw one.error;
+	if (all.error) throw all.error;
+	[project, allProjects] = [one.data, all.data];
 } catch (error) {
 	console.error(`Projet introuvable (${id}) :`, error);
 	return Astro.redirect("/projets");
@@ -33,16 +36,16 @@ const prevProject = position > 0 ? allProjects[position - 1] : undefined;
 const nextProject = position >= 0 && position < allProjects.length - 1 ? allProjects[position + 1] : undefined;
 const number = String(position + 1).padStart(2, "0");
 const total = String(allProjects.length).padStart(2, "0");
-const year = project.created ? new Date(project.created.replace(" ", "T")).getFullYear() : undefined;
+const year = project.created_at ? new Date(project.created_at).getFullYear() : undefined;
 
 const file = (name: string) => getFileUrl(project.id, name);
-const finals = (project.prod_finale ?? []).map(file);
-const inspirations = (project.inspirations ?? []).map(file);
-const logoUrl = project.logo_new ? file(project.logo_new) : undefined;
-const siteUrl = project.lien_appli || project.lien_site;
+const finals = (project.visuels ?? []).map(file);
+const inspirations = (project.inspirations_images ?? []).map(file);
+const logoUrl = project.logo_apres ? file(project.logo_apres) : undefined;
+const siteUrl = project.lien_site;
 
 // Taille de départ du titre (la police fait environ 1em par lettre), affinée ensuite en JS pour tenir dans le hero
-const name = project.nom_projet;
+const name = project.nom;
 const longestWord = Math.max(...name.split(" ").map((w) => w.length));
 const fitLength = name.length <= 12 ? name.length : longestWord;
 const titleSize = Math.min(20, 86 / Math.max(fitLength, 1)).toFixed(2);
@@ -193,7 +196,7 @@ const chapterFinals = inspirations.length > 0 ? "02" : "01";
 						{prevProject ? (
 							<a href={`/projets/${prevProject.id}`} class="project-nav">
 								<span class="text-sm uppercase tracking-widest">← Projet précédent</span>
-								<span class="font-heading text-2xl md:text-3xl leading-tight">{prevProject.nom_projet}</span>
+								<span class="font-heading text-2xl md:text-3xl leading-tight">{prevProject.nom}</span>
 							</a>
 						) : (
 							<span class="hidden md:block" />
@@ -201,7 +204,7 @@ const chapterFinals = inspirations.length > 0 ? "02" : "01";
 						{nextProject && (
 							<a href={`/projets/${nextProject.id}`} class="project-nav project-nav--next">
 								<span class="text-sm uppercase tracking-widest">Projet suivant →</span>
-								<span class="font-heading text-2xl md:text-3xl leading-tight">{nextProject.nom_projet}</span>
+								<span class="font-heading text-2xl md:text-3xl leading-tight">{nextProject.nom}</span>
 							</a>
 						)}
 					</div>
