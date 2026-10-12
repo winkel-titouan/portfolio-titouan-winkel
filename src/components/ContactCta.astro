@@ -1,0 +1,87 @@
+---
+import { Image } from "astro:assets";
+import SectionTitle from "./SectionTitle.astro";
+import SkewButton from "./SkewButton.astro";
+import spike from "../assets/spike.svg";
+---
+
+<section id="contact" class="contact-cta container mx-auto px-4 md:px-6 pt-16 md:pt-24">
+	<SectionTitle text="Me contacter" />
+	<div class="contact-card" data-reveal>
+		<div class="relative z-10 max-w-2xl">
+			<h2 class="text-4xl md:text-6xl xl:text-7xl leading-[1.05]">
+				Un projet en tête&nbsp;?
+				<span class="block text-outline">Parlons-en.</span>
+			</h2>
+			<p class="mt-6 text-lg md:text-xl">
+				Intéressé par mon travail, des questions, une offre d'emploi...
+				<strong class="text-grape">Contactez moi !</strong>
+			</p>
+			<div class="mt-10">
+				<SkewButton href="/contact" icon="arrow" variant="primary">Accéder au formulaire</SkewButton>
+			</div>
+		</div>
+		<Image src={spike} alt="" class="contact-spike" />
+	</div>
+</section>
+
+<style>
+	.contact-card {
+		position: relative;
+		overflow: hidden;
+		padding: 2.5rem 1.75rem;
+		border: 4px solid var(--color-ink);
+		background:
+			radial-gradient(circle at 85% 20%, rgb(255 255 255 / 0.7), transparent 40%),
+			linear-gradient(135deg, var(--color-lilac) 0%, var(--color-iris) 100%);
+		box-shadow: var(--shadow-brutal-lg);
+	}
+
+	@media (min-width: 768px) {
+		.contact-card {
+			padding: 4.5rem;
+		}
+	}
+
+	.text-outline {
+		color: transparent;
+		-webkit-text-stroke: 2px var(--color-ink);
+	}
+
+	.contact-spike {
+		position: absolute;
+		right: -40px;
+		bottom: -30px;
+		width: min(45vw, 420px);
+		height: auto;
+		opacity: 0.9;
+	}
+
+	@media (max-width: 767px) {
+		.contact-spike {
+			opacity: 0.25;
+		}
+	}
+</style>
+
+<script>
+	import { gsap } from "gsap";
+	import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+	gsap.registerPlugin(ScrollTrigger);
+
+	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		gsap.fromTo(
+			".contact-spike",
+			{ rotate: -25, xPercent: 20 },
+			{ rotate: 8, xPercent: 0, ease: "none", scrollTrigger: { trigger: ".contact-cta", start: "top bottom", end: "bottom 60%", scrub: true } },
+		);
+		gsap.from(".contact-card .text-outline", {
+			xPercent: -25,
+			opacity: 0,
+			duration: 1.1,
+			ease: "power4.out",
+			scrollTrigger: { trigger: ".contact-card", start: "top 70%", once: true },
+		});
+	}
+</script>

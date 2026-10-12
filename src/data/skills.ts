@@ -172,3 +172,17 @@ export const skills: Skill[] = [
             "CapCut est une application de montage vidéo intuitive et accessible, parfaite pour créer du contenu créatif pour les réseaux sociaux rapidement.",
     },
 ];
+
+// Les compétences saisies dans PocketBase utilisent parfois d'autres identifiants
+const skillAliases: Record<string, string> = {
+    js: "javascript",
+    astrojs: "astro",
+    tailwindcss: "tailwind",
+    davinci_resolve: "davinci",
+};
+
+/** Retrouve l'outil correspondant à une compétence PocketBase (ou undefined s'il est inconnu). */
+export function findSkill(key: string) {
+    const normalized = key.toLowerCase();
+    return skills.find((s) => s.id === (skillAliases[normalized] ?? normalized));
+}

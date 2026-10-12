@@ -1,19 +1,25 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 
-interface Props extends HTMLAttributes<"a"> {
+// Sans href, le composant devient un vrai <button> (ex. envoi de formulaire)
+type Props = (HTMLAttributes<"a"> | HTMLAttributes<"button">) & {
     text?: string;
     /** Icône affichée dans la case de droite */
     icon?: "arrow" | "download";
     /** primary = fond noir, secondary = fond blanc */
     variant?: "primary" | "secondary";
-}
+};
 
-// Les attributs restants (download, target, aria-*…) sont transmis au lien
-const { href, text, icon, variant = "secondary", class: className, ...attrs } = Astro.props;
+// Les attributs restants (download, target, type, aria-*…) sont transmis à l'élément
+const { href, text, icon, variant = "secondary", class: className, ...attrs } = Astro.props as HTMLAttributes<"a"> & {
+    text?: string;
+    icon?: "arrow" | "download";
+    variant?: "primary" | "secondary";
+};
+const Tag = href ? "a" : "button";
 ---
 
-<a href={href} class:list={["sk-btn", `sk-btn--${variant}`, className]} {...attrs}>
+<Tag href={href} class:list={["sk-btn", `sk-btn--${variant}`, className]} {...attrs}>
     <span class="sk-shine" aria-hidden="true"></span>
     <span class="sk-label"><slot>{text}</slot></span>
     {
@@ -31,7 +37,7 @@ const { href, text, icon, variant = "secondary", class: className, ...attrs } = 
             </span>
         )
     }
-</a>
+</Tag>
 
 <style>
     .sk-btn {
@@ -55,6 +61,7 @@ const { href, text, icon, variant = "secondary", class: className, ...attrs } = 
         line-height: 1;
         text-decoration: none;
         white-space: nowrap;
+        cursor: pointer;
         transform: skewX(-12deg);
         box-shadow: 6px 6px 0 0 var(--sk-shadow);
         transition:
@@ -73,6 +80,12 @@ const { href, text, icon, variant = "secondary", class: className, ...attrs } = 
     .sk-btn:hover {
         transform: skewX(-12deg) translate(-3px, -3px);
         box-shadow: 9px 9px 0 0 var(--sk-shadow);
+    }
+
+    .sk-btn:disabled {
+        opacity: 0.6;
+        cursor: progress;
+        pointer-events: none;
     }
 
     .sk-btn:active {

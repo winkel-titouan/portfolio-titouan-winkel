@@ -18,6 +18,7 @@ export default defineConfig({
         'three/examples/jsm/environments/RoomEnvironment.js',
         'gsap',
         'gsap/ScrollTrigger',
+        'gsap/Flip',
         'lenis',
       ],
     },

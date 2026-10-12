@@ -23,6 +23,8 @@ export interface Projet {
     logo_new_txt?: string;
     lien_site?: string;
     lien_appli?: string;
+    section_logo?: boolean;
+    conclusion?: string;
 }
 
 export function getFileUrl(recordId: string, filename: string, collection = 'projets') {

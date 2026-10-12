@@ -1,323 +1,520 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import SectionTitle from "../components/SectionTitle.astro";
-import { Image } from "astro:assets";
-import illustrationTravail from "../assets/a_propos/illustration_travail.webp";
-import Crac19 from "../assets/a_propos/crac19.webp";
-import immeuble from "../assets/a_propos/immeuble.webp";
-import PouletsRotis from "../assets/a_propos/nos_poulets_rotis.png";
-import personnage from "../assets/a_propos/personnage.svg";
-import line1 from "../assets/boutons/line1.svg";
-import line2 from "../assets/boutons/line2.svg";
-import bubble from "../assets/bubble.svg";
-import arrowDown from "../assets/arrow-down.svg";
 import SkewButton from "../components/SkewButton.astro";
-import spike from "../assets/spike.svg";
+import ContactCta from "../components/ContactCta.astro";
+import { Image } from "astro:assets";
+import strasbourg from "../assets/a_propos/strasbourg.jpg";
+import montbeliard from "../assets/a_propos/montbeliard.jpg";
+import crac19 from "../assets/a_propos/crac19.webp";
+import afficheVitra from "../assets/a_propos/affiche-vitra.jpg";
+import personnage from "../assets/a_propos/personnage.svg";
+import bubble from "../assets/bubble.svg";
+
+const facts = [
+	{ value: "20 ans", label: "originaire des environs de Strasbourg" },
+	{ value: "BUT MMI", label: "3e année à Montbéliard" },
+	{ value: "Graphiste", label: "le métier que je vise" },
+];
+
+const principles = [
+	{
+		title: "Épuré",
+		text: "Des compositions simples et réfléchies, où chaque élément a une raison d'être. Pas de surcharge visuelle.",
+	},
+	{
+		title: "Lisible",
+		text: "Un bon design communique vite : il capte l'attention puis guide naturellement le regard vers l'essentiel.",
+	},
+	{
+		title: "Cohérent",
+		text: "Des identités visuelles qui tiennent sur tous les supports et répondent aux besoins de leurs utilisateurs.",
+	},
+	{
+		title: "Impactant",
+		text: "Rendre les idées plus claires et plus mémorables, en trouvant l'équilibre entre esthétique et fonction.",
+	},
+];
+
+const references = [
+	{ href: "/projets/ahnq6bhmb0qxbib", src: crac19, type: "Affiche", title: "CRAC 19" },
+	{ href: "/projets/4jlqbvb2oz1oqoz", src: afficheVitra, type: "Affiche", title: "Vitra Walls" },
+];
 ---
 
-<Layout title="À propos - Titouan Winkel">
-    <main class="min-h-screen pt-32 pb-20">
-        <!-- Hero section -->
-        <section class="relative max-w-7xl mx-auto px-8 mb-20">
-            <!-- Single bubble behind title -->
-            <div
-                class="absolute top-14 left-2/5 -translate-y-1/2 -translate-x-1/2 z-0"
-            >
-                <img
-                    src={bubble.src || "/placeholder.svg"}
-                    alt=""
-                    class="w-48 h-48 opacity-60"
-                />
-            </div>
+<Layout
+	title="À propos - Titouan Winkel"
+	description="Titouan Winkel, 20 ans, étudiant en BUT MMI à Montbéliard et futur graphiste : parcours, approche du design et inspirations."
+>
+	<main class="overflow-x-clip">
+		<!-- HERO -->
+		<section class="about-hero relative">
+			<div class="about-hero-bg absolute inset-0" aria-hidden="true">
+				<div class="about-hero-grid absolute inset-0"></div>
+			</div>
 
-            <!-- Centered title with decorations -->
-            <div class="relative z-10 flex justify-center md:z-60">
-                <div class="relative inline-block">
-                    <img
-                        src={line1.src || "/placeholder.svg"}
-                        alt=""
-                        class="absolute -top-2 -left-8 w-12 h-12"
-                    />
-                    <h1
-                        class="text-black font-[Russo_One] text-[50px] font-normal leading-normal"
-                    >
-                        À propos
-                    </h1>
-                    <img
-                        src={line2.src || "/placeholder.svg"}
-                        alt=""
-                        class="absolute -bottom-2 -right-8 w-12 h-12"
-                    />
-                </div>
-            </div>
+			<div class="relative container mx-auto px-4 md:px-6 pt-16 md:pt-24 pb-20 md:pb-28">
+				<div class="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
+					<div class="space-y-6 md:space-y-8">
+						<p class="eyebrow" data-hero-in>
+							<span class="dot" aria-hidden="true"></span>
+							À propos
+						</p>
+						<h1 class="about-title text-4xl md:text-6xl xl:text-7xl leading-[1.08]">
+							<span class="line"><span>Donner du sens</span></span>
+							<span class="line"><span>à chaque</span></span>
+							<span class="line"><span class="title-highlight text-white">création.</span></span>
+						</h1>
+						<p class="max-w-xl text-lg md:text-xl leading-relaxed" data-hero-in>
+							Étudiant en design graphique, je conçois des identités visuelles, des affiches et des
+							interfaces qui allient <strong class="text-grape">créativité, réflexion et communication</strong>.
+						</p>
+						<div class="flex flex-col sm:flex-row gap-5 sm:gap-8" data-hero-in>
+							<SkewButton href="/projets" icon="arrow" variant="primary">Voir mes projets</SkewButton>
+							<SkewButton href="/CV_Titouan_Winkel.pdf" download icon="download">Télécharger mon CV</SkewButton>
+						</div>
+					</div>
 
-            <!-- Arrow down -->
-            <div class="flex justify-center mt-50">
-                <img
-                    src={arrowDown.src || "/placeholder.svg"}
-                    alt="Scroll down"
-                    class="w-6 h-10"
-                />
-            </div>
-        </section>
+					<div class="hero-visual relative mx-auto aspect-square w-full max-w-md">
+						<Image src={bubble} alt="" class="hero-bubble absolute inset-0 m-auto w-full h-auto" />
+						<svg class="hero-badge" viewBox="0 0 200 200" aria-hidden="true">
+							<defs>
+								<path id="about-badge-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+							</defs>
+							<circle cx="100" cy="100" r="98" fill="#fff" stroke="#0b0710" stroke-width="4" />
+							<text>
+								<textPath href="#about-badge-circle">GRAPHISTE ✦ DESIGNER WEB ✦ ILLUSTRATEUR ✦ </textPath>
+							</text>
+							<text x="100" y="114" text-anchor="middle" class="badge-center">TW</text>
+						</svg>
+						<Image
+							src={personnage}
+							alt="Illustration de Titouan"
+							class="hero-character relative z-10 mx-auto h-full w-auto"
+							loading="eager"
+						/>
+					</div>
+				</div>
 
-        <!-- Enhanced Qui suis-je section with hover effects and better visual hierarchy -->
-        <section class="relative max-w-7xl mx-auto px-8 mb-32">
-            <SectionTitle text="Qui suis-je ?" />
+				<ul class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mt-16 md:mt-20" data-reveal data-reveal-stagger>
+					{
+						facts.map((fact) => (
+							<li class="fact">
+								<span class="font-heading text-2xl md:text-3xl leading-tight">{fact.value}</span>
+								<span class="text-sm md:text-base">{fact.label}</span>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</section>
 
-            <!-- Two-column layout with enhanced spacing -->
-            <div class="grid md:grid-cols-2 gap-16 items-center mt-16">
-                <!-- Text column with better typography -->
-                <div
-                    class="space-y-8 order-2 md:order-1"
-                    style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 400; line-height: 1.8; color: #000;"
-                >
-                    <p class="text-balance">
-                        Je m'appelle Titouan Winkel, j'ai 20 ans et je suis
-                        actuellement en troisième année de BUT Métiers du
-                        Multimédia et de l'Internet (MMI) à Montbéliard.
-                        Originaire des environs de Strasbourg, je me suis
-                        naturellement orienté vers le design graphique, un
-                        domaine qui me permet d'allier créativité, réflexion et
-                        communication visuelle.
-                    </p>
+		<!-- QUI SUIS-JE -->
+		<section class="container mx-auto px-4 md:px-6 py-16 md:py-24">
+			<div class="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-20 items-center">
+				<div>
+					<SectionTitle text="Qui suis-je ?" />
+					<div class="space-y-5 text-lg md:text-xl leading-relaxed" data-split-words>
+						<p>
+							Je m'appelle Titouan <strong class="text-grape">Winkel</strong>, j'ai 20 ans et je suis
+							actuellement en troisième année de <strong class="text-grape">BUT Métiers du Multimédia et de
+							l'Internet</strong> (MMI) à Montbéliard. Originaire des environs de Strasbourg, je me suis
+							naturellement orienté vers le design graphique, un domaine qui me permet d'allier créativité,
+							réflexion et communication visuelle.
+						</p>
+						<p>
+							Aujourd'hui, mon objectif est de <strong class="text-grape">devenir graphiste</strong> et de
+							concevoir des supports de communication qui ont un réel impact : affiches, flyers, identités
+							visuelles, logos ou tout autre support permettant de transmettre un message de manière claire
+							et efficace.
+						</p>
+					</div>
+				</div>
 
-                    <p class="text-balance">
-                        Aujourd'hui, mon objectif est de devenir graphiste et de
-                        concevoir des supports de communication qui ont un réel
-                        impact : affiches, flyers, identités visuelles, logos ou
-                        tout autre support permettant de transmettre un message
-                        de manière claire et efficace. Ce qui me motive, c'est
-                        de donner du sens à chaque création en trouvant le juste
-                        équilibre entre esthétique et fonctionnalité.
-                    </p>
-                </div>
+				<div class="collage relative mx-auto w-full max-w-md">
+					<figure class="photo photo-main">
+						<Image
+							src={strasbourg}
+							alt="Vue aérienne de Strasbourg et de sa cathédrale"
+							widths={[400, 640]}
+							sizes="(min-width: 1024px) 380px, 80vw"
+							class="h-full w-full object-cover object-[35%_center]"
+						/>
+					</figure>
+					<figure class="photo photo-small">
+						<Image
+							src={montbeliard}
+							alt="Rue piétonne de Montbéliard décorée de fanions colorés"
+							widths={[240, 480]}
+							sizes="200px"
+							class="h-full w-full object-cover"
+						/>
+					</figure>
+					<span class="collage-tag">Strasbourg ✦ Montbéliard</span>
+				</div>
+			</div>
+		</section>
 
-                <!-- Images column with enhanced decorative layout -->
-                <div class="relative order-1 md:order-2">
-                    <!-- Multiple decorative bubbles -->
-                    <div
-                        class="absolute -top-12 -right-12 z-0 animate-pulse-slow"
-                    >
-                        <img
-                            src={bubble.src || "/placeholder.svg"}
-                            alt=""
-                            class="w-36 h-36"
-                        />
-                    </div>
+		<!-- APPROCHE -->
+		<section class="approach py-16 md:py-24">
+			<div class="container mx-auto px-4 md:px-6">
+				<SectionTitle text="Mon approche" />
+				<p class="max-w-2xl text-lg md:text-xl leading-relaxed -mt-2 mb-12" data-reveal>
+					Mon approche du design est résolument <strong class="text-grape">minimaliste</strong>. Ce qui me
+					motive, c'est de trouver le juste équilibre entre esthétique et fonctionnalité.
+				</p>
+				<ol class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" data-reveal data-reveal-stagger>
+					{
+						principles.map((item, i) => (
+							<li class="principle">
+								<span class="principle-num">{String(i + 1).padStart(2, "0")}</span>
+								<h3 class="text-2xl mt-6 mb-3">{item.title}</h3>
+								<p class="leading-relaxed">{item.text}</p>
+							</li>
+						))
+					}
+				</ol>
+			</div>
+		</section>
 
-                    <!-- Images grid with enhanced hover effects -->
-                    <div class="relative z-10 grid grid-cols-2 gap-6">
-                        <!-- Character illustration with enhanced styling -->
-                        <div
-                            class="row-span-2 flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl p-6 border-4 border-black relative hover:shadow-2xl hover:scale-105 transition-all duration-300 hover:-rotate-1"
-                        >
-                            <Image
-                                src={personnage || "/placeholder.svg"}
-                                alt="Character illustration"
-                                class="w-auto h-auto max-h-[320px]"
-                            />
-                        </div>
+		<!-- RÉFÉRENCES -->
+		<section class="container mx-auto px-4 md:px-6 py-16 md:py-24">
+			<div class="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-12 lg:gap-20 items-center">
+				<div>
+					<SectionTitle text="Ce qui me ressemble" />
+					<div class="space-y-5 text-lg md:text-xl leading-relaxed" data-reveal>
+						<p>
+							À travers chacun de mes projets, je cherche à concevoir des identités visuelles cohérentes
+							et des supports de communication efficaces, capables de répondre aux besoins de leurs
+							utilisateurs tout en affirmant <strong class="text-grape">une identité forte</strong>.
+						</p>
+						<p>
+							Le design est pour moi un moyen de rendre les idées plus lisibles, plus mémorables et plus
+							impactantes. Deux réalisations print qui résument bien cette démarche :
+						</p>
+					</div>
+				</div>
 
-                        <!-- Building image with hover effect -->
-                        <div
-                            class="relative overflow-hidden rounded-xl border-2 border-black hover:shadow-xl hover:scale-105 transition-all duration-300 hover:rotate-1 h-40"
-                        >
-                            <Image
-                                src={immeuble || "/placeholder.svg"}
-                                alt="Building"
-                                class="w-full h-full object-cover"
-                            />
-                        </div>
+				<ul class="grid grid-cols-2 gap-5 md:gap-8" data-reveal data-reveal-stagger>
+					{
+						references.map((ref) => (
+							<li>
+								<a href={ref.href} class="reference group block">
+									<span class="reference-frame">
+										<Image
+											src={ref.src}
+											alt={`${ref.type} ${ref.title}`}
+											widths={[320, 640]}
+											sizes="(min-width: 1024px) 300px, 45vw"
+											class="reference-img"
+										/>
+									</span>
+									<span class="reference-caption">
+										<span class="text-xs uppercase tracking-widest">{ref.type}</span>
+										<span class="font-heading text-base md:text-lg leading-tight">{ref.title}</span>
+									</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</section>
 
-                        <!-- Decorative element with bubble -->
-                        <div
-                            class="flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-black h-40 relative overflow-hidden group"
-                        >
-                            <Image
-                                src={illustrationTravail || "/placeholder.svg"}
-                                alt=""
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            />
-                            <div
-                                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                            >
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Enhanced Mes inspirations section with dynamic layout and animations -->
-        <section class="relative max-w-7xl mx-auto px-8 mb-32">
-            <!-- Decorative floating bubbles -->
-            <div class="absolute top-24 left-16 z-0 animate-float">
-                <img
-                    src={bubble.src || "/placeholder.svg"}
-                    alt=""
-                    class="w-36 h-36 opacity-25"
-                />
-            </div>
-            <div class="absolute -bottom-12 right-24 z-0 animate-pulse-slow">
-                <img
-                    src={bubble.src || "/placeholder.svg"}
-                    alt=""
-                    class="w-32 h-32 opacity-30"
-                />
-            </div>
-
-            <SectionTitle text="Inspirations & Références" />
-
-            <!-- Two-column layout: images A4 côte à côte -->
-            <div class="grid md:grid-cols-2 gap-12 items-start mt-16">
-                <!-- Images column: two A4 images côte à côte, affichées en entier -->
-                <div class="relative">
-                    <div class="relative z-10">
-                        <div class="flex flex-col md:flex-row gap-6">
-                            <a
-                                href="/projets/ahnq6bhmb0qxbib"
-                                aria-label="Projet Crac19"
-                                class="w-full md:w-1/2 flex justify-center"
-                            >
-                                <div
-                                    class="overflow-hidden rounded-xl border-2 border-black transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
-                                >
-                                    <Image
-                                        src={Crac19 || "/placeholder.svg"}
-                                        alt="Affiche Crac19"
-                                        class="w-full h-auto object-contain max-h-[900px]"
-                                    />
-                                </div>
-                            </a>
-
-                            <a
-                                href="/projets/6vvegr6tgt6g8ij"
-                                aria-label="Projet Stage à la ferme Urban"
-                                class="w-full md:w-1/2 flex justify-center"
-                            >
-                                <div
-                                    class="overflow-hidden rounded-xl border-2 border-black transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
-                                >
-                                    <Image
-                                        src={PouletsRotis || "/placeholder.svg"}
-                                        alt="Flyer Nos Poulets Rotis"
-                                        class="w-full h-auto object-contain max-h-[900px]"
-                                    />
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Text column with enhanced typography -->
-                <div
-                    class="space-y-8"
-                    style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 400; line-height: 1.8; color: #000;"
-                >
-                    <p class="text-balance">
-                        Mon approche du design est résolument minimaliste. Je
-                        privilégie des compositions simples, épurées et
-                        réfléchies, où chaque élément a une raison d'être. Pour
-                        moi, un bon design est avant tout un design qui
-                        communique rapidement et efficacement, sans surcharge
-                        visuelle. J'aime créer des visuels capables de capter
-                        l'attention tout en guidant naturellement le regard vers
-                        l'essentiel.
-                    </p>
-
-                    <p class="text-balance">
-                        À travers chacun de mes projets, je cherche à concevoir
-                        des identités visuelles cohérentes et des supports de
-                        communication efficaces, capables de répondre aux
-                        besoins de leurs utilisateurs tout en affirmant une
-                        identité forte. Le design est pour moi un moyen de
-                        rendre les idées plus lisibles, plus mémorables et plus
-                        impactantes.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <section class="container mx-auto px-4 md:px-4 py-8 md:py-16 md:ml-20">
-            <SectionTitle text="Me contacter" />
-
-            <div
-                class="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-0 mt-8"
-            >
-                <div class="space-y-6">
-                    <p
-                        class="text-base md:text-xl"
-                        style="font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-style: normal; line-height: normal; color: #000;"
-                    >
-                        Intéressé par mon travail, des questions, une offre
-                        d'emploi... <span class="text-purple-600 font-semibold"
-                            >Contactez moi !</span
-                        >
-                    </p>
-                    <div class="md:mt-15">
-                        <SkewButton href="/contact" icon="arrow" variant="primary">
-                            Accéder au formulaire
-                        </SkewButton>
-                    </div>
-                </div>
-
-                <div class="hidden md:block md:-mt-16 md:mr-25">
-                    <Image
-                        src={spike || "/placeholder.svg"}
-                        alt=""
-                        class="w-auto h-auto"
-                    />
-                </div>
-            </div>
-        </section>
-    </main>
+		<ContactCta />
+	</main>
 </Layout>
 
-<!-- Added custom animations for floating and pulsing effects -->
 <style>
-    @keyframes float {
-        0%,
-        100% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-20px);
-        }
-    }
+	/* ---------- HERO ---------- */
+	.about-hero {
+		margin-top: calc(-1 * var(--header-h));
+		padding-top: var(--header-h);
+	}
 
-    @keyframes float-delayed {
-        0%,
-        100% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-15px);
-        }
-    }
+	.about-hero-bg {
+		background: linear-gradient(180deg, #d5b9ff 0%, #e6d5ff 60%, #fff 100%);
+	}
 
-    @keyframes pulse-slow {
-        0%,
-        100% {
-            opacity: 0.3;
-            transform: scale(1);
-        }
-        50% {
-            opacity: 0.5;
-            transform: scale(1.05);
-        }
-    }
+	.about-hero-grid {
+		background-image:
+			linear-gradient(rgb(11 7 16 / 0.07) 1px, transparent 1px),
+			linear-gradient(90deg, rgb(11 7 16 / 0.07) 1px, transparent 1px);
+		background-size: 56px 56px;
+		mask-image: radial-gradient(ellipse at 70% 40%, #000 20%, transparent 75%);
+	}
 
-    .animate-float {
-        animation: float 6s ease-in-out infinite;
-    }
+	.eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		padding: 6px 14px;
+		border: 2px solid var(--color-ink);
+		background: rgb(255 255 255 / 0.7);
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
 
-    .animate-float-delayed {
-        animation: float-delayed 7s ease-in-out infinite;
-        animation-delay: 1s;
-    }
+	.eyebrow .dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 9999px;
+		background: var(--color-grape);
+	}
 
-    .animate-pulse-slow {
-        animation: pulse-slow 8s ease-in-out infinite;
-    }
+	.about-title .line {
+		display: block;
+		overflow: hidden;
+		padding-bottom: 0.08em;
+	}
+
+	.about-title .line > span {
+		display: inline-block;
+	}
+
+	.title-highlight {
+		position: relative;
+		z-index: 0;
+		padding: 0 0.15em;
+		margin-left: -0.05em;
+	}
+
+	.title-highlight::before {
+		content: "";
+		position: absolute;
+		inset: 0.1em 0 0.02em;
+		z-index: -1;
+		background: var(--color-ink);
+		transform: skewX(-15deg);
+	}
+
+	.hero-badge {
+		position: absolute;
+		top: 2%;
+		right: 2%;
+		z-index: 20;
+		width: 30%;
+		max-width: 130px;
+		font-family: var(--font-heading);
+		font-size: 15.5px;
+		letter-spacing: 0.08em;
+		animation: badge-spin 18s linear infinite;
+	}
+
+	.hero-badge .badge-center {
+		font-size: 40px;
+		fill: var(--color-grape);
+	}
+
+	@keyframes badge-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.fact {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: 18px 20px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		box-shadow: var(--shadow-brutal);
+	}
+
+	.fact:nth-child(2) {
+		background: var(--color-lilac);
+	}
+
+	.fact:nth-child(3) {
+		background: var(--color-ink);
+		color: #fff;
+		box-shadow: 6px 6px 0 0 var(--color-iris);
+	}
+
+	/* ---------- QUI SUIS-JE ---------- */
+	[data-split-words] :global(.word) {
+		display: inline;
+	}
+
+	.collage {
+		aspect-ratio: 4 / 5;
+	}
+
+	.photo {
+		position: absolute;
+		overflow: hidden;
+		border: 4px solid var(--color-ink);
+		background: var(--color-lilac-soft);
+	}
+
+	.photo-main {
+		inset: 0 18% 12% 0;
+		box-shadow: var(--shadow-brutal-lg);
+		transform: rotate(-2deg);
+	}
+
+	.photo-small {
+		right: 0;
+		bottom: 0;
+		width: 42%;
+		aspect-ratio: 1 / 2;
+		box-shadow: 6px 6px 0 0 var(--color-iris);
+		transform: rotate(4deg);
+	}
+
+	.collage-tag {
+		position: absolute;
+		left: -8px;
+		bottom: 4%;
+		z-index: 2;
+		padding: 6px 14px;
+		border: 3px solid var(--color-ink);
+		background: var(--color-lilac);
+		font-family: var(--font-heading);
+		font-size: 0.85rem;
+		transform: rotate(-4deg);
+	}
+
+	/* ---------- APPROCHE ---------- */
+	.approach {
+		border-block: 4px solid var(--color-ink);
+		background:
+			radial-gradient(circle at 10% 0%, rgb(255 255 255 / 0.6), transparent 40%),
+			var(--color-lilac-soft);
+	}
+
+	.principle {
+		height: 100%;
+		padding: 24px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		box-shadow: var(--shadow-brutal);
+		/* Survol via la propriété translate : transform est réservé à l'animation d'entrée GSAP,
+		   une transition CSS dessus la bloquait à mi-course (cartes décalées) */
+		transition:
+			translate 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.principle:hover {
+		translate: -3px -3px;
+		box-shadow: var(--shadow-brutal-lg);
+	}
+
+	.principle-num {
+		display: inline-block;
+		padding: 2px 12px;
+		background: var(--color-ink);
+		color: #fff;
+		font-family: var(--font-heading);
+		transform: skewX(-12deg);
+	}
+
+	/* ---------- RÉFÉRENCES ---------- */
+	.reference-frame {
+		display: block;
+		overflow: hidden;
+		border: 4px solid var(--color-ink);
+		background: var(--color-lilac-soft);
+		box-shadow: var(--shadow-brutal);
+		transition:
+			transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	li:nth-child(2) .reference-frame {
+		transform: translateY(2rem);
+	}
+
+	.group:hover .reference-frame,
+	.group:focus-visible .reference-frame {
+		transform: translate(-3px, -3px) rotate(-1deg);
+		box-shadow: var(--shadow-brutal-lg);
+	}
+
+	li:nth-child(2) .group:hover .reference-frame {
+		transform: translate(-3px, calc(2rem - 3px)) rotate(1deg);
+	}
+
+	.reference-img {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 1 / 1.414;
+		object-fit: cover;
+	}
+
+	.reference-caption {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		margin-top: 16px;
+	}
+
+	li:nth-child(2) .reference-caption {
+		margin-top: calc(2rem + 16px);
+	}
 </style>
+
+<script>
+	import { gsap } from "gsap";
+	import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+	gsap.registerPlugin(ScrollTrigger);
+
+	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		// Intro du hero
+		gsap.from(".about-title .line > span", { yPercent: 110, duration: 1.1, ease: "power4.out", stagger: 0.12, delay: 0.15 });
+		gsap.from("[data-hero-in]", { y: 30, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.12, delay: 0.3 });
+		gsap.from(".hero-character", { y: 80, opacity: 0, duration: 1.1, ease: "power3.out", delay: 0.4 });
+		gsap.fromTo(
+			".hero-bubble",
+			{ scale: 0.85 },
+			{ yPercent: -12, scale: 1.1, ease: "none", scrollTrigger: { trigger: ".about-hero", start: "top top", end: "bottom top", scrub: true } },
+		);
+
+		// Texte révélé mot à mot (en conservant les <strong>)
+		const textRoot = document.querySelector<HTMLElement>("[data-split-words]");
+		if (textRoot) {
+			const walker = document.createTreeWalker(textRoot, NodeFilter.SHOW_TEXT);
+			const nodes: Text[] = [];
+			while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+			nodes.forEach((node) => {
+				const frag = document.createDocumentFragment();
+				node.textContent!.split(/(\s+)/).forEach((part) => {
+					if (!part) return;
+					if (/^\s+$/.test(part)) frag.append(part);
+					else {
+						const span = document.createElement("span");
+						span.className = "word";
+						span.textContent = part;
+						frag.append(span);
+					}
+				});
+				node.replaceWith(frag);
+			});
+			gsap.fromTo(
+				textRoot.querySelectorAll(".word"),
+				{ opacity: 0.15 },
+				{
+					opacity: 1,
+					stagger: 0.05,
+					ease: "none",
+					scrollTrigger: { trigger: textRoot, start: "top 95%", end: "bottom 75%", scrub: true },
+				},
+			);
+		}
+
+		// Collage : les photos se posent l'une après l'autre
+		gsap.from(".collage .photo, .collage-tag", {
+			y: 60,
+			opacity: 0,
+			rotate: 0,
+			duration: 1,
+			ease: "power3.out",
+			stagger: 0.15,
+			scrollTrigger: { trigger: ".collage", start: "top 80%", once: true },
+		});
+
+	}
+</script>

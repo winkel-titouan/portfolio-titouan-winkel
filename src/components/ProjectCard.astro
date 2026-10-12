@@ -1,7 +1,4 @@
 ---
-import lineTop from "../assets/card/line-top.svg";
-import lineBot from "../assets/card/line-bot.svg";
-
 interface Props {
     href: string;
     project: {
@@ -11,11 +8,11 @@ interface Props {
         created?: string;
     };
     imageUrl?: string;
-    index?: number;
+    /** Affiche le bouton « Voir le projet » en bas de la carte */
+    showCta?: boolean;
 }
 
-const { href, project, imageUrl, index } = Astro.props;
-const number = index !== undefined ? String(index + 1).padStart(2, "0") : undefined;
+const { href, project, imageUrl, showCta = true } = Astro.props;
 ---
 
 <a
@@ -25,11 +22,10 @@ const number = index !== undefined ? String(index + 1).padStart(2, "0") : undefi
     data-created={project.created}
 >
     <article class="project-card relative h-full flex flex-col">
-        <img src={lineTop.src} alt="" aria-hidden="true" class="corner corner-tl" />
-        <img src={lineBot.src} alt="" aria-hidden="true" class="corner corner-br" />
+        <span class="corner corner-tl" aria-hidden="true"></span>
+        <span class="corner corner-br" aria-hidden="true"></span>
 
         <div class="card-media relative">
-            {number && <span class="card-number">{number}</span>}
             {
                 imageUrl ? (
                     <img
@@ -51,12 +47,16 @@ const number = index !== undefined ? String(index + 1).padStart(2, "0") : undefi
         <div class="flex flex-1 flex-col items-center text-center gap-3 px-6 pt-5 pb-6">
             <h3 class="text-2xl leading-tight">{project.nom_projet}</h3>
             {project.description && <p class="leading-relaxed line-clamp-3">{project.description}</p>}
-            <span class="card-cta mt-auto">
-                Voir le projet
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                    <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"></path>
-                </svg>
-            </span>
+            {
+                showCta && (
+                    <span class="card-cta mt-auto">
+                        Voir le projet
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                            <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square"></path>
+                        </svg>
+                    </span>
+                )
+            }
         </div>
 
         <span class="card-glare" aria-hidden="true"></span>
@@ -81,54 +81,86 @@ const number = index !== undefined ? String(index + 1).padStart(2, "0") : undefi
             rgba(234, 221, 255, 0.23) 10.66%,
             #a983e2 67.17%,
             rgba(234, 221, 255, 0.23) 109.64%
-        );
+        ),
+        /* Fond opaque : l'ombre placée derrière ne doit pas transparaître */
+        #fff;
         border: 3px solid var(--color-ink);
-        box-shadow: var(--shadow-brutal);
         transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
         transition:
             --card-angle 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-            box-shadow 0.35s ease,
             transform 0.35s ease;
+    }
+
+    /* Ombre diffuse en dégradé, posée derrière la carte */
+    .project-card-link {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .project-card-link::before {
+        content: "";
+        position: absolute;
+        inset: 10% 4% -2% 16%;
+        z-index: -1;
+        background: linear-gradient(135deg, rgb(11 7 16 / 0.15) 0%, rgb(11 7 16 / 0.55) 60%, var(--color-ink) 100%);
+        filter: blur(26px);
+        opacity: 0.35;
+        transform: translate(14px, 10px);
+        transition:
+            opacity 0.4s ease,
+            transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+            filter 0.4s ease;
+    }
+
+    .group:hover::before,
+    .group:focus-visible::before {
+        opacity: 0.5;
+        filter: blur(32px);
+        transform: translate(22px, 18px);
     }
 
     .group:hover .project-card,
     .group:focus-visible .project-card {
         --card-angle: 413deg;
-        box-shadow: var(--shadow-brutal-lg);
-        transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translate(-3px, -3px);
+        transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(-6px);
     }
 
     /* Pendant le tilt, on suit la souris sans latence */
     .project-card.is-tilting {
-        transition:
-            --card-angle 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-            box-shadow 0.35s ease;
+        transition: --card-angle 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
+    /* Équerres identiques à celles du loader de la scène 3D :
+       posées sur la bordure de la carte, elles s'en écartent au survol */
     .corner {
         position: absolute;
         z-index: 2;
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
+        border: 8px solid var(--color-ink);
         transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .corner-tl {
-        top: -12px;
-        left: -14px;
+        top: -3px;
+        left: -3px;
+        border-right: 0;
+        border-bottom: 0;
     }
 
     .corner-br {
-        bottom: -18px;
-        right: -14px;
+        bottom: -3px;
+        right: -3px;
+        border-left: 0;
+        border-top: 0;
     }
 
     .group:hover .corner-tl {
-        transform: translate(-6px, -6px);
+        transform: translate(-12px, -12px);
     }
 
     .group:hover .corner-br {
-        transform: translate(6px, 6px);
+        transform: translate(12px, 12px);
     }
 
     .card-media {
@@ -159,18 +191,6 @@ const number = index !== undefined ? String(index + 1).padStart(2, "0") : undefi
         font-family: var(--font-heading);
         font-size: 5rem;
         color: var(--color-iris);
-    }
-
-    .card-number {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 1;
-        padding: 2px 10px;
-        background: var(--color-ink);
-        color: #fff;
-        font-family: var(--font-heading);
-        font-size: 0.85rem;
     }
 
     .card-cta {

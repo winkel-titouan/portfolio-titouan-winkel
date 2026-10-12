@@ -16,8 +16,8 @@
 }
 
 :root {
-    /* Hauteur du header sticky (py-4 + logo h-10 + bordure 4px) */
-    --header-h: 76px;
+    /* Hauteur du header sticky (py-4 + nav h-12 + bordure 4px), resynchronisée en JS */
+    --header-h: 84px;
 }
 
 html {

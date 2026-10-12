@@ -2,479 +2,883 @@
 export const prerender = false;
 
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
-import SkewButton from "../../components/SkewButton.astro";
 import SectionTitle from "../../components/SectionTitle.astro";
-import { pb } from "../../utils/pb";
-import bubble from "../../assets/bubble.svg";
-import line1 from "../../assets/boutons/line1.svg";
-import line2 from "../../assets/boutons/line2.svg";
-import javascriptLogo from "../../assets/logos/js.svg";
-import astroLogo from "../../assets/logos/astrojs.svg";
-import tailwindLogo from "../../assets/logos/tailwindcss.svg";
-import sqlLogo from "../../assets/logos/sql.svg";
-import pocketbaseLogo from "../../assets/logos/pocketbase.svg";
-import capcutLogo from "../../assets/logos/capcut.svg";
-import cssLogo from "../../assets/logos/css.svg";
-import htmlLogo from "../../assets/logos/html.svg";
-import figmaLogo from "../../assets/logos/figma.svg";
-import wordpressLogo from "../../assets/logos/wordpress.svg";
-import affinityLogo from "../../assets/logos/affinity.png";
-import davinciresolveLogo from "../../assets/logos/davinci_resolve.svg";
-import canvaLogo from "../../assets/logos/canva.svg";
+import SkewButton from "../../components/SkewButton.astro";
+import ContactCta from "../../components/ContactCta.astro";
+import { pb, getFileUrl, type Projet } from "../../utils/pb";
+import { findSkill } from "../../data/skills";
 
-export async function getStaticPaths() {
-    const projects = await pb.collection("projets").getFullList();
+const { id = "" } = Astro.params;
 
-    return projects.map((project) => ({
-        params: { id: project.id },
-    }));
-}
-
-const { id } = Astro.params;
-
-let project;
+let project: Projet;
+let allProjects: Pick<Projet, "id" | "nom_projet" | "created">[] = [];
 try {
-    project = await pb.collection("projets").getOne(id);
+	[project, allProjects] = await Promise.all([
+		pb.collection("projets").getOne<Projet>(id),
+		pb.collection("projets").getFullList<Projet>({ sort: "created", fields: "id,nom_projet,created" }),
+	]);
 } catch (error) {
-    // Redirect handled in the server-side code
+	console.error(`Projet introuvable (${id}) :`, error);
+	return Astro.redirect("/projets");
 }
 
-if (!project) {
-    // Redirect handled in the server-side code
-}
+// Couleur du projet (certaines sont saisies sans « # ») et couleur de texte lisible dessus
+const rawColor = (project.couleur || "").trim().replace(/^#?/, "#");
+const projectColor = /^#[0-9a-f]{6}$/i.test(rawColor) ? rawColor : "#a983e2";
+const [r, g, b] = [1, 3, 5].map((i) => parseInt(projectColor.slice(i, i + 2), 16) / 255);
+const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+const onColor = luminance > 0.5 ? "#0b0710" : "#ffffff";
 
-const projectColor = project.couleur || "#A983E2";
+// Position dans la liste (ordre chronologique) pour la numérotation et la navigation
+const position = allProjects.findIndex((p) => p.id === project.id);
+const prevProject = position > 0 ? allProjects[position - 1] : undefined;
+const nextProject = position >= 0 && position < allProjects.length - 1 ? allProjects[position + 1] : undefined;
+const number = String(position + 1).padStart(2, "0");
+const total = String(allProjects.length).padStart(2, "0");
+const year = project.created ? new Date(project.created.replace(" ", "T")).getFullYear() : undefined;
 
-const logoMap = {
-    javascript: javascriptLogo,
-    js: javascriptLogo,
-    astro: astroLogo,
-    astrojs: astroLogo,
-    tailwind: tailwindLogo,
-    tailwindcss: tailwindLogo,
-    sql: sqlLogo,
-    pocketbase: pocketbaseLogo,
-    capcut: capcutLogo,
-    css: cssLogo,
-    html: htmlLogo,
-    figma: figmaLogo,
-    wordpress: wordpressLogo,
-    affinity: affinityLogo,
-    davinci_resolve: davinciresolveLogo,
-    canva: canvaLogo
-};
+const tools = (project.competences ?? []).map((key) => {
+	const skill = findSkill(key);
+	return { name: skill?.name ?? key.replace(/_/g, " "), logo: skill?.logo };
+});
 
-// Helper function to get image URL from PocketBase
-function getImageUrl(record, filename) {
-    return `https://portfolio.titouan-winkel.fr/api/files/${record.collectionId}/${record.id}/${filename}`;
-}
+const toParagraphs = (text?: string) =>
+	(text ?? "")
+		.replace(/<[^>]+>/g, "\n")
+		.split(/\r?\n/)
+		.map((p) => p.trim())
+		.filter(Boolean);
 
-// Get the first image from prod_finale array
-const heroImageUrl = project.logo_new
-    ? getImageUrl(project, project.logo_new)
-    : "";
+const intro = toParagraphs(project.introduction);
+const inspiration = toParagraphs(project.inspiration_texte);
+const conclusion = toParagraphs(project.conclusion);
 
-// Get inspirations images
-const inspirationImages = project.inspirations || [];
-
-// Get production finale images
-const prodFinaleImages = project.prod_finale || [];
-
-const introText = project.introduction || "";
-const introWords = introText.split(" ");
-const halfLength = Math.ceil(introWords.length / 2);
-const introCol1 = introWords.slice(0, halfLength).join(" ");
-const introCol2 = introWords.slice(halfLength).join(" ");
-
-const inspText = project.inspiration_texte || "";
-const inspParagraphs = inspText
-    .split(". ")
-    .reduce((acc, sentence, index) => {
-        const paragraphIndex = Math.floor(index / 3);
-        if (!acc[paragraphIndex]) acc[paragraphIndex] = "";
-        acc[paragraphIndex] +=
-            sentence + (index < inspText.split(". ").length - 1 ? ". " : "");
-        return acc;
-    }, [])
-    .filter((p) => p.trim());
+const file = (name: string) => getFileUrl(project.id, name);
+const finals = (project.prod_finale ?? []).map(file);
+const inspirations = (project.inspirations ?? []).map(file);
+const cover = finals[0];
+const logoUrl = project.logo_new ? file(project.logo_new) : undefined;
+const showLogoEvolution = project.section_logo !== false && project.logo_old && project.logo_new;
+const siteUrl = project.lien_appli || project.lien_site;
 ---
 
-<Layout title={project.nom_projet}>
-    <!-- Added back to projects link in top left -->
-    <a
-        id="back-link"
-        href="/projets"
-        class="fixed top-32 left-4 md:left-8 z-40 flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
-    >
-        <svg
-            class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform duration-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"></path>
-        </svg>
-        <span class="font-['Space_Grotesk'] text-sm md:text-base font-medium"
-            >Retour</span
-        >
-    </a>
+<Layout title={`${project.nom_projet} - Titouan Winkel`} description={project.description || undefined}>
+	<main class="project overflow-x-clip" style={`--p: ${projectColor}; --p-on: ${onColor};`}>
+		<!-- HERO -->
+		<section class="project-hero relative">
+			<div class="project-hero-bg absolute inset-0" aria-hidden="true">
+				<div class="project-hero-grid absolute inset-0"></div>
+			</div>
 
-    <!-- Hero Section with project title and colored background -->
-    <!-- Added negative z-index to position hero behind header -->
-    <section class="relative py-24 md:py-40 overflow-hidden -mt-32 pt-56">
-        <!-- Animated background gradient -->
-        <div
-            class="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-purple-100 -z-10"
-            style={`background: linear-gradient(to bottom right, ${projectColor}10, white, ${projectColor}20);`}
-        >
-        </div>
+			<div class="relative container mx-auto px-4 md:px-6 pt-10 md:pt-14 pb-16 md:pb-24">
+				<a href="/projets" class="back-link" data-hero-in>
+					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+						<path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="square"></path>
+					</svg>
+					Tous les projets
+				</a>
 
-        <!-- Decorative floating elements -->
-        <div
-            class="absolute top-20 right-20 w-72 h-72 rounded-full opacity-10 blur-3xl animate-pulse"
-            style={`background-color: ${projectColor};`}
-        >
-        </div>
-        <div
-            class="absolute bottom-20 left-20 w-96 h-96 rounded-full opacity-10 blur-3xl animate-pulse"
-            style={`background-color: ${projectColor}; animation-delay: 1s;`}
-        >
-        </div>
+				<div class="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center mt-10 md:mt-14">
+					<div class="space-y-6 md:space-y-8">
+						<p class="flex flex-wrap items-center gap-3" data-hero-in>
+							<span class="project-num">Projet {number} / {total}</span>
+							{year && <span class="project-year">{year}</span>}
+						</p>
 
-        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-            <div
-                id="hero-content"
-                class="flex flex-col items-center justify-center gap-6 md:gap-8 transition-opacity duration-300 md:opacity-100"
-            >
-                {
-                    heroImageUrl && (
-                        <div class="relative group z-50">
-                            <img
-                                src={heroImageUrl || "/placeholder.svg"}
-                                alt={`${project.nom_projet} logo`}
-                                class="relative w-20 md:w-32 h-auto object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-300"
-                            />
-                        </div>
-                    )
-                }
-                <h1
-                    class="text-black font-['Russo_One'] text-3xl md:text-6xl font-normal leading-tight text-center relative z-50"
-                >
-                    <span class="relative inline-block">
-                        {project.nom_projet}
-                        <div
-                            class="absolute -bottom-2 left-0 right-0 h-1"
-                            style={`background: linear-gradient(to right, transparent, ${projectColor}, transparent);`}
-                        >
-                        </div>
-                    </span>
-                </h1>
-            </div>
-        </div>
-    </section>
+						<div class="flex items-center gap-5">
+							{
+								logoUrl && (
+									<span class="project-logo" data-hero-in>
+										<img src={logoUrl} alt={`Logo ${project.nom_projet}`} />
+									</span>
+								)
+							}
+							<h1 class="project-title text-4xl md:text-6xl xl:text-7xl leading-[1.05]">
+								<span class="line"><span>{project.nom_projet}</span></span>
+							</h1>
+						</div>
 
-    <!-- Skills Section with logos -->
-    <section class="py-12 md:py-20 bg-white relative overflow-hidden">
-        <div
-            class="absolute top-0 right-0 w-64 h-64 rounded-full opacity-30 blur-3xl"
-            style={`background-color: ${projectColor};`}
-        >
-        </div>
+						{project.description && <p class="max-w-xl text-lg md:text-xl leading-relaxed" data-hero-in>{project.description}</p>}
 
-        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-            <SectionTitle text="Compétences mobilisées" />
+						{
+							tools.length > 0 && (
+								<ul class="flex flex-wrap gap-2" aria-label="Outils utilisés" data-hero-in>
+									{tools.map((tool) => (
+										<li class="tool-chip">
+											{tool.logo && <img src={tool.logo.src} alt="" width="20" height="20" />}
+											{tool.name}
+										</li>
+									))}
+								</ul>
+							)
+						}
 
-            <div
-                class="flex flex-wrap gap-6 md:gap-8 justify-center mt-8 md:mt-12"
-            >
-                {
-                    project.competences &&
-                        project.competences.map((competence, index) => {
-                            const logoKey = competence.toLowerCase();
-                            const logo =
-                                logoMap[logoKey] || logoMap[competence];
-                            const logoSrc = logo
-                                ? logo.src
-                                : "/placeholder.svg";
+						<div class="flex flex-col sm:flex-row gap-5 sm:gap-8 pt-2" data-hero-in>
+							{
+								siteUrl && (
+									<SkewButton href={siteUrl} target="_blank" rel="noopener noreferrer" icon="arrow" variant="primary">
+										Voir le site
+									</SkewButton>
+								)
+							}
+							{finals.length > 0 && <SkewButton href="#realisation" icon="arrow">Voir les visuels</SkewButton>}
+						</div>
+					</div>
 
-                            return (
-                                <div
-                                    class="group relative"
-                                    style={`animation-delay: ${index * 100}ms;`}
-                                >
-                                    {/* Gradient glow effect */}
-                                    <div
-                                        class="absolute -inset-2 rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-all duration-300"
-                                        style={`background: linear-gradient(to bottom right, ${projectColor}, ${projectColor});`}
-                                    />
+					{
+						cover && (
+							<a href={cover} class="hero-cover" data-lightbox="finals" data-index="0" aria-label="Agrandir le visuel principal">
+								<img src={cover} alt={`Visuel principal du projet ${project.nom_projet}`} fetchpriority="high" />
+							</a>
+						)
+					}
+				</div>
+			</div>
+		</section>
 
-                                    {/* Card container */}
-                                    <div
-                                        class="relative bg-gradient-to-br from-purple-50 to-white p-6 md:p-8 rounded-2xl border-2 shadow-lg group-hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-1"
-                                        style={`background: linear-gradient(to bottom right, ${projectColor}10, white); border-color: ${projectColor}30;`}
-                                    >
-                                        <img
-                                            src={logoSrc || "/placeholder.svg"}
-                                            alt={competence}
-                                            class="w-16 h-16 md:w-20 md:h-20 object-contain transform group-hover:scale-110 transition-transform duration-300"
-                                        />
-                                        <p class="mt-3 text-center text-sm font-['Space_Grotesk'] text-black/70 font-medium">
-                                            {competence}
-                                        </p>
-                                    </div>
-                                </div>
-                            );
-                        })
-                }
-            </div>
-        </div>
-    </section>
+		<!-- PRÉSENTATION -->
+		{
+			intro.length > 0 && (
+				<section class="container mx-auto px-4 md:px-6 py-16 md:py-24">
+					<div class="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-12 lg:gap-20 items-start">
+						<div>
+							<SectionTitle text="Le projet" />
+							<div class="space-y-5" data-reveal>
+								{intro.map((paragraph, i) => (
+									<p class:list={["leading-relaxed", i === 0 ? "text-xl md:text-2xl" : "text-lg md:text-xl"]}>{paragraph}</p>
+								))}
+							</div>
+						</div>
 
-    <!-- Introduction Section -->
-    {
-        introText && (
-            <section
-                class="py-12 md:py-20 relative overflow-hidden"
-                style={`background: linear-gradient(to bottom, white, ${projectColor}10);`}
-            >
-                <div
-                    class="absolute bottom-0 left-0 w-full h-px"
-                    style={`background: linear-gradient(to right, transparent, ${projectColor}50, transparent);`}
-                />
+						<aside class="fact-sheet" data-reveal>
+							<h2 class="text-xl mb-5">En bref</h2>
+							<dl class="space-y-4">
+								{year && (
+									<div>
+										<dt>Année</dt>
+										<dd>{year}</dd>
+									</div>
+								)}
+								{tools.length > 0 && (
+									<div>
+										<dt>Outils</dt>
+										<dd>{tools.map((t) => t.name).join(", ")}</dd>
+									</div>
+								)}
+								{finals.length > 0 && (
+									<div>
+										<dt>Visuels</dt>
+										<dd>{finals.length} réalisation{finals.length > 1 ? "s" : ""}</dd>
+									</div>
+								)}
+								{siteUrl && (
+									<div>
+										<dt>En ligne</dt>
+										<dd>
+											<a href={siteUrl} target="_blank" rel="noopener noreferrer" class="underline decoration-2 underline-offset-4 break-all">
+												{siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+											</a>
+										</dd>
+									</div>
+								)}
+							</dl>
+						</aside>
+					</div>
+				</section>
+			)
+		}
 
-                <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-                    <SectionTitle text="Introduction" />
+		<!-- ÉVOLUTION DU LOGO -->
+		{
+			showLogoEvolution && (
+				<section class="tinted py-16 md:py-24">
+					<div class="container mx-auto px-4 md:px-6">
+						<SectionTitle text="Évolution du logo" />
+						<div class="logo-compare grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 md:gap-6 items-stretch" data-reveal data-reveal-stagger>
+							<figure class="logo-card">
+								<span class="logo-tag">Avant</span>
+								<div class="logo-frame">
+									<img src={file(project.logo_old!)} alt={`Premier logo ${project.nom_projet}`} loading="lazy" />
+								</div>
+								{project.logo_old_txt && <figcaption>{project.logo_old_txt}</figcaption>}
+							</figure>
+							<span class="logo-arrow" aria-hidden="true">
+								<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.5">
+									<path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square" />
+								</svg>
+							</span>
+							<figure class="logo-card logo-card--new">
+								<span class="logo-tag">Après</span>
+								<div class="logo-frame">
+									<img src={file(project.logo_new!)} alt={`Logo final ${project.nom_projet}`} loading="lazy" />
+								</div>
+								{project.logo_new_txt && <figcaption>{project.logo_new_txt}</figcaption>}
+							</figure>
+						</div>
+					</div>
+				</section>
+			)
+		}
 
-                    <div class="relative mt-8 md:mt-12">
-                        {/* Decorative quote mark */}
-                        <div
-                            class="absolute -top-8 -left-4 text-9xl font-['Russo_One'] opacity-50"
-                            style={`color: ${projectColor}30;`}
-                        >
-                            "
-                        </div>
+		<!-- INSPIRATIONS -->
+		{
+			(inspiration.length > 0 || inspirations.length > 0) && (
+				<section class="container mx-auto px-4 md:px-6 py-16 md:py-24">
+					<div class="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-20 items-center">
+						<div>
+							<SectionTitle text="Inspirations" />
+							{inspiration.length > 0 && (
+								<blockquote class="inspiration-quote space-y-4" data-reveal>
+									{inspiration.map((paragraph) => (
+										<p class="text-lg md:text-xl leading-relaxed">{paragraph}</p>
+									))}
+								</blockquote>
+							)}
+						</div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 relative">
-                            <div class="relative">
-                                <div
-                                    class="absolute -left-4 top-0 bottom-0 w-1 rounded-full"
-                                    style={`background: linear-gradient(to bottom, ${projectColor}, ${projectColor}50);`}
-                                />
-                                <p
-                                    class="text-black/80 font-['Space_Grotesk'] text-base md:text-xl font-normal leading-relaxed pl-4"
-                                    style="text-align: justify;"
-                                >
-                                    {introCol1}
-                                </p>
-                            </div>
-                            <p
-                                class="text-black/80 font-['Space_Grotesk'] text-base md:text-xl font-normal leading-relaxed"
-                                style="text-align: justify;"
-                            >
-                                {introCol2}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        )
-    }
+						{inspirations.length > 0 && (
+							<ul class:list={["inspiration-grid", `count-${Math.min(inspirations.length, 3)}`]} data-reveal data-reveal-stagger>
+								{inspirations.map((src, i) => (
+									<li>
+										<a href={src} class="inspiration-item" data-lightbox="inspirations" data-index={i} aria-label={`Agrandir l'inspiration ${i + 1}`}>
+											<img src={src} alt={`Inspiration ${i + 1}`} loading="lazy" decoding="async" />
+										</a>
+									</li>
+								))}
+							</ul>
+						)}
+					</div>
+				</section>
+			)
+		}
 
-    <!-- Inspirations Section -->
-    {
-        project.inspiration_texte && (
-            <section
-                class="py-12 md:py-24 relative overflow-hidden"
-                style={`background: linear-gradient(to bottom, ${projectColor}10, white, ${projectColor}10);`}
-            >
-                <div
-                    class="absolute top-10 right-10 w-64 h-64 rounded-full opacity-20 blur-3xl"
-                    style={`background-color: ${projectColor};`}
-                />
-                <div
-                    class="absolute bottom-10 left-10 w-64 h-64 rounded-full opacity-20 blur-3xl"
-                    style={`background-color: ${projectColor};`}
-                />
+		<!-- RÉALISATION -->
+		{
+			finals.length > 0 && (
+				<section id="realisation" class="tinted py-16 md:py-24 scroll-mt-20">
+					<div class="container mx-auto px-4 md:px-6">
+						<div class="flex flex-wrap items-end justify-between gap-4">
+							<SectionTitle text="Réalisation" />
+							<p class="mb-8 font-heading">
+								{finals.length} visuel{finals.length > 1 ? "s" : ""}
+							</p>
+						</div>
+						<ul class="gallery">
+							{finals.map((src, i) => (
+								<li class="gallery-item">
+									<a href={src} data-lightbox="finals" data-index={i} aria-label={`Agrandir le visuel ${i + 1}`}>
+										<img src={src} alt={`${project.nom_projet} — visuel ${i + 1}`} loading="lazy" decoding="async" />
+										<span class="gallery-num">{String(i + 1).padStart(2, "0")}</span>
+									</a>
+								</li>
+							))}
+						</ul>
 
-                <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-                    <SectionTitle text="Inspirations" />
+						{siteUrl && (
+							<div class="flex justify-center mt-14">
+								<SkewButton href={siteUrl} target="_blank" rel="noopener noreferrer" icon="arrow" variant="primary">
+									Accéder au site web
+								</SkewButton>
+							</div>
+						)}
+					</div>
+				</section>
+			)
+		}
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mt-8">
-                        {/* Text content with decorative card */}
-                        <div class="relative">
-                            <div
-                                class="absolute -inset-4 rounded-2xl transform rotate-1 opacity-50"
-                                style={`background: linear-gradient(to bottom right, ${projectColor}20, ${projectColor}10);`}
-                            />
-                            <div
-                                class="relative bg-white p-6 md:p-8 rounded-2xl shadow-lg border-2"
-                                style={`border-color: ${projectColor}30;`}
-                            >
-                                <div class="space-y-4 md:space-y-6">
-                                    {inspParagraphs.map((paragraph, index) => (
-                                        <p
-                                            class="text-black/80 font-['Space_Grotesk'] text-sm md:text-lg font-normal leading-relaxed"
-                                            style="text-align: justify;"
-                                        >
-                                            {index === 0 && (
-                                                <span
-                                                    class="text-5xl float-left font-['Russo_One'] leading-none mr-2 mt-1"
-                                                    style={`color: ${projectColor};`}
-                                                >
-                                                    "
-                                                </span>
-                                            )}
-                                            {paragraph}
-                                        </p>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
+		<!-- CONCLUSION -->
+		{
+			conclusion.length > 0 && (
+				<section class="container mx-auto px-4 md:px-6 py-16 md:py-24">
+					<SectionTitle text="Conclusion" />
+					<div class="max-w-3xl space-y-5 text-lg md:text-xl leading-relaxed" data-reveal>
+						{conclusion.map((paragraph) => <p>{paragraph}</p>)}
+					</div>
+				</section>
+			)
+		}
 
-                        {/* Images gallery with modern grid */}
-                        {inspirationImages.length > 0 && (
-                            <div class="grid grid-cols-2 gap-4 auto-rows-[200px]">
-                                {inspirationImages
-                                    .slice(0, 3)
-                                    .map((image, index) => (
-                                        <div
-                                            class={`
-                                            ${index === 0 ? "col-span-2 row-span-2" : "col-span-1"}
-                                            relative group overflow-hidden rounded-xl shadow-lg
-                                            hover:shadow-2xl transition-all duration-300
-                                        `}
-                                        >
-                                            <div
-                                                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                                                style={`background: linear-gradient(to top, ${projectColor}99, transparent);`}
-                                            />
-                                            <img
-                                                src={
-                                                    getImageUrl(
-                                                        project,
-                                                        image,
-                                                    ) || "/placeholder.svg"
-                                                }
-                                                alt={`Inspiration ${index + 1}`}
-                                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                                            />
-                                            <div class="absolute bottom-4 left-4 text-white font-['Russo_One'] text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                                                #{index + 1}
-                                            </div>
-                                        </div>
-                                    ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </section>
-        )
-    }
+		<!-- NAVIGATION ENTRE PROJETS -->
+		{
+			(prevProject || nextProject) && (
+				<nav class="container mx-auto px-4 md:px-6 pt-16 md:pt-24" aria-label="Autres projets">
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-reveal data-reveal-stagger>
+						{prevProject ? (
+							<a href={`/projets/${prevProject.id}`} class="project-nav">
+								<span class="text-sm uppercase tracking-widest">← Projet précédent</span>
+								<span class="font-heading text-2xl md:text-3xl leading-tight">{prevProject.nom_projet}</span>
+							</a>
+						) : (
+							<span class="hidden md:block" />
+						)}
+						{nextProject && (
+							<a href={`/projets/${nextProject.id}`} class="project-nav project-nav--next">
+								<span class="text-sm uppercase tracking-widest">Projet suivant →</span>
+								<span class="font-heading text-2xl md:text-3xl leading-tight">{nextProject.nom_projet}</span>
+							</a>
+						)}
+					</div>
+				</nav>
+			)
+		}
 
-    <!-- Production Finale Section -->
-    {
-        prodFinaleImages.length > 0 && (
-            <section class="py-12 md:py-20 bg-white relative overflow-hidden">
-                <div
-                    class="absolute top-0 left-1/2 w-96 h-96 rounded-full opacity-20 blur-3xl -translate-x-1/2"
-                    style={`background-color: ${projectColor};`}
-                />
+		<ContactCta />
+	</main>
 
-                <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-                    <SectionTitle text="Production Finale" />
-
-                    {/* Modern masonry-style grid */}
-                    <div class="columns-1 md:columns-2 lg:columns-3 gap-6 md:gap-8 mt-8 md:mt-12 space-y-6 md:space-y-8">
-                        {prodFinaleImages.map((image, index) => (
-                            <div class="break-inside-avoid group">
-                                <div
-                                    class="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-2"
-                                    style={`background: linear-gradient(to bottom right, ${projectColor}10, white);`}
-                                >
-                                    <div
-                                        class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                                        style={`background: linear-gradient(to top, ${projectColor}30, transparent);`}
-                                    />
-                                    <img
-                                        src={
-                                            getImageUrl(project, image) ||
-                                            "/placeholder.svg" ||
-                                            "/placeholder.svg"
-                                        }
-                                        alt={`Production finale ${index + 1}`}
-                                        class="w-full h-auto max-w-md mx-auto object-contain rounded-xl transform group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                    {/* Image counter badge */}
-                                    <div
-                                        class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-['Russo_One'] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"
-                                        style={`color: ${projectColor};`}
-                                    >
-                                        {index + 1}/{prodFinaleImages.length}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Visit Website Button */}
-                    {project.lien_appli && (
-                        <div class="flex justify-center mt-12 md:mt-16">
-                            <div class="relative group">
-                                <div
-                                    class="absolute -inset-2 rounded-xl opacity-20 group-hover:opacity-40 blur-xl transition-opacity duration-300"
-                                    style={`background: linear-gradient(to right, ${projectColor}, ${projectColor});`}
-                                />
-                                <SkewButton href={project.lien_appli}>
-                                    Accéder au site web
-                                </SkewButton>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </section>
-        )
-    }
+	<!-- Visionneuse plein écran -->
+	<dialog id="lightbox" class="lightbox" aria-label="Visionneuse d'images">
+		<img id="lightbox-img" alt="" />
+		<p id="lightbox-count" class="lightbox-count"></p>
+		<button class="lightbox-btn lightbox-close" data-lightbox-close aria-label="Fermer">
+			<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19" stroke-linecap="square" /></svg>
+		</button>
+		<button class="lightbox-btn lightbox-prev" data-lightbox-prev aria-label="Image précédente">
+			<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="square" /></svg>
+		</button>
+		<button class="lightbox-btn lightbox-next" data-lightbox-next aria-label="Image suivante">
+			<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square" /></svg>
+		</button>
+	</dialog>
 </Layout>
 
+<style>
+	/* ---------- HERO ---------- */
+	.project-hero {
+		margin-top: calc(-1 * var(--header-h));
+		padding-top: var(--header-h);
+		border-bottom: 4px solid var(--color-ink);
+	}
+
+	.project-hero-bg {
+		background: linear-gradient(160deg, color-mix(in srgb, var(--p) 55%, #fff) 0%, color-mix(in srgb, var(--p) 18%, #fff) 70%);
+	}
+
+	.project-hero-grid {
+		background-image:
+			linear-gradient(rgb(11 7 16 / 0.07) 1px, transparent 1px),
+			linear-gradient(90deg, rgb(11 7 16 / 0.07) 1px, transparent 1px);
+		background-size: 56px 56px;
+		mask-image: radial-gradient(ellipse at 70% 40%, #000 20%, transparent 75%);
+	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 14px;
+		border: 2px solid var(--color-ink);
+		background: #fff;
+		font-family: var(--font-heading);
+		font-size: 0.9rem;
+		transition:
+			background-color 0.25s ease,
+			color 0.25s ease;
+	}
+
+	.back-link svg {
+		transition: transform 0.25s ease;
+	}
+
+	.back-link:hover {
+		background: var(--color-ink);
+		color: #fff;
+	}
+
+	.back-link:hover svg {
+		transform: translateX(-4px);
+	}
+
+	.project-num {
+		padding: 4px 12px;
+		background: var(--color-ink);
+		color: #fff;
+		font-family: var(--font-heading);
+		font-size: 0.9rem;
+		transform: skewX(-12deg);
+	}
+
+	.project-year {
+		padding: 2px 12px;
+		border: 2px solid var(--color-ink);
+		background: rgb(255 255 255 / 0.7);
+		font-weight: 600;
+	}
+
+	.project-logo {
+		display: grid;
+		flex-shrink: 0;
+		place-items: center;
+		width: clamp(64px, 9vw, 104px);
+		aspect-ratio: 1;
+		padding: 10px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		box-shadow: var(--shadow-brutal);
+	}
+
+	.project-logo img {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+	}
+
+	.project-title .line {
+		display: block;
+		overflow: hidden;
+		padding-bottom: 0.08em;
+	}
+
+	.project-title .line > span {
+		display: inline-block;
+	}
+
+	.tool-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 5px 12px;
+		border: 2px solid var(--color-ink);
+		background: #fff;
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+
+	.tool-chip img {
+		width: 20px;
+		height: 20px;
+		object-fit: contain;
+	}
+
+	.hero-cover {
+		display: block;
+		overflow: hidden;
+		border: 4px solid var(--color-ink);
+		background: #fff;
+		box-shadow: 12px 12px 0 0 var(--color-ink);
+		transform: rotate(2deg);
+		cursor: zoom-in;
+		transition:
+			transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.hero-cover:hover {
+		transform: rotate(0deg) translate(-4px, -4px);
+		box-shadow: 16px 16px 0 0 var(--color-ink);
+	}
+
+	.hero-cover img {
+		width: 100%;
+		max-height: 70vh;
+		object-fit: contain;
+	}
+
+	/* ---------- SECTIONS ---------- */
+	.tinted {
+		border-block: 4px solid var(--color-ink);
+		background: color-mix(in srgb, var(--p) 14%, #fff);
+	}
+
+	.fact-sheet {
+		padding: 28px;
+		border: 3px solid var(--color-ink);
+		background: var(--p);
+		color: var(--p-on);
+		box-shadow: var(--shadow-brutal-lg);
+	}
+
+	@media (min-width: 1024px) {
+		.fact-sheet {
+			position: sticky;
+			top: calc(var(--header-h) + 24px);
+		}
+	}
+
+	.fact-sheet dt {
+		font-family: var(--font-heading);
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		opacity: 0.75;
+	}
+
+	.fact-sheet dd {
+		font-size: 1.1rem;
+		font-weight: 600;
+	}
+
+	/* Évolution du logo */
+	.logo-card {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		padding: 28px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		box-shadow: var(--shadow-brutal);
+	}
+
+	.logo-card--new {
+		box-shadow: 10px 10px 0 0 var(--p);
+		outline: 3px solid var(--color-ink);
+		outline-offset: -3px;
+	}
+
+	.logo-tag {
+		position: absolute;
+		top: -16px;
+		left: 20px;
+		padding: 2px 12px;
+		background: var(--color-ink);
+		color: #fff;
+		font-family: var(--font-heading);
+		transform: skewX(-12deg);
+	}
+
+	.logo-card--new .logo-tag {
+		background: var(--p);
+		color: var(--p-on);
+		border: 2px solid var(--color-ink);
+	}
+
+	.logo-frame {
+		display: grid;
+		place-items: center;
+		height: 200px;
+		background: repeating-conic-gradient(rgb(11 7 16 / 0.04) 0% 25%, transparent 0% 50%) 0 0 / 24px 24px;
+	}
+
+	.logo-frame img {
+		max-width: 80%;
+		max-height: 160px;
+		object-fit: contain;
+	}
+
+	.logo-card:not(.logo-card--new) .logo-frame img {
+		filter: grayscale(0.6);
+		opacity: 0.85;
+	}
+
+	.logo-card figcaption {
+		line-height: 1.6;
+	}
+
+	.logo-arrow {
+		display: grid;
+		place-items: center;
+		align-self: center;
+		justify-self: center;
+		width: 64px;
+		height: 64px;
+		border: 3px solid var(--color-ink);
+		background: var(--color-lilac);
+		transform: skewX(-12deg);
+	}
+
+	@media (max-width: 767px) {
+		.logo-arrow {
+			transform: skewX(-12deg) rotate(90deg);
+		}
+	}
+
+	/* Inspirations */
+	.inspiration-quote {
+		position: relative;
+		padding-left: 24px;
+		border-left: 6px solid var(--p);
+	}
+
+	.inspiration-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		grid-auto-rows: 180px;
+		gap: 16px;
+	}
+
+	@media (min-width: 768px) {
+		.inspiration-grid {
+			grid-auto-rows: 220px;
+		}
+	}
+
+	.inspiration-grid.count-1 {
+		grid-template-columns: 1fr;
+		grid-auto-rows: 360px;
+	}
+
+	.inspiration-grid.count-3 > li:first-child {
+		grid-column: span 2;
+	}
+
+	.inspiration-item {
+		display: block;
+		height: 100%;
+		overflow: hidden;
+		border: 3px solid var(--color-ink);
+		box-shadow: var(--shadow-brutal);
+		cursor: zoom-in;
+	}
+
+	.inspiration-item img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.inspiration-item:hover img {
+		transform: scale(1.06);
+	}
+
+	/* Galerie */
+	.gallery {
+		columns: 1;
+		column-gap: 28px;
+	}
+
+	@media (min-width: 640px) {
+		.gallery {
+			columns: 2;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.gallery {
+			columns: 3;
+		}
+	}
+
+	.gallery-item {
+		break-inside: avoid;
+		margin-bottom: 28px;
+	}
+
+	.gallery-item a {
+		position: relative;
+		display: block;
+		overflow: hidden;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		box-shadow: var(--shadow-brutal);
+		cursor: zoom-in;
+		transition:
+			transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.gallery-item a:hover {
+		transform: translate(-3px, -3px);
+		box-shadow: 9px 9px 0 0 var(--color-ink);
+	}
+
+	.gallery-item img {
+		width: 100%;
+		height: auto;
+	}
+
+	.gallery-num {
+		position: absolute;
+		top: 0;
+		left: 0;
+		padding: 2px 10px;
+		background: var(--color-ink);
+		color: #fff;
+		font-family: var(--font-heading);
+		font-size: 0.85rem;
+	}
+
+	/* Navigation entre projets */
+	.project-nav {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		height: 100%;
+		padding: 28px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		box-shadow: var(--shadow-brutal);
+		transition:
+			translate 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+			background-color 0.3s ease,
+			color 0.3s ease;
+	}
+
+	.project-nav--next {
+		align-items: flex-end;
+		text-align: right;
+	}
+
+	.project-nav:hover {
+		translate: -3px -3px;
+		background: var(--color-ink);
+		color: #fff;
+		box-shadow: 9px 9px 0 0 var(--color-iris);
+	}
+
+	/* ---------- VISIONNEUSE ---------- */
+	.lightbox {
+		width: 100vw;
+		height: 100dvh;
+		max-width: none;
+		max-height: none;
+		margin: 0;
+		padding: 64px 16px;
+		border: 0;
+		background: transparent;
+		color: #fff;
+	}
+
+	.lightbox[open] {
+		display: grid;
+		place-items: center;
+	}
+
+	.lightbox::backdrop {
+		background: rgb(11 7 16 / 0.92);
+	}
+
+	.lightbox img {
+		max-width: min(100%, 1400px);
+		max-height: calc(100dvh - 128px);
+		object-fit: contain;
+		border: 3px solid #fff;
+		background: #fff;
+	}
+
+	.lightbox-count {
+		position: absolute;
+		left: 50%;
+		bottom: 20px;
+		transform: translateX(-50%);
+		font-family: var(--font-heading);
+	}
+
+	.lightbox-btn {
+		position: absolute;
+		display: grid;
+		place-items: center;
+		width: 52px;
+		height: 52px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		color: var(--color-ink);
+		transform: skewX(-12deg);
+		transition:
+			background-color 0.25s ease,
+			color 0.25s ease;
+	}
+
+	.lightbox-btn:hover {
+		background: var(--color-lilac);
+	}
+
+	.lightbox-btn[hidden] {
+		display: none;
+	}
+
+	.lightbox-close {
+		top: 16px;
+		right: 16px;
+	}
+
+	.lightbox-prev,
+	.lightbox-next {
+		top: 50%;
+		margin-top: -26px;
+	}
+
+	.lightbox-prev {
+		left: 16px;
+	}
+
+	.lightbox-next {
+		right: 16px;
+	}
+
+	@media (max-width: 767px) {
+		.lightbox-prev,
+		.lightbox-next {
+			top: auto;
+			bottom: 12px;
+			margin-top: 0;
+		}
+
+		.lightbox-count {
+			bottom: 28px;
+		}
+	}
+</style>
+
 <script>
-    const backLink = document.getElementById("back-link");
-    let lastScrollTop = 0;
+	import { gsap } from "gsap";
+	import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-    window.addEventListener("scroll", () => {
-        const scrollTop =
-            window.pageYOffset || document.documentElement.scrollTop;
+	gsap.registerPlugin(ScrollTrigger);
 
-        if (scrollTop > 100) {
-            // When scrolled down, stick to top
-            backLink?.classList.remove("top-32");
-            backLink?.classList.add("top-4");
-        } else {
-            // When at top, position below header
-            backLink?.classList.remove("top-4");
-            backLink?.classList.add("top-32");
-        }
-    });
+	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		gsap.from(".project-title .line > span", { yPercent: 110, duration: 1.1, ease: "power4.out", delay: 0.15 });
+		gsap.from("[data-hero-in]", { y: 30, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.08, delay: 0.2 });
+		gsap.from(".hero-cover", { y: 80, rotate: 8, opacity: 0, duration: 1.2, ease: "power3.out", delay: 0.35, clearProps: "transform" });
+		gsap.from(".gallery-item", {
+			y: 60,
+			opacity: 0,
+			duration: 0.9,
+			ease: "power3.out",
+			stagger: 0.08,
+			scrollTrigger: { trigger: ".gallery", start: "top 85%", once: true },
+		});
+	}
 
-    // Existing mobile menu toggle script
-    document.addEventListener("mobileMenuToggle", (event) => {
-        const heroContent = document.getElementById("hero-content");
-        if (heroContent && window.innerWidth < 768) {
-            if (event.detail.isOpen) {
-                heroContent.style.opacity = "0";
-                heroContent.style.pointerEvents = "none";
-            } else {
-                heroContent.style.opacity = "1";
-                heroContent.style.pointerEvents = "auto";
-            }
-        }
-    });
+	/* ---------- VISIONNEUSE ---------- */
+	const dialog = document.getElementById("lightbox") as HTMLDialogElement;
+	const img = document.getElementById("lightbox-img") as HTMLImageElement;
+	const count = document.getElementById("lightbox-count")!;
+	const prevBtn = dialog.querySelector<HTMLButtonElement>("[data-lightbox-prev]")!;
+	const nextBtn = dialog.querySelector<HTMLButtonElement>("[data-lightbox-next]")!;
 
-    // Handle redirection if project is null
-    // This part is already handled in the server-side code
+	// Une liste d'images par groupe (sans doublon : la couverture fait aussi partie de la galerie)
+	const groups = new Map<string, { src: string; alt: string }[]>();
+	document.querySelectorAll<HTMLAnchorElement>("[data-lightbox]").forEach((link) => {
+		const group = link.dataset.lightbox!;
+		const index = Number(link.dataset.index);
+		const list = groups.get(group) ?? [];
+		list[index] ??= { src: link.href, alt: link.querySelector("img")?.alt ?? "" };
+		groups.set(group, list);
+	});
+
+	let current: { src: string; alt: string }[] = [];
+	let index = 0;
+
+	function show(i: number) {
+		index = (i + current.length) % current.length;
+		img.src = current[index].src;
+		img.alt = current[index].alt;
+		count.textContent = current.length > 1 ? `${index + 1} / ${current.length}` : "";
+		prevBtn.hidden = nextBtn.hidden = current.length < 2;
+	}
+
+	document.addEventListener("click", (e) => {
+		const link = (e.target as HTMLElement).closest<HTMLAnchorElement>("[data-lightbox]");
+		if (!link || e.metaKey || e.ctrlKey) return;
+		e.preventDefault();
+		current = groups.get(link.dataset.lightbox!) ?? [];
+		show(Number(link.dataset.index));
+		dialog.showModal();
+		window.lenis?.stop();
+	});
+
+	prevBtn.addEventListener("click", () => show(index - 1));
+	nextBtn.addEventListener("click", () => show(index + 1));
+	dialog.querySelector("[data-lightbox-close]")!.addEventListener("click", () => dialog.close());
+	// Un clic hors de l'image ferme la visionneuse
+	dialog.addEventListener("click", (e) => {
+		if (e.target === dialog) dialog.close();
+	});
+	dialog.addEventListener("keydown", (e) => {
+		if (e.key === "ArrowLeft") show(index - 1);
+		if (e.key === "ArrowRight") show(index + 1);
+	});
+	dialog.addEventListener("close", () => window.lenis?.start());
 </script>
