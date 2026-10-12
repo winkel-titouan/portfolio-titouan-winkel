@@ -313,11 +313,24 @@ const isActive = (href: string) => currentPath.startsWith(href);
     const SCROLL_TOLERANCE = 24;
     let anchorY = window.scrollY;
     let ticking = false;
+    // Une page peut verrouiller le header (masqué même en remontant), ex. pendant l'aperçu des projets
+    let locked = false;
+    window.addEventListener("headerLock", (e) => {
+        const { locked: next, reveal } = (e as CustomEvent<{ locked: boolean; reveal?: boolean }>).detail;
+        locked = next;
+        anchorY = window.scrollY;
+        if (locked) header.classList.add("is-hidden");
+        else if (reveal) header.classList.remove("is-hidden");
+    });
+
     function onScroll() {
         const y = window.scrollY;
         header.classList.toggle("is-scrolled", y > 10);
 
-        if (y <= 300 || isOpen) {
+        if (locked && !isOpen) {
+            header.classList.add("is-hidden");
+            anchorY = y;
+        } else if (y <= 300 || isOpen) {
             header.classList.remove("is-hidden");
             anchorY = y;
         } else {

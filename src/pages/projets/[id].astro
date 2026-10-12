@@ -2,11 +2,9 @@
 export const prerender = false;
 
 import Layout from "../../layouts/Layout.astro";
-import SectionTitle from "../../components/SectionTitle.astro";
 import SkewButton from "../../components/SkewButton.astro";
 import ContactCta from "../../components/ContactCta.astro";
 import { pb, getFileUrl, type Projet } from "../../utils/pb";
-import { findSkill } from "../../data/skills";
 
 const { id = "" } = Astro.params;
 
@@ -37,262 +35,152 @@ const number = String(position + 1).padStart(2, "0");
 const total = String(allProjects.length).padStart(2, "0");
 const year = project.created ? new Date(project.created.replace(" ", "T")).getFullYear() : undefined;
 
-const tools = (project.competences ?? []).map((key) => {
-	const skill = findSkill(key);
-	return { name: skill?.name ?? key.replace(/_/g, " "), logo: skill?.logo };
-});
-
-const toParagraphs = (text?: string) =>
-	(text ?? "")
-		.replace(/<[^>]+>/g, "\n")
-		.split(/\r?\n/)
-		.map((p) => p.trim())
-		.filter(Boolean);
-
-const intro = toParagraphs(project.introduction);
-const inspiration = toParagraphs(project.inspiration_texte);
-const conclusion = toParagraphs(project.conclusion);
-
 const file = (name: string) => getFileUrl(project.id, name);
 const finals = (project.prod_finale ?? []).map(file);
 const inspirations = (project.inspirations ?? []).map(file);
-const cover = finals[0];
 const logoUrl = project.logo_new ? file(project.logo_new) : undefined;
-const showLogoEvolution = project.section_logo !== false && project.logo_old && project.logo_new;
 const siteUrl = project.lien_appli || project.lien_site;
+
+// Taille de départ du titre (la police fait environ 1em par lettre), affinée ensuite en JS pour tenir dans le hero
+const name = project.nom_projet;
+const longestWord = Math.max(...name.split(" ").map((w) => w.length));
+const fitLength = name.length <= 12 ? name.length : longestWord;
+const titleSize = Math.min(20, 86 / Math.max(fitLength, 1)).toFixed(2);
+
+// Emplacements du moodboard (centre en %, rotation en degrés), réutilisés en boucle
+const spots = [
+	[20, 30, -8],
+	[79, 26, 6],
+	[30, 74, 5],
+	[71, 73, -6],
+	[50, 20, 3],
+	[11, 58, 7],
+	[90, 55, -4],
+	[52, 84, -3],
+];
+const chapterInspi = "01";
+const chapterFinals = inspirations.length > 0 ? "02" : "01";
 ---
 
-<Layout title={`${project.nom_projet} - Titouan Winkel`} description={project.description || undefined}>
+<Layout title={`${name} - Titouan Winkel`} description={project.description || undefined}>
 	<main class="project overflow-x-clip" style={`--p: ${projectColor}; --p-on: ${onColor};`}>
-		<!-- HERO -->
-		<section class="project-hero relative">
-			<div class="project-hero-bg absolute inset-0" aria-hidden="true">
-				<div class="project-hero-grid absolute inset-0"></div>
-			</div>
+		<!-- HERO : couleur du projet, logo dans un disque, nom en très grand -->
+		<section class="hero">
+			<div class="hero-bg" aria-hidden="true"></div>
 
-			<div class="relative container mx-auto px-4 md:px-6 pt-10 md:pt-14 pb-16 md:pb-24">
-				<a href="/projets" class="back-link" data-hero-in>
+			<div class="hero-top container mx-auto px-4 md:px-6">
+				<a href="/projets" class="back-link">
 					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
 						<path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="square"></path>
 					</svg>
 					Tous les projets
 				</a>
+				<p class="hero-meta">
+					<span>Projet {number} / {total}</span>
+					{year && <span>{year}</span>}
+				</p>
+			</div>
 
-				<div class="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center mt-10 md:mt-14">
-					<div class="space-y-6 md:space-y-8">
-						<p class="flex flex-wrap items-center gap-3" data-hero-in>
-							<span class="project-num">Projet {number} / {total}</span>
-							{year && <span class="project-year">{year}</span>}
-						</p>
-
-						<div class="flex items-center gap-5">
-							{
-								logoUrl && (
-									<span class="project-logo" data-hero-in>
-										<img src={logoUrl} alt={`Logo ${project.nom_projet}`} />
-									</span>
-								)
-							}
-							<h1 class="project-title text-4xl md:text-6xl xl:text-7xl leading-[1.05]">
-								<span class="line"><span>{project.nom_projet}</span></span>
-							</h1>
-						</div>
-
-						{project.description && <p class="max-w-xl text-lg md:text-xl leading-relaxed" data-hero-in>{project.description}</p>}
-
-						{
-							tools.length > 0 && (
-								<ul class="flex flex-wrap gap-2" aria-label="Outils utilisés" data-hero-in>
-									{tools.map((tool) => (
-										<li class="tool-chip">
-											{tool.logo && <img src={tool.logo.src} alt="" width="20" height="20" />}
-											{tool.name}
-										</li>
-									))}
-								</ul>
-							)
-						}
-
-						<div class="flex flex-col sm:flex-row gap-5 sm:gap-8 pt-2" data-hero-in>
-							{
-								siteUrl && (
-									<SkewButton href={siteUrl} target="_blank" rel="noopener noreferrer" icon="arrow" variant="primary">
-										Voir le site
-									</SkewButton>
-								)
-							}
-							{finals.length > 0 && <SkewButton href="#realisation" icon="arrow">Voir les visuels</SkewButton>}
-						</div>
-					</div>
-
+			<div class="hero-center">
+				<div class="hero-disc-wrap">
+					<span class="hero-disc" aria-hidden="true"></span>
 					{
-						cover && (
-							<a href={cover} class="hero-cover" data-lightbox="finals" data-index="0" aria-label="Agrandir le visuel principal">
-								<img src={cover} alt={`Visuel principal du projet ${project.nom_projet}`} fetchpriority="high" />
-							</a>
+						logoUrl ? (
+							<img class="hero-logo" src={logoUrl} alt={`Logo ${name}`} fetchpriority="high" />
+						) : (
+							<span class="hero-logo hero-initial" aria-hidden="true">{name.charAt(0)}</span>
 						)
 					}
+				</div>
+
+				<h1 class="hero-title" style={`--title-size: ${titleSize}vw`} aria-label={name}>
+					{
+						name.split(" ").map((word) => (
+							<span class="word" aria-hidden="true">
+								{[...word].map((char) => (
+									<span class="char">{char}</span>
+								))}
+							</span>
+						))
+					}
+				</h1>
+			</div>
+
+			<div class="hero-band" aria-hidden="true">
+				<div class="hero-band-track">
+					{Array.from({ length: 12 }, () => <span>{name} ✦</span>)}
 				</div>
 			</div>
 		</section>
 
-		<!-- PRÉSENTATION -->
-		{
-			intro.length > 0 && (
-				<section class="container mx-auto px-4 md:px-6 py-16 md:py-24">
-					<div class="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-12 lg:gap-20 items-start">
-						<div>
-							<SectionTitle text="Le projet" />
-							<div class="space-y-5" data-reveal>
-								{intro.map((paragraph, i) => (
-									<p class:list={["leading-relaxed", i === 0 ? "text-xl md:text-2xl" : "text-lg md:text-xl"]}>{paragraph}</p>
-								))}
-							</div>
-						</div>
-
-						<aside class="fact-sheet" data-reveal>
-							<h2 class="text-xl mb-5">En bref</h2>
-							<dl class="space-y-4">
-								{year && (
-									<div>
-										<dt>Année</dt>
-										<dd>{year}</dd>
-									</div>
-								)}
-								{tools.length > 0 && (
-									<div>
-										<dt>Outils</dt>
-										<dd>{tools.map((t) => t.name).join(", ")}</dd>
-									</div>
-								)}
-								{finals.length > 0 && (
-									<div>
-										<dt>Visuels</dt>
-										<dd>{finals.length} réalisation{finals.length > 1 ? "s" : ""}</dd>
-									</div>
-								)}
-								{siteUrl && (
-									<div>
-										<dt>En ligne</dt>
-										<dd>
-											<a href={siteUrl} target="_blank" rel="noopener noreferrer" class="underline decoration-2 underline-offset-4 break-all">
-												{siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+		<div class="story">
+			<!-- CHAPITRE : INSPIRATIONS, les images arrivent une à une pour former un moodboard -->
+			{
+				inspirations.length > 0 && (
+					<section class="chapter inspi" aria-label="Inspirations">
+						<div class="inspi-stage">
+							<h2 class="chapter-title inspi-title">
+								<span class="chapter-num">{chapterInspi}</span>
+								Inspirations
+							</h2>
+							<ul class="inspi-board">
+								{inspirations.map((src, i) => {
+									const [x, y, rot] = spots[i % spots.length];
+									const shift = Math.floor(i / spots.length) * 4;
+									return (
+										<li class="inspi-item" style={`--x: ${x + shift}%; --y: ${y + shift}%; --r: ${rot}deg;`}>
+											<a href={src} data-lightbox="inspirations" data-index={i} aria-label={`Agrandir l'inspiration ${i + 1}`}>
+												<img src={src} alt={`Inspiration ${i + 1}`} decoding="async" />
 											</a>
-										</dd>
-									</div>
-								)}
-							</dl>
-						</aside>
-					</div>
-				</section>
-			)
-		}
-
-		<!-- ÉVOLUTION DU LOGO -->
-		{
-			showLogoEvolution && (
-				<section class="tinted py-16 md:py-24">
-					<div class="container mx-auto px-4 md:px-6">
-						<SectionTitle text="Évolution du logo" />
-						<div class="logo-compare grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 md:gap-6 items-stretch" data-reveal data-reveal-stagger>
-							<figure class="logo-card">
-								<span class="logo-tag">Avant</span>
-								<div class="logo-frame">
-									<img src={file(project.logo_old!)} alt={`Premier logo ${project.nom_projet}`} loading="lazy" />
-								</div>
-								{project.logo_old_txt && <figcaption>{project.logo_old_txt}</figcaption>}
-							</figure>
-							<span class="logo-arrow" aria-hidden="true">
-								<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.5">
-									<path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square" />
-								</svg>
-							</span>
-							<figure class="logo-card logo-card--new">
-								<span class="logo-tag">Après</span>
-								<div class="logo-frame">
-									<img src={file(project.logo_new!)} alt={`Logo final ${project.nom_projet}`} loading="lazy" />
-								</div>
-								{project.logo_new_txt && <figcaption>{project.logo_new_txt}</figcaption>}
-							</figure>
-						</div>
-					</div>
-				</section>
-			)
-		}
-
-		<!-- INSPIRATIONS -->
-		{
-			(inspiration.length > 0 || inspirations.length > 0) && (
-				<section class="container mx-auto px-4 md:px-6 py-16 md:py-24">
-					<div class="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-20 items-center">
-						<div>
-							<SectionTitle text="Inspirations" />
-							{inspiration.length > 0 && (
-								<blockquote class="inspiration-quote space-y-4" data-reveal>
-									{inspiration.map((paragraph) => (
-										<p class="text-lg md:text-xl leading-relaxed">{paragraph}</p>
-									))}
-								</blockquote>
-							)}
-						</div>
-
-						{inspirations.length > 0 && (
-							<ul class:list={["inspiration-grid", `count-${Math.min(inspirations.length, 3)}`]} data-reveal data-reveal-stagger>
-								{inspirations.map((src, i) => (
-									<li>
-										<a href={src} class="inspiration-item" data-lightbox="inspirations" data-index={i} aria-label={`Agrandir l'inspiration ${i + 1}`}>
-											<img src={src} alt={`Inspiration ${i + 1}`} loading="lazy" decoding="async" />
-										</a>
-									</li>
-								))}
+										</li>
+									);
+								})}
 							</ul>
-						)}
-					</div>
-				</section>
-			)
-		}
-
-		<!-- RÉALISATION -->
-		{
-			finals.length > 0 && (
-				<section id="realisation" class="tinted py-16 md:py-24 scroll-mt-20">
-					<div class="container mx-auto px-4 md:px-6">
-						<div class="flex flex-wrap items-end justify-between gap-4">
-							<SectionTitle text="Réalisation" />
-							<p class="mb-8 font-heading">
-								{finals.length} visuel{finals.length > 1 ? "s" : ""}
-							</p>
 						</div>
-						<ul class="gallery">
-							{finals.map((src, i) => (
-								<li class="gallery-item">
-									<a href={src} data-lightbox="finals" data-index={i} aria-label={`Agrandir le visuel ${i + 1}`}>
-										<img src={src} alt={`${project.nom_projet} — visuel ${i + 1}`} loading="lazy" decoding="async" />
-										<span class="gallery-num">{String(i + 1).padStart(2, "0")}</span>
+					</section>
+				)
+			}
+
+			<!-- CHAPITRE : RÉALISATION, défilement horizontal des productions finales -->
+			{
+				finals.length > 0 && (
+					<section id="realisation" class="chapter finals" aria-label="Réalisation">
+						<div class="finals-stage">
+							<div class="finals-track">
+								<div class="finals-intro">
+									<h2 class="chapter-title">
+										<span class="chapter-num">{chapterFinals}</span>
+										Réalisation
+									</h2>
+									<p class="finals-count">
+										{String(finals.length).padStart(2, "0")} visuel{finals.length > 1 ? "s" : ""}
+										<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true">
+											<path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square" />
+										</svg>
+									</p>
+								</div>
+								{finals.map((src, i) => (
+									<a href={src} class="final-item" data-lightbox="finals" data-index={i} aria-label={`Agrandir le visuel ${i + 1}`}>
+										<img src={src} alt={`${name} — visuel ${i + 1}`} decoding="async" />
 									</a>
-								</li>
-							))}
-						</ul>
-
-						{siteUrl && (
-							<div class="flex justify-center mt-14">
-								<SkewButton href={siteUrl} target="_blank" rel="noopener noreferrer" icon="arrow" variant="primary">
-									Accéder au site web
-								</SkewButton>
+								))}
 							</div>
-						)}
-					</div>
-				</section>
-			)
-		}
+							<div class="finals-progress" aria-hidden="true"><span></span></div>
+						</div>
+					</section>
+				)
+			}
+		</div>
 
-		<!-- CONCLUSION -->
+		<!-- FIN : lien vers le site -->
 		{
-			conclusion.length > 0 && (
-				<section class="container mx-auto px-4 md:px-6 py-16 md:py-24">
-					<SectionTitle text="Conclusion" />
-					<div class="max-w-3xl space-y-5 text-lg md:text-xl leading-relaxed" data-reveal>
-						{conclusion.map((paragraph) => <p>{paragraph}</p>)}
+			siteUrl && (
+				<section class="outro">
+					<p class="outro-title" data-reveal>En ligne</p>
+					<div data-reveal>
+						<SkewButton href={siteUrl} target="_blank" rel="noopener noreferrer" icon="arrow" variant="primary">
+							Voir le site
+						</SkewButton>
 					</div>
 				</section>
 			)
@@ -342,23 +230,43 @@ const siteUrl = project.lien_appli || project.lien_site;
 </Layout>
 
 <style>
+	.project {
+		/* Fond des chapitres : le disque du hero prend cette couleur en s'agrandissant pour faire la transition */
+		--story-bg: color-mix(in srgb, var(--p) 12%, #fff);
+	}
+
 	/* ---------- HERO ---------- */
-	.project-hero {
+	.hero {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		height: 100svh;
+		min-height: 560px;
 		margin-top: calc(-1 * var(--header-h));
 		padding-top: var(--header-h);
-		border-bottom: 4px solid var(--color-ink);
+		overflow: hidden;
+		background: var(--p);
+		color: var(--p-on);
 	}
 
-	.project-hero-bg {
-		background: linear-gradient(160deg, color-mix(in srgb, var(--p) 55%, #fff) 0%, color-mix(in srgb, var(--p) 18%, #fff) 70%);
+	.hero-bg {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(circle at 50% 42%, color-mix(in srgb, #fff 30%, transparent), transparent 55%),
+			linear-gradient(color-mix(in srgb, var(--p-on) 10%, transparent) 1px, transparent 1px) 0 0 / 56px 56px,
+			linear-gradient(90deg, color-mix(in srgb, var(--p-on) 10%, transparent) 1px, transparent 1px) 0 0 / 56px 56px;
 	}
 
-	.project-hero-grid {
-		background-image:
-			linear-gradient(rgb(11 7 16 / 0.07) 1px, transparent 1px),
-			linear-gradient(90deg, rgb(11 7 16 / 0.07) 1px, transparent 1px);
-		background-size: 56px 56px;
-		mask-image: radial-gradient(ellipse at 70% 40%, #000 20%, transparent 75%);
+	.hero-top {
+		position: relative;
+		z-index: 3;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding-top: 1.5rem;
 	}
 
 	.back-link {
@@ -368,6 +276,7 @@ const siteUrl = project.lien_appli || project.lien_site;
 		padding: 6px 14px;
 		border: 2px solid var(--color-ink);
 		background: #fff;
+		color: var(--color-ink);
 		font-family: var(--font-heading);
 		font-size: 0.9rem;
 		transition:
@@ -388,304 +297,348 @@ const siteUrl = project.lien_appli || project.lien_site;
 		transform: translateX(-4px);
 	}
 
-	.project-num {
+	.hero-meta {
+		display: flex;
+		gap: 10px;
+		font-family: var(--font-heading);
+		font-size: 0.9rem;
+	}
+
+	.hero-meta span {
 		padding: 4px 12px;
 		background: var(--color-ink);
 		color: #fff;
-		font-family: var(--font-heading);
-		font-size: 0.9rem;
 		transform: skewX(-12deg);
 	}
 
-	.project-year {
-		padding: 2px 12px;
-		border: 2px solid var(--color-ink);
-		background: rgb(255 255 255 / 0.7);
-		font-weight: 600;
+	.hero-center {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		/* Hauteur fixée par le hero (et non par le titre) pour que l'ajustement du titre puisse la mesurer */
+		min-height: 0;
+		padding-inline: 4vw;
 	}
 
-	.project-logo {
+	.hero-disc-wrap {
+		position: relative;
 		display: grid;
-		flex-shrink: 0;
 		place-items: center;
-		width: clamp(64px, 9vw, 104px);
+		width: clamp(130px, 22svh, 240px);
 		aspect-ratio: 1;
-		padding: 10px;
-		border: 3px solid var(--color-ink);
-		background: #fff;
-		box-shadow: var(--shadow-brutal);
+		margin-bottom: -0.6rem;
 	}
 
-	.project-logo img {
-		max-width: 100%;
-		max-height: 100%;
+	/* Le disque s'agrandit au défilement jusqu'à couvrir tout l'écran */
+	.hero-disc {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		border: 4px solid var(--color-ink);
+		border-radius: 9999px;
+		background: var(--story-bg);
+		box-shadow: 8px 8px 0 0 var(--color-ink);
+	}
+
+	.hero-logo {
+		position: relative;
+		z-index: 1;
+		max-width: 62%;
+		max-height: 62%;
 		object-fit: contain;
 	}
 
-	.project-title .line {
-		display: block;
-		overflow: hidden;
-		padding-bottom: 0.08em;
+	.hero-initial {
+		font-family: var(--font-heading);
+		font-size: clamp(4rem, 12svh, 8rem);
+		line-height: 1;
+		color: var(--color-ink);
 	}
 
-	.project-title .line > span {
+	.hero-title {
+		position: relative;
+		z-index: 2;
+		max-width: 100%;
+		font-size: min(var(--title-size), 28svh);
+		line-height: 0.95;
+		text-align: center;
+		text-shadow: 0.045em 0.045em 0 color-mix(in srgb, var(--color-ink) 35%, transparent);
+	}
+
+	.hero-title .word {
+		display: inline-flex;
+		overflow: hidden;
+		padding: 0 0.06em 0.1em;
+		margin-right: 0.2em;
+	}
+
+	.hero-title.is-ready .word {
+		overflow: visible;
+	}
+
+	.hero-title .word:last-child {
+		margin-right: 0;
+	}
+
+	.hero-title .char {
 		display: inline-block;
 	}
 
-	.tool-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 5px 12px;
-		border: 2px solid var(--color-ink);
-		background: #fff;
-		font-weight: 600;
-		font-size: 0.9rem;
-	}
-
-	.tool-chip img {
-		width: 20px;
-		height: 20px;
-		object-fit: contain;
-	}
-
-	.hero-cover {
-		display: block;
-		overflow: hidden;
-		border: 4px solid var(--color-ink);
-		background: #fff;
-		box-shadow: 12px 12px 0 0 var(--color-ink);
-		transform: rotate(2deg);
-		cursor: zoom-in;
-		transition:
-			transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-			box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	.hero-cover:hover {
-		transform: rotate(0deg) translate(-4px, -4px);
-		box-shadow: 16px 16px 0 0 var(--color-ink);
-	}
-
-	.hero-cover img {
-		width: 100%;
-		max-height: 70vh;
-		object-fit: contain;
-	}
-
-	/* ---------- SECTIONS ---------- */
-	.tinted {
+	/* Bandeau incliné qui répète le nom du projet en continu */
+	.hero-band {
+		position: relative;
+		z-index: 3;
+		margin: 0 -2vw 3.5rem;
+		padding: 14px 0;
 		border-block: 4px solid var(--color-ink);
-		background: color-mix(in srgb, var(--p) 14%, #fff);
+		background: var(--color-ink);
+		color: var(--p);
+		transform: rotate(-2deg);
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
-	.fact-sheet {
-		padding: 28px;
-		border: 3px solid var(--color-ink);
-		background: var(--p);
-		color: var(--p-on);
-		box-shadow: var(--shadow-brutal-lg);
+	.hero-band-track {
+		display: inline-flex;
+		gap: 2rem;
+		font-family: var(--font-heading);
+		font-size: clamp(1rem, 2.2vw, 1.6rem);
+		animation: band-scroll 30s linear infinite;
 	}
 
-	@media (min-width: 1024px) {
-		.fact-sheet {
-			position: sticky;
-			top: calc(var(--header-h) + 24px);
+	@keyframes band-scroll {
+		to {
+			transform: translateX(-50%);
 		}
 	}
 
-	.fact-sheet dt {
-		font-family: var(--font-heading);
-		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		opacity: 0.75;
-	}
-
-	.fact-sheet dd {
-		font-size: 1.1rem;
-		font-weight: 600;
-	}
-
-	/* Évolution du logo */
-	.logo-card {
+	/* ---------- CHAPITRES ---------- */
+	.chapter {
 		position: relative;
+		background: var(--story-bg);
+		color: var(--color-ink);
+	}
+
+	.chapter-title {
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
-		padding: 28px;
-		border: 3px solid var(--color-ink);
-		background: #fff;
-		box-shadow: var(--shadow-brutal);
+		font-size: min(7.2vw, 7rem);
+		line-height: 0.95;
 	}
 
-	.logo-card--new {
-		box-shadow: 10px 10px 0 0 var(--p);
-		outline: 3px solid var(--color-ink);
-		outline-offset: -3px;
+	.chapter-num {
+		font-size: max(0.45em, 1.5rem);
+		color: transparent;
+		-webkit-text-stroke: 2px var(--color-ink);
 	}
 
-	.logo-tag {
-		position: absolute;
-		top: -16px;
-		left: 20px;
-		padding: 2px 12px;
-		background: var(--color-ink);
-		color: #fff;
-		font-family: var(--font-heading);
-		transform: skewX(-12deg);
+	/* Inspirations : grille simple sur mobile, moodboard éparpillé sur grand écran */
+	.inspi-stage {
+		padding: 4rem 1rem;
 	}
 
-	.logo-card--new .logo-tag {
-		background: var(--p);
-		color: var(--p-on);
-		border: 2px solid var(--color-ink);
+	.inspi-title {
+		margin-bottom: 2rem;
 	}
 
-	.logo-frame {
-		display: grid;
-		place-items: center;
-		height: 200px;
-		background: repeating-conic-gradient(rgb(11 7 16 / 0.04) 0% 25%, transparent 0% 50%) 0 0 / 24px 24px;
-	}
-
-	.logo-frame img {
-		max-width: 80%;
-		max-height: 160px;
-		object-fit: contain;
-	}
-
-	.logo-card:not(.logo-card--new) .logo-frame img {
-		filter: grayscale(0.6);
-		opacity: 0.85;
-	}
-
-	.logo-card figcaption {
-		line-height: 1.6;
-	}
-
-	.logo-arrow {
-		display: grid;
-		place-items: center;
-		align-self: center;
-		justify-self: center;
-		width: 64px;
-		height: 64px;
-		border: 3px solid var(--color-ink);
-		background: var(--color-lilac);
-		transform: skewX(-12deg);
-	}
-
-	@media (max-width: 767px) {
-		.logo-arrow {
-			transform: skewX(-12deg) rotate(90deg);
-		}
-	}
-
-	/* Inspirations */
-	.inspiration-quote {
-		position: relative;
-		padding-left: 24px;
-		border-left: 6px solid var(--p);
-	}
-
-	.inspiration-grid {
+	.inspi-board {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		grid-auto-rows: 180px;
-		gap: 16px;
+		gap: 14px;
 	}
 
-	@media (min-width: 768px) {
-		.inspiration-grid {
-			grid-auto-rows: 220px;
-		}
-	}
-
-	.inspiration-grid.count-1 {
-		grid-template-columns: 1fr;
-		grid-auto-rows: 360px;
-	}
-
-	.inspiration-grid.count-3 > li:first-child {
-		grid-column: span 2;
-	}
-
-	.inspiration-item {
+	.inspi-item a {
 		display: block;
-		height: 100%;
 		overflow: hidden;
 		border: 3px solid var(--color-ink);
+		background: #fff;
 		box-shadow: var(--shadow-brutal);
 		cursor: zoom-in;
 	}
 
-	.inspiration-item img {
+	.inspi-item img {
 		width: 100%;
-		height: 100%;
-		object-fit: cover;
+		height: auto;
 		transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.inspiration-item:hover img {
+	.inspi-item a:hover img {
 		transform: scale(1.06);
 	}
 
-	/* Galerie */
-	.gallery {
-		columns: 1;
-		column-gap: 28px;
-	}
-
-	@media (min-width: 640px) {
-		.gallery {
-			columns: 2;
-		}
-	}
-
 	@media (min-width: 1024px) {
-		.gallery {
-			columns: 3;
+		.inspi-stage {
+			position: relative;
+			height: 100svh;
+			padding: 0;
+			overflow: hidden;
+		}
+
+		.inspi-title {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			z-index: 0;
+			margin: 0;
+			translate: -50% -50%;
+			font-size: min(7vw, 9rem);
+			text-align: center;
+			align-items: center;
+		}
+
+		.inspi-board {
+			position: absolute;
+			inset: 0;
+			display: block;
+		}
+
+		.inspi-item {
+			position: absolute;
+			top: var(--y);
+			left: var(--x);
+			z-index: 1;
+			translate: -50% -50%;
+			rotate: var(--r);
+		}
+
+		.inspi-item img {
+			width: auto;
+			max-width: 24vw;
+			max-height: 36svh;
+		}
+
+		.inspi-item a {
+			transition: box-shadow 0.3s ease;
+		}
+
+		.inspi-item a:hover {
+			box-shadow: 10px 10px 0 0 var(--p);
 		}
 	}
 
-	.gallery-item {
-		break-inside: avoid;
-		margin-bottom: 28px;
+	/* Réalisation : liste verticale sur mobile, piste horizontale épinglée sur grand écran */
+	.finals {
+		border-top: 4px solid var(--color-ink);
 	}
 
-	.gallery-item a {
+	.finals-track {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+		padding: 4rem 1rem;
+	}
+
+	.finals-count {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		margin-top: 1rem;
+		padding: 6px 14px;
+		background: var(--p);
+		color: var(--p-on);
+		border: 3px solid var(--color-ink);
+		font-family: var(--font-heading);
+	}
+
+	.final-item {
 		position: relative;
 		display: block;
+		flex-shrink: 0;
 		overflow: hidden;
-		border: 3px solid var(--color-ink);
+		border: 4px solid var(--color-ink);
 		background: #fff;
-		box-shadow: var(--shadow-brutal);
+		box-shadow: 10px 10px 0 0 var(--color-ink);
 		cursor: zoom-in;
-		transition:
-			transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-			box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.gallery-item a:hover {
-		transform: translate(-3px, -3px);
-		box-shadow: 9px 9px 0 0 var(--color-ink);
-	}
-
-	.gallery-item img {
+	.final-item img {
 		width: 100%;
 		height: auto;
 	}
 
-	.gallery-num {
-		position: absolute;
-		top: 0;
-		left: 0;
-		padding: 2px 10px;
-		background: var(--color-ink);
-		color: #fff;
+
+	.finals-progress {
+		display: none;
+	}
+
+	@media (min-width: 1024px) {
+		.finals-stage {
+			position: relative;
+			display: flex;
+			align-items: center;
+			height: 100svh;
+			overflow: hidden;
+		}
+
+		.finals-track {
+			flex-direction: row;
+			align-items: center;
+			gap: 5vw;
+			padding: 0 8vw;
+			will-change: transform;
+		}
+
+		.finals-intro {
+			flex-shrink: 0;
+			width: max-content;
+		}
+
+		.final-item {
+			height: 68svh;
+			transition: box-shadow 0.3s ease;
+		}
+
+		.final-item:hover {
+			box-shadow: 14px 14px 0 0 var(--p);
+		}
+
+		.final-item img {
+			width: auto;
+			height: 100%;
+			max-width: 75vw;
+			object-fit: contain;
+		}
+
+		.finals-progress {
+			position: absolute;
+			right: 8vw;
+			bottom: 5svh;
+			left: 8vw;
+			display: block;
+			height: 6px;
+			background: rgb(11 7 16 / 0.12);
+		}
+
+		.finals-progress span {
+			display: block;
+			height: 100%;
+			background: var(--color-ink);
+			transform: scaleX(0);
+			transform-origin: left;
+		}
+	}
+
+	/* ---------- FIN ---------- */
+	.outro {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2rem;
+		padding: 5rem 1rem;
+		border-block: 4px solid var(--color-ink);
+		background: var(--p);
+		color: var(--p-on);
+		text-align: center;
+	}
+
+	.outro-title {
 		font-family: var(--font-heading);
-		font-size: 0.85rem;
+		font-size: clamp(3rem, 10vw, 8rem);
+		line-height: 1;
 	}
 
 	/* Navigation entre projets */
@@ -715,6 +668,12 @@ const siteUrl = project.lien_appli || project.lien_site;
 		background: var(--color-ink);
 		color: #fff;
 		box-shadow: 9px 9px 0 0 var(--color-iris);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero-band-track {
+			animation: none;
+		}
 	}
 
 	/* ---------- VISIONNEUSE ---------- */
@@ -817,19 +776,178 @@ const siteUrl = project.lien_appli || project.lien_site;
 
 	gsap.registerPlugin(ScrollTrigger);
 
-	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-		gsap.from(".project-title .line > span", { yPercent: 110, duration: 1.1, ease: "power4.out", delay: 0.15 });
-		gsap.from("[data-hero-in]", { y: 30, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.08, delay: 0.2 });
-		gsap.from(".hero-cover", { y: 80, rotate: 8, opacity: 0, duration: 1.2, ease: "power3.out", delay: 0.35, clearProps: "transform" });
-		gsap.from(".gallery-item", {
-			y: 60,
-			opacity: 0,
-			duration: 0.9,
-			ease: "power3.out",
-			stagger: 0.08,
-			scrollTrigger: { trigger: ".gallery", start: "top 85%", once: true },
-		});
+	/* ---------- HERO : le nom du projet tient toujours en entier ---------- */
+	// Les mots ne se coupent pas : on réduit la taille jusqu'à ce que le titre tienne en largeur
+	// et dans la hauteur laissée par le disque du logo.
+	const heroTitle = document.querySelector<HTMLElement>(".hero-title")!;
+	const heroCenter = document.querySelector<HTMLElement>(".hero-center")!;
+	const discWrap = document.querySelector<HTMLElement>(".hero-disc-wrap")!;
+	function fitTitle() {
+		heroTitle.style.fontSize = "";
+		const style = getComputedStyle(heroCenter);
+		const maxW = heroCenter.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+		const maxH = heroCenter.clientHeight - discWrap.offsetHeight;
+		let size = parseFloat(getComputedStyle(heroTitle).fontSize);
+		while (size > 20 && (heroTitle.scrollWidth > maxW || heroTitle.offsetHeight > maxH)) {
+			size *= 0.94;
+			heroTitle.style.fontSize = `${size}px`;
+		}
 	}
+	fitTitle();
+	document.fonts.ready.then(fitTitle);
+	let resizeFrame = 0;
+	window.addEventListener("resize", () => {
+		cancelAnimationFrame(resizeFrame);
+		resizeFrame = requestAnimationFrame(fitTitle);
+	});
+
+	const mm = gsap.matchMedia();
+
+	mm.add("(prefers-reduced-motion: no-preference)", () => {
+		/* ---------- HERO : entrée ---------- */
+		// L'entrée et le défilement animent des propriétés (ou éléments) distinctes pour ne pas se contredire
+		const title = document.querySelector<HTMLElement>(".hero-title")!;
+		gsap
+			.timeline({ delay: 0.1 })
+			.from(".hero-disc-wrap", { scale: 0, rotate: -120, duration: 1.1, ease: "back.out(1.6)" })
+			.from(".hero-title .char", {
+				yPercent: 120,
+				duration: 1,
+				ease: "power4.out",
+				stagger: 0.04,
+				// Les lettres sortent ensuite de leur masque pour pouvoir s'envoler au défilement
+				onComplete: () => title.classList.add("is-ready"),
+			}, 0.25)
+			.from(".hero-band", { yPercent: 160, duration: 0.9, ease: "power3.out" }, 0.5)
+			.from(".hero-top > *", { y: -20, opacity: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 }, 0.6);
+
+		/* ---------- HERO : au défilement, le disque avale l'écran et les lettres s'envolent ---------- */
+		const hero = document.querySelector<HTMLElement>(".hero")!;
+		const disc = document.querySelector<HTMLElement>(".hero-disc")!;
+		// Échelle nécessaire pour que le disque couvre tout le hero depuis sa position
+		const coverScale = () => {
+			const h = hero.getBoundingClientRect();
+			const d = disc.getBoundingClientRect();
+			const cx = d.left + d.width / 2 - h.left;
+			const cy = d.top + d.height / 2 - h.top;
+			const far = Math.hypot(Math.max(cx, h.width - cx), Math.max(cy, h.height - cy));
+			return (far * 2) / disc.offsetWidth + 0.2;
+		};
+
+		const heroTl = gsap.timeline({
+			scrollTrigger: { trigger: ".hero", start: "top top", end: "+=110%", pin: true, scrub: 0.6, invalidateOnRefresh: true },
+		});
+		heroTl
+			.to(".hero-title .char", {
+				y: () => gsap.utils.random(-260, 260),
+				x: () => gsap.utils.random(-120, 120),
+				rotate: () => gsap.utils.random(-50, 50),
+				opacity: 0,
+				ease: "power2.in",
+				stagger: { each: 0.02, from: "center" },
+				duration: 0.5,
+			})
+			.to([".hero-band", ".hero-top"], { opacity: 0, duration: 0.3 }, 0)
+			.to(".hero-logo", { scale: 0.4, opacity: 0, duration: 0.35 }, 0.15)
+			.to(disc, { scale: coverScale, borderWidth: 0, boxShadow: "0 0 0 0 rgba(0,0,0,0)", ease: "power2.in", duration: 0.6 }, 0.25);
+	});
+
+	/* ---------- CHAPITRES (grand écran) ---------- */
+	mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+		// Inspirations : chaque image tombe à sa place dans le moodboard
+		const inspi = document.querySelector<HTMLElement>(".inspi");
+		if (inspi) {
+			const items = gsap.utils.toArray<HTMLElement>(".inspi-item");
+			gsap
+				.timeline({
+					scrollTrigger: { trigger: inspi, start: "top top", end: `+=${60 + items.length * 45}%`, pin: true, scrub: 0.6 },
+				})
+				.from(".inspi-title", { scale: 0.6, opacity: 0, duration: 0.6 })
+				.from(
+					items,
+					{
+						y: () => innerHeight * 1.1,
+						x: () => gsap.utils.random(-200, 200),
+						rotate: () => gsap.utils.random(-35, 35),
+						scale: 1.3,
+						ease: "power3.out",
+						duration: 1,
+						stagger: 0.6,
+					},
+					0.3,
+				)
+				.to(".inspi-title", { scale: 1.15, opacity: 0.35, ease: "none", duration: 0.4 + items.length * 0.6 }, 0.6);
+		}
+
+		// Réalisation : la piste défile horizontalement pendant le défilement vertical
+		const stage = document.querySelector<HTMLElement>(".finals-stage");
+		const track = document.querySelector<HTMLElement>(".finals-track");
+		if (stage && track) {
+			const distance = () => Math.max(0, track.scrollWidth - innerWidth);
+			const scroll = gsap.timeline({
+				scrollTrigger: {
+					trigger: stage,
+					start: "top top",
+					end: () => `+=${distance()}`,
+					pin: true,
+					scrub: 0.6,
+					invalidateOnRefresh: true,
+				},
+			});
+			scroll
+				.to(track, { x: () => -distance(), ease: "none" })
+				.to(".finals-progress span", { scaleX: 1, ease: "none" }, 0);
+
+			// Chaque visuel se redresse en entrant dans l'écran
+			gsap.utils.toArray<HTMLElement>(".final-item").forEach((item) => {
+				gsap.from(item, {
+					scale: 0.8,
+					rotate: 4,
+					ease: "none",
+					scrollTrigger: {
+						trigger: item,
+						containerAnimation: scroll,
+						start: "left right",
+						end: "center center",
+						scrub: true,
+					},
+				});
+			});
+
+			// La largeur de la piste dépend des images : on recalcule une fois chacune chargée
+			track.querySelectorAll("img").forEach((img) => {
+				if (!img.complete) img.addEventListener("load", () => ScrollTrigger.refresh(), { once: true });
+			});
+		}
+
+		// Le header masquerait le haut des scènes épinglées : il reste caché pendant les chapitres
+		const story = document.querySelector<HTMLElement>(".story");
+		if (story) {
+			const setLock = (locked: boolean, reveal = false) =>
+				window.dispatchEvent(new CustomEvent("headerLock", { detail: { locked, reveal } }));
+			ScrollTrigger.create({
+				trigger: story,
+				start: "top top",
+				end: "bottom bottom",
+				onToggle: (self) => setLock(self.isActive, !self.isActive && self.direction < 0),
+			});
+			return () => setLock(false, true);
+		}
+	});
+
+	// Sur mobile, les visuels apparaissent simplement au défilement
+	mm.add("(max-width: 1023px) and (prefers-reduced-motion: no-preference)", () => {
+		gsap.utils.toArray<HTMLElement>(".inspi-item, .final-item").forEach((item) => {
+			gsap.from(item, {
+				y: 60,
+				opacity: 0,
+				rotate: gsap.utils.random(-4, 4),
+				duration: 0.8,
+				ease: "power3.out",
+				scrollTrigger: { trigger: item, start: "top 90%", once: true },
+			});
+		});
+	});
 
 	/* ---------- VISIONNEUSE ---------- */
 	const dialog = document.getElementById("lightbox") as HTMLDialogElement;
@@ -838,7 +956,7 @@ const siteUrl = project.lien_appli || project.lien_site;
 	const prevBtn = dialog.querySelector<HTMLButtonElement>("[data-lightbox-prev]")!;
 	const nextBtn = dialog.querySelector<HTMLButtonElement>("[data-lightbox-next]")!;
 
-	// Une liste d'images par groupe (sans doublon : la couverture fait aussi partie de la galerie)
+	// Une liste d'images par groupe
 	const groups = new Map<string, { src: string; alt: string }[]>();
 	document.querySelectorAll<HTMLAnchorElement>("[data-lightbox]").forEach((link) => {
 		const group = link.dataset.lightbox!;
