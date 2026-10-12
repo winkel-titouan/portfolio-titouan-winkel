@@ -1,21 +1,22 @@
 import type { ImageMetadata } from "astro";
 import illustrator from "../assets/logos/web/illustrator.webp";
+import photoshop from "../assets/logos/web/photoshop.png";
+import indesign from "../assets/logos/web/indesign.webp";
 import figma from "../assets/logos/web/figma.webp";
 import affinity from "../assets/logos/web/affinity.webp";
-import sketchbook from "../assets/logos/web/sketchbook.webp";
 import canva from "../assets/logos/web/canva.webp";
 import html from "../assets/logos/web/html.webp";
 import css from "../assets/logos/web/css.webp";
 import js from "../assets/logos/web/js.webp";
 import astro from "../assets/logos/web/astrojs.webp";
 import tailwind from "../assets/logos/web/tailwindcss.webp";
-import daisyui from "../assets/logos/web/daisyui.webp";
 import wordpress from "../assets/logos/web/wordpress.webp";
 import sql from "../assets/logos/web/sql.webp";
 import pocketbase from "../assets/logos/web/pocketbase.webp";
 import notion from "../assets/logos/web/notion.webp";
 import davinci from "../assets/logos/web/davinci_resolve.webp";
 import capcut from "../assets/logos/web/capcut.webp";
+import claude from "../assets/logos/web/claude.webp";
 
 export const skillCategories = {
     design: "Design",
@@ -44,6 +45,22 @@ export const skills: Skill[] = [
             "Adobe Illustrator est un logiciel de création graphique vectorielle professionnel, idéal pour la conception de logos, illustrations et designs complexes.",
     },
     {
+        id: "photoshop",
+        name: "Photoshop",
+        logo: photoshop,
+        categories: ["design", "communication"],
+        description:
+            "Adobe Photoshop est le logiciel de référence pour la retouche photo et la création d'images, idéal pour les montages, visuels publicitaires et contenus pour les réseaux sociaux.",
+    },
+    {
+        id: "indesign",
+        name: "InDesign",
+        logo: indesign,
+        categories: ["design", "communication"],
+        description:
+            "Adobe InDesign est le logiciel de mise en page professionnel pour concevoir des supports print et numériques : affiches, brochures, magazines et chartes graphiques.",
+    },
+    {
         id: "figma",
         name: "Figma",
         logo: figma,
@@ -58,14 +75,6 @@ export const skills: Skill[] = [
         categories: ["design"],
         description:
             "Affinity Designer est un logiciel de design graphique vectoriel professionnel, offrant des outils puissants pour la création d'illustrations, de logos et de mises en page.",
-    },
-    {
-        id: "sketchbook",
-        name: "Sketchbook",
-        logo: sketchbook,
-        categories: ["design"],
-        description:
-            "Sketchbook est une application de dessin numérique intuitive offrant des outils professionnels pour l'illustration et le croquis artistique.",
     },
     {
         id: "canva",
@@ -116,14 +125,6 @@ export const skills: Skill[] = [
             "Tailwind CSS est un framework CSS utility-first qui permet de construire rapidement des interfaces modernes en composant des classes utilitaires.",
     },
     {
-        id: "daisyui",
-        name: "DaisyUI",
-        logo: daisyui,
-        categories: ["web"],
-        description:
-            "DaisyUI est une bibliothèque de composants pour Tailwind CSS qui propose des éléments d'interface prêts à l'emploi avec un design moderne et cohérent.",
-    },
-    {
         id: "wordpress",
         name: "WordPress",
         logo: wordpress,
@@ -170,6 +171,14 @@ export const skills: Skill[] = [
         categories: ["audiovisuel", "communication"],
         description:
             "CapCut est une application de montage vidéo intuitive et accessible, parfaite pour créer du contenu créatif pour les réseaux sociaux rapidement.",
+    },
+    {
+        id: "claude",
+        name: "Claude Code",
+        logo: claude,
+        categories: ["web"],
+        description:
+            "Claude Code est un assistant de développement par IA d'Anthropic qui travaille directement dans le code : il m'aide à transformer mes maquettes en interfaces fonctionnelles, à construire des composants et à soigner animations et responsive.",
     },
 ];
 
