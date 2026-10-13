@@ -10,7 +10,7 @@ import { supabase, getCoverUrl, withStorageFiles, type Projet } from "../utils/s
 
 let projets: Projet[] = [];
 try {
-	const { data, error } = await supabase.from("projets").select("*").eq("a_la_une", true).order("created_at");
+	const { data, error } = await supabase.from("projets").select("*").eq("a_la_une", true).order("created_at", { ascending: false });
 	if (error) throw error;
 	projets = await Promise.all(data.map(withStorageFiles));
 } catch (error) {
@@ -158,18 +158,6 @@ const steps = [
 			<div class="projects-stage container mx-auto px-4 md:px-6">
 				<div class="flex flex-wrap items-end justify-between gap-6">
 					<SectionTitle text="Mes projets" />
-					{
-						projets.length > 1 && (
-							<div class="carousel-nav flex gap-3 mb-8">
-								<button class="carousel-btn" data-carousel-prev aria-label="Projet précédent">
-									<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="square" /></svg>
-								</button>
-								<button class="carousel-btn" data-carousel-next aria-label="Projet suivant">
-									<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="square" /></svg>
-								</button>
-							</div>
-						)
-					}
 				</div>
 
 				{
@@ -209,7 +197,15 @@ const steps = [
 				<div class="projects-footer mt-6 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
 					<SkewButton href="/projets" icon="arrow">Voir tous les projets</SkewButton>
 					{projets.length > 1 && (
-						<div class="carousel-progress w-full md:flex-1" aria-hidden="true"><span></span></div>
+						<input
+							type="range"
+							class="carousel-slider w-full md:flex-1"
+							min="0"
+							max="1000"
+							step="1"
+							value="0"
+							aria-label="Faire défiler les projets"
+						/>
 					)}
 				</div>
 			</div>
@@ -697,6 +693,11 @@ const steps = [
 		scroll-snap-type: none;
 	}
 
+	/* Pendant qu'on déplace le curseur, le carrousel suit librement sans s'aimanter aux cartes */
+	.carousel.is-scrubbing {
+		scroll-snap-type: none;
+	}
+
 	.carousel.is-dragging a {
 		pointer-events: none;
 	}
@@ -860,43 +861,79 @@ const steps = [
 		opacity: 0;
 	}
 
-	.carousel-btn {
-		display: grid;
-		place-items: center;
-		width: 52px;
-		height: 52px;
-		border: 3px solid var(--color-ink);
-		background: #fff;
-		transform: skewX(-12deg);
-		transition:
-			background-color 0.25s ease,
-			color 0.25s ease,
-			box-shadow 0.25s ease,
-			opacity 0.25s ease;
+	/* Curseur de défilement : la partie parcourue de la barre se remplit (--fill mis à jour en JS) */
+	.carousel-slider {
+		--fill: 0%;
+		appearance: none;
+		height: 44px; /* zone tactile confortable autour d'une barre fine */
+		background: transparent;
+		cursor: pointer;
+		touch-action: pan-y;
 	}
 
-	.carousel-btn:hover:not(:disabled) {
-		background: var(--color-ink);
-		color: #fff;
-		box-shadow: 4px 4px 0 var(--color-iris);
-	}
-
-	.carousel-btn:disabled {
+	.carousel-slider:disabled {
 		opacity: 0.35;
-		cursor: not-allowed;
+		cursor: default;
 	}
 
-	.carousel-progress {
+	.carousel-slider::-webkit-slider-runnable-track {
+		height: 6px;
+		background:
+			linear-gradient(90deg, var(--color-iris), var(--color-ink)) 0 0 / var(--fill) 100% no-repeat,
+			rgb(11 7 16 / 0.1);
+	}
+
+	.carousel-slider::-moz-range-track {
 		height: 6px;
 		background: rgb(11 7 16 / 0.1);
 	}
 
-	.carousel-progress span {
-		display: block;
-		height: 100%;
+	.carousel-slider::-moz-range-progress {
+		height: 6px;
 		background: linear-gradient(90deg, var(--color-iris), var(--color-ink));
-		transform-origin: left;
-		transform: scaleX(0);
+	}
+
+	.carousel-slider::-webkit-slider-thumb {
+		appearance: none;
+		width: 26px;
+		height: 26px;
+		margin-top: -10px;
+		border: 3px solid var(--color-ink);
+		background: #fff;
+		box-shadow: 3px 3px 0 var(--color-ink);
+		transition:
+			background-color 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.carousel-slider::-moz-range-thumb {
+		box-sizing: border-box;
+		width: 26px;
+		height: 26px;
+		border: 3px solid var(--color-ink);
+		border-radius: 0;
+		background: #fff;
+		box-shadow: 3px 3px 0 var(--color-ink);
+		transition:
+			background-color 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.carousel-slider:hover:not(:disabled)::-webkit-slider-thumb,
+	.carousel-slider:active:not(:disabled)::-webkit-slider-thumb {
+		background: var(--color-iris);
+		box-shadow: 4px 4px 0 var(--color-ink);
+	}
+
+	.carousel-slider:hover:not(:disabled)::-moz-range-thumb,
+	.carousel-slider:active:not(:disabled)::-moz-range-thumb {
+		background: var(--color-iris);
+		box-shadow: 4px 4px 0 var(--color-ink);
+	}
+
+	.carousel-slider:focus-visible {
+		outline: 3px solid var(--color-iris);
+		outline-offset: 2px;
 	}
 </style>
 
@@ -991,24 +1028,46 @@ const steps = [
 	const carousel = document.querySelector<HTMLElement>(".carousel");
 	if (carousel) {
 		const items = carousel.querySelectorAll<HTMLElement>(".carousel-item");
-		const prev = document.querySelector<HTMLButtonElement>("[data-carousel-prev]");
-		const next = document.querySelector<HTMLButtonElement>("[data-carousel-next]");
-		const bar = document.querySelector<HTMLElement>(".carousel-progress span");
-
+		const slider = document.querySelector<HTMLInputElement>(".carousel-slider");
+		const maxScroll = () => carousel.scrollWidth - carousel.clientWidth;
 		const step = () => (items[1] ? items[1].offsetLeft - items[0].offsetLeft : carousel.clientWidth);
-		prev?.addEventListener("click", () => carousel.scrollBy({ left: -step(), behavior: "smooth" }));
-		next?.addEventListener("click", () => carousel.scrollBy({ left: step(), behavior: "smooth" }));
 
+		const setSlider = (value: number) => {
+			if (!slider) return;
+			slider.value = String(value);
+			slider.style.setProperty("--fill", `${value / 10}%`);
+		};
+
+		// Le curseur suit le carrousel, sauf pendant qu'on le déplace (c'est alors lui qui pilote)
+		let scrubbing = false;
 		function updateCarousel() {
-			const max = carousel!.scrollWidth - carousel!.clientWidth;
-			const ratio = max > 0 ? carousel!.scrollLeft / max : 1;
-			if (bar) bar.style.transform = `scaleX(${Math.max(ratio, 0.04)})`;
-			if (prev) prev.disabled = carousel!.scrollLeft < 4;
-			if (next) next.disabled = carousel!.scrollLeft > max - 4;
+			const max = maxScroll();
+			if (slider) slider.disabled = max <= 0;
+			if (!scrubbing) setSlider(max > 0 ? Math.round((carousel!.scrollLeft / max) * 1000) : 0);
 		}
 		carousel.addEventListener("scroll", updateCarousel, { passive: true });
 		window.addEventListener("resize", updateCarousel);
 		updateCarousel();
+
+		// Déplacer le curseur fait défiler le carrousel librement ; au relâchement, il s'aimante à la carte la plus proche
+		slider?.addEventListener("input", () => {
+			scrubbing = true;
+			carousel.classList.add("is-scrubbing");
+			setSlider(Number(slider.value));
+			carousel.scrollLeft = (Number(slider.value) / 1000) * maxScroll();
+		});
+		const endScrub = () => {
+			if (!scrubbing) return;
+			scrubbing = false;
+			const target = carousel.scrollLeft;
+			carousel.classList.remove("is-scrubbing");
+			carousel.scrollLeft = target;
+			updateCarousel();
+		};
+		slider?.addEventListener("change", endScrub);
+		slider?.addEventListener("pointerup", endScrub);
+		slider?.addEventListener("pointercancel", endScrub);
+		slider?.addEventListener("blur", endScrub);
 
 		// Glisser-déposer à la souris (le tactile utilise le défilement natif)
 		let startX = 0;
@@ -1042,8 +1101,8 @@ const steps = [
 		carousel.addEventListener("pointercancel", endDrag);
 
 		carousel.addEventListener("keydown", (e) => {
-			if (e.key === "ArrowRight") next?.click();
-			if (e.key === "ArrowLeft") prev?.click();
+			if (e.key === "ArrowRight") carousel.scrollBy({ left: step(), behavior: "smooth" });
+			if (e.key === "ArrowLeft") carousel.scrollBy({ left: -step(), behavior: "smooth" });
 		});
 
 		/* Booster piloté par le scroll : il arrive, tremble, se déchire puis distribue les cartes.
@@ -1065,8 +1124,12 @@ const steps = [
 			const dy = (item: HTMLElement) => booster.offsetTop - (item.offsetTop + item.offsetHeight / 2);
 			const rise = () => booster.offsetHeight * 0.85;
 
-			// Le carrousel ne redevient manipulable qu'une fois toutes les cartes posées
+			// Le carrousel ne redevient manipulable qu'une fois toutes les cartes posées. Il ne se rebloque que si l'on
+			// remonte jusqu'au départ de la dernière carte : sur mobile, un glissement horizontal fait souvent bouger
+			// un peu la page, ce qui ne doit ni bloquer le carrousel ni le ramener au début.
 			let dealt = false;
+			let landedAt = 0;
+			let lockBelow = 0;
 			const setDealt = (value: boolean) => {
 				if (value === dealt) return;
 				dealt = value;
@@ -1077,7 +1140,10 @@ const steps = [
 
 			const tl = gsap.timeline({
 				defaults: { ease: "none" },
-				onUpdate: () => setDealt(tl.progress() === 1),
+				onUpdate: () => {
+					if (!dealt && tl.time() >= landedAt) setDealt(true);
+					else if (dealt && tl.time() < lockBelow) setDealt(false);
+				},
 				scrollTrigger: { trigger: section, start: "top top", end: "bottom bottom", scrub: 0.8, invalidateOnRefresh: true },
 			});
 
@@ -1117,6 +1183,10 @@ const steps = [
 					`${at}+0.5`,
 				);
 			});
+
+			// Départ et arrivée de la dernière carte (sortie du sachet 0.5, vol vers sa place 1)
+			lockBelow = tl.labels.deal + (items.length - 1) * 0.45;
+			landedAt = lockBelow + 1.5;
 
 			// Le sachet vide tombe une fois la dernière carte sortie, puis le bas de section apparaît
 			tl.to(
