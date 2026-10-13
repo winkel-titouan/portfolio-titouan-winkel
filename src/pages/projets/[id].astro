@@ -4,7 +4,7 @@ export const prerender = false;
 import Layout from "../../layouts/Layout.astro";
 import SkewButton from "../../components/SkewButton.astro";
 import ContactCta from "../../components/ContactCta.astro";
-import { supabase, getFileUrl, type Projet } from "../../utils/supabase";
+import { supabase, getFileUrl, withStorageFiles, type Projet } from "../../utils/supabase";
 
 const { id = "" } = Astro.params;
 
@@ -17,7 +17,7 @@ try {
 	]);
 	if (one.error) throw one.error;
 	if (all.error) throw all.error;
-	[project, allProjects] = [one.data, all.data];
+	[project, allProjects] = [await withStorageFiles(one.data), all.data];
 } catch (error) {
 	console.error(`Projet introuvable (${id}) :`, error);
 	return Astro.redirect("/projets");

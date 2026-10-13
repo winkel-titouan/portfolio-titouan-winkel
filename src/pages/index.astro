@@ -6,13 +6,13 @@ import SkewButton from "../components/SkewButton.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import ContactCta from "../components/ContactCta.astro";
 import laptopUrl from "../assets/3d/laptop.glb?url";
-import { supabase, getCoverUrl, type Projet } from "../utils/supabase";
+import { supabase, getCoverUrl, withStorageFiles, type Projet } from "../utils/supabase";
 
 let projets: Projet[] = [];
 try {
 	const { data, error } = await supabase.from("projets").select("*").eq("a_la_une", true).order("created_at");
 	if (error) throw error;
-	projets = data;
+	projets = await Promise.all(data.map(withStorageFiles));
 } catch (error) {
 	console.error("Erreur lors de la récupération des projets:", error);
 }

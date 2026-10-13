@@ -1,6 +1,10 @@
 -- Schéma de référence de la base Supabase du portfolio.
--- Les fichiers (images) sont dans le bucket Storage public "projets", rangés en {id du projet}/{nom du fichier} ;
--- les colonnes d'images ne contiennent que les noms de fichiers.
+-- Les images sont dans le bucket Storage public "projets", rangées par projet :
+--   {id du projet}/visuels/...       visuels finaux (ordre alphabétique, le premier sert de couverture)
+--   {id du projet}/inspirations/...  images du moodboard
+--   {id du projet}/logo/...          logo (le premier fichier du dossier)
+-- Le site lit ces dossiers directement ; les colonnes visuels, inspirations et logo ne servent
+-- que si le dossier correspondant est vide (elles contiennent alors des noms de fichiers).
 
 create table if not exists public.projets (
     id text primary key default substr(md5(random()::text), 1, 15),  -- utilisé dans l'URL /projets/{id}
@@ -39,3 +43,10 @@ create policy "Lecture publique des projets"
     on public.projets for select
     to anon, authenticated
     using (true);
+
+-- Le site liste les dossiers du bucket : la lecture des fichiers du bucket "projets" doit être publique
+drop policy if exists "Lecture publique du bucket projets" on storage.objects;
+create policy "Lecture publique du bucket projets"
+    on storage.objects for select
+    to anon, authenticated
+    using (bucket_id = 'projets');
