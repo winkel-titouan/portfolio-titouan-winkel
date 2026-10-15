@@ -17,7 +17,7 @@ try {
 }
 
 // Visuels de production finale de chaque projet, pour le panneau d'aperçu
-const visualsOf = (projet: Projet) => (projet.visuels ?? []).map((file) => getFileUrl(projet.id, file));
+const visualsOf = (projet: Projet) => (projet.visuels ?? []).map((file) => getFileUrl(projet, file));
 const first = projets[0];
 const firstVisuals = first ? visualsOf(first) : [];
 ---

@@ -38,7 +38,7 @@ const number = String(position + 1).padStart(2, "0");
 const total = String(allProjects.length).padStart(2, "0");
 const year = project.created_at ? new Date(project.created_at).getFullYear() : undefined;
 
-const file = (name: string) => getFileUrl(project.id, name);
+const file = (name: string) => getFileUrl(project, name);
 const finals = (project.visuels ?? []).map(file);
 const inspirations = (project.inspirations ?? []).map(file);
 const logoUrl = project.logo ? file(project.logo) : undefined;

@@ -1,14 +1,16 @@
 -- Schéma de référence de la base Supabase du portfolio.
 -- Les images sont dans le bucket Storage public "projets", rangées par projet :
---   {id du projet}/visuels/...       visuels finaux (ordre alphabétique, le premier sert de couverture)
---   {id du projet}/inspirations/...  images du moodboard
---   {id du projet}/logo/...          logo (le premier fichier du dossier)
+--   {dossier}/visuels/...       visuels finaux (ordre alphabétique, le premier sert de couverture)
+--   {dossier}/inspirations/...  images du moodboard
+--   {dossier}/logo/...          logo (le premier fichier du dossier)
+-- {dossier} est la colonne dossier du projet (ou son id si elle est vide).
 -- Le site lit ces dossiers directement ; les colonnes visuels, inspirations et logo ne servent
 -- que si le dossier correspondant est vide (elles contiennent alors des noms de fichiers).
 
 create table if not exists public.projets (
     id text primary key default substr(md5(random()::text), 1, 15),  -- utilisé dans l'URL /projets/{id}
     nom text not null,
+    dossier text unique,                                -- dossier du projet dans le bucket, ex. cookitup
     couleur text,                                       -- couleur hexadécimale du projet, ex. #6BD5D5
     description text,                                   -- résumé court (cartes, balise meta)
     competences text[] not null default '{}',           -- ids des outils, voir src/data/skills.ts
@@ -20,6 +22,8 @@ create table if not exists public.projets (
     created_at timestamptz not null default now(),      -- sert aussi à l'ordre et à l'année affichée
     updated_at timestamptz not null default now()
 );
+
+alter table public.projets add column if not exists dossier text unique;
 
 -- updated_at se met à jour tout seul à chaque modification
 create or replace function public.set_updated_at() returns trigger

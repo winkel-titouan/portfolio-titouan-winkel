@@ -12,6 +12,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 export interface Projet {
     id: string;
     nom: string;
+    dossier?: string | null;
     couleur: string | null;
     description: string | null;
     competences?: string[];
@@ -24,19 +25,25 @@ export interface Projet {
     updated_at?: string;
 }
 
-/** URL publique d'un fichier du bucket Storage (rangé en {id du projet}/{chemin du fichier}). */
-export function getFileUrl(recordId: string, filename: string, bucket = 'projets') {
+type ProjetDossier = Pick<Projet, 'id' | 'dossier'>;
+
+/** Dossier du projet à la racine du bucket : la colonne dossier, ou l'id du projet si elle est vide. */
+const dossierOf = (projet: ProjetDossier) => projet.dossier || projet.id;
+
+/** URL publique d'un fichier du bucket Storage (rangé en {dossier du projet}/{chemin du fichier}). */
+export function getFileUrl(projet: ProjetDossier, filename: string, bucket = 'projets') {
     const path = filename.split('/').map(encodeURIComponent).join('/');
-    return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${recordId}/${path}`;
+    return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${encodeURIComponent(dossierOf(projet))}/${path}`;
 }
 
 /** Fichiers d'un sous-dossier du projet dans le bucket, triés par nom (chemins relatifs au dossier du projet). */
-async function listFolder(recordId: string, folder: string, bucket = 'projets') {
+async function listFolder(projet: ProjetDossier, folder: string, bucket = 'projets') {
+    const prefix = `${dossierOf(projet)}/${folder}`;
     const { data, error } = await supabase.storage
         .from(bucket)
-        .list(`${recordId}/${folder}`, { limit: 1000, sortBy: { column: 'name', order: 'asc' } });
+        .list(prefix, { limit: 1000, sortBy: { column: 'name', order: 'asc' } });
     if (error) {
-        console.error(`Lecture du dossier ${recordId}/${folder} impossible :`, error);
+        console.error(`Lecture du dossier ${prefix} impossible :`, error);
         return [];
     }
     // Les sous-dossiers (id null) et le fichier fantôme d'un dossier vide sont ignorés
@@ -49,7 +56,7 @@ async function listFolder(recordId: string, folder: string, bucket = 'projets') 
  */
 export async function withStorageFiles<T extends Projet>(projet: T): Promise<T> {
     const [visuels, inspirations, logos] = await Promise.all(
-        ['visuels', 'inspirations', 'logo'].map((folder) => listFolder(projet.id, folder)),
+        ['visuels', 'inspirations', 'logo'].map((folder) => listFolder(projet, folder)),
     );
     return {
         ...projet,
@@ -60,7 +67,7 @@ export async function withStorageFiles<T extends Projet>(projet: T): Promise<T> 
 }
 
 /** Première image de production finale, ou undefined si le projet n'en a pas. */
-export function getCoverUrl(projet: Pick<Projet, 'id' | 'visuels'>) {
+export function getCoverUrl(projet: Pick<Projet, 'id' | 'dossier' | 'visuels'>) {
     const first = projet.visuels?.[0];
-    return first ? getFileUrl(projet.id, first) : undefined;
+    return first ? getFileUrl(projet, first) : undefined;
 }
